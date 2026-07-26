@@ -1,0 +1,44 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/home
+docs: https://developer.bill.com/docs/search-op-with-lists
+description: >-
+  Cross-cutting request/response conventions for the Divvy (BILL Spend &
+  Expense) API, delivered on the BILL v3 API platform. Captures authentication
+  style, pagination, versioning, webhook signing, and rate-limit signaling.
+  Idempotency is not documented as a client-supplied key contract and is
+  therefore not asserted here.
+api_style: REST over HTTPS, JSON requests and responses
+versioning:
+  scheme: uri-path major version
+  current: v3
+  detail: lifecycle/divvy-lifecycle.yml
+authentication:
+  scheme: apiKey headers (no OAuth)
+  spend_expense: apiToken header (Spend & Expense API)
+  bill_v3: devKey + sessionId headers (AP/AR/network)
+  detail: authentication/divvy-authentication.yml
+pagination:
+  style: cursor
+  default_page_size: 20
+  max_page_size: 100
+  params: [max, page]
+  response_fields: [nextPage]
+  direction: forward-only for some list operations (nextPage only; no previous page)
+  docs: https://developer.bill.com/docs/search-op-with-lists
+webhooks:
+  signing: HMAC-SHA256 via x-bill-sha-signature header
+  retries: exponential backoff
+  detail: asyncapi/divvy-spend-expense-webhooks.yml
+rate_limit_signaling:
+  spend_expense: 60 calls per token per minute
+  bill_v3: 20000 requests per developer key per hour; concurrency 3 per organization
+  error_codes: [BDC_1144, BDC_1322]
+  backoff: exponential (2 ^ retry_count)
+  detail: rate-limits/divvy-rate-limits.yml
+error_envelope:
+  format: BILL BDC_ error codes with message
+  detail: errors/divvy-error-codes.yml
+idempotency:
+  supported: false
+  note: No client-supplied idempotency-key contract is documented for the BILL v3 / Spend & Expense API.

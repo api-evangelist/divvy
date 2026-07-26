@@ -1,21 +1,48 @@
 aid: divvy
 name: Divvy
-description: 'Divvy is a company surfaced as a portfolio company of insight-partners and added to the
-  API Evangelist network as a stub for enrichment. Sector: payments. This profile is a lead awaiting the
-  enrichment pipeline.'
+description: >-
+  Divvy is a corporate card and spend-management platform (free software plus
+  business credit cards) that was acquired by BILL and now operates as BILL
+  Spend & Expense; getdivvy.com redirects to bill.com. Its API for budgets,
+  users, virtual cards, transactions, and reimbursements is delivered through
+  the BILL developer platform (developer.bill.com) as part of the BILL v3 API,
+  authenticated with a Spend & Expense API token, with a documented webhook
+  event surface, dated changelog, sandbox environment, and per-token rate
+  limits. This profile was surfaced as an Insight Partners portfolio company and
+  has been enriched from BILL's public developer surface.
 url: https://raw.githubusercontent.com/api-evangelist/divvy/refs/heads/main/apis.yml
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://www.bill.com/product/spend-and-expense
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - insight-partners
+x-parent: bill
+x-status: acquired-by-bill (now BILL Spend & Expense)
 x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-18'
 tags:
 - Company
 - Payments
+- Spend Management
+- Corporate Cards
+- Expense Management
+- Fintech
+- BILL
 apis: []
 maintainers:
 - FN: Kin Lane
@@ -25,3 +52,58 @@ maintainers:
 common:
 - type: Website
   url: https://getdivvy.com/
+- type: DeveloperPortal
+  url: https://developer.bill.com/docs/home
+- type: Documentation
+  url: https://developer.bill.com/docs/spend-expense-api
+- type: APIReference
+  url: https://developer.bill.com/reference
+- type: GettingStarted
+  url: https://developer.bill.com/docs/bill-v3-api-get-started
+- type: Support
+  url: https://help.bill.com/direct/s/
+- type: Blog
+  url: https://www.bill.com/blog
+- type: Pricing
+  url: https://www.bill.com/product/pricing
+- type: SignUp
+  url: https://www.bill.com/signup
+- type: Login
+  url: https://login.us.bill.com/neo/login
+- type: TermsOfService
+  url: https://www.bill.com/legal/spend-expense-terms-of-service
+- type: PrivacyPolicy
+  url: https://www.bill.com/privacy
+- type: Postman
+  url: https://developer.bill.com/docs/bill-v3-api-postman-collection
+- type: ChangeLog
+  url: https://developer.bill.com/changelog
+- type: ChangeLog
+  url: changelog/divvy-changelog.yml
+- type: Authentication
+  url: authentication/divvy-authentication.yml
+- type: RateLimits
+  url: rate-limits/divvy-rate-limits.yml
+- type: Webhooks
+  url: asyncapi/divvy-spend-expense-webhooks.yml
+- type: Conventions
+  url: conventions/divvy-conventions.yml
+- type: ErrorCatalog
+  url: errors/divvy-error-codes.yml
+- type: Lifecycle
+  url: lifecycle/divvy-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/divvy-lifecycle.yml
+- type: Sandbox
+  url: sandbox/divvy-sandbox.yml
+- type: DataModel
+  url: data-model/divvy-data-model.yml
+- type: LLMsTxt
+  url: llms/divvy-llms.txt
+- type: DomainSecurity
+  url: security/divvy-domain-security.yml
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

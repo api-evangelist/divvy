@@ -1,0 +1,24 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/api-rate-limits
+docs: https://developer.bill.com/docs/home
+format: bill-bdc-codes
+description: >-
+  The Divvy (BILL Spend & Expense) / BILL v3 API returns structured BDC_ error
+  codes with a human-readable message. This artifact captures the rate-limiting
+  error registry documented on the BILL developer platform; it is the
+  non-payments error-code sibling of a decline-code catalog and is expected to
+  grow as more of the BILL error reference is harvested.
+envelope:
+  fields: [code, message]
+errors:
+  - code: BDC_1144
+    message: 'Max number of allowed requests per hour reached: 20000.'
+    cause: BILL v3 API hourly rate limit (per developer key) exceeded.
+    remediation: Space requests with exponential backoff; wait until the next hour window.
+    area: rate-limiting
+  - code: BDC_1322
+    message: Max number of concurrent requests per organization reached.
+    cause: More than 3 concurrent BILL v3 API requests per organization.
+    remediation: Reduce request concurrency to at most 3 per organization.
+    area: rate-limiting

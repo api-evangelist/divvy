@@ -1,0 +1,60 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/webhooks
+docs: https://developer.bill.com/docs/webhooks
+spec_type: Webhooks
+description: >-
+  BILL (Divvy / Spend & Expense) publishes a webhook event surface. Subscribers
+  create event subscriptions (up to 10 per organization) against a full events
+  catalog (GET /v3/events/catalog). Notifications are signed with an HMAC-SHA256
+  security key delivered as the x-bill-sha-signature header, and failed
+  deliveries are retried with exponential backoff.
+delivery:
+  transport: HTTP POST to subscriber notificationUrl
+  signing: HMAC-SHA256, header x-bill-sha-signature
+  security_key: One-time securityKey returned on subscription create; rotatable via createNewSecurityKey
+  retries: Exponential backoff on delivery failure
+  subscription_limit: 10 subscriptions per organization
+management_operations:
+  - operationId: geteventcatalog
+    summary: Get the complete list of available events you can subscribe to
+  - operationId: createsubscription
+    summary: Create a new event subscription (multiple events per request)
+  - operationId: getallsubscriptions
+    summary: Get a list of all created subscriptions
+  - operationId: geteventsforsubscription
+    summary: Get event notifications sent for a subscription (retry troubleshooting)
+  - operationId: resendevent
+    summary: Resend an existing event notification
+  - operationId: sendtestevent
+    summary: Generate a test event notification to the subscriber URL
+  - operationId: createnewsecuritykey
+    summary: Rotate the HMAC signing key for a subscription
+event_families:
+  - family: Spend & Expense (Divvy)
+    events:
+      - name: spend.three-ds-challenge.created
+        payload: https://developer.bill.com/docs/spend-expense-3ds-challenge-notification-payload
+        summary: A 3D Secure challenge was triggered for a card transaction
+      - name: Spend & Expense transaction
+        payload: https://developer.bill.com/docs/spend-expense-transaction-notification-payloads
+      - name: Spend & Expense reimbursement
+        payload: https://developer.bill.com/docs/spend-expense-reimbursement-notification-payload
+      - name: Card account
+        payload: https://developer.bill.com/docs/card-account-webhook-notification-payloads
+  - family: BILL AP/AR/network
+    events:
+      - name: Vendor
+        payload: https://developer.bill.com/docs/vendor-webhook-notification-payloads
+      - name: Vendor auto-pay
+        payload: https://developer.bill.com/docs/vendor-autopay-webhook-notification-payloads
+      - name: AP bill
+        payload: https://developer.bill.com/docs/bill-webhook-notification-payloads
+      - name: AP payment
+        payload: https://developer.bill.com/docs/payment-webhook-notification-payloads
+      - name: Bank account
+        payload: https://developer.bill.com/docs/bank-account-webhook-notification-payloads
+      - name: AR invoice
+        payload: https://developer.bill.com/docs/invoice-webhook-notification-payloads
+      - name: Risk verification
+        payload: https://developer.bill.com/docs/risk-verification-webhook-notification-payloads

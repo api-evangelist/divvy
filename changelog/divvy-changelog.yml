@@ -1,0 +1,34 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/changelog
+docs: https://developer.bill.com/changelog
+description: >-
+  Divvy (BILL Spend & Expense) ships through the BILL developer platform, which
+  maintains a dated changelog for the BILL v3 API. This artifact captures the
+  recent window; the live changelog is the source of truth.
+versioning:
+  scheme: uri-path major version (v3)
+  current: v3
+  detail: lifecycle/divvy-lifecycle.yml
+entries:
+  - date: '2026-05-21'
+    title: Vendor bank accounts API improvements
+    url: https://developer.bill.com/changelog/2026-05-21-vendor-bank-accounts-api-improvements
+    breaking: false
+  - date: '2026-05-21'
+    title: New developer tutorial on YouTube
+    url: https://developer.bill.com/changelog/2026-05-21-new-developer-tutorial-on-youtube
+    breaking: false
+  - date: '2026-05-12'
+    title: New v3 API endpoints for BILL export operations
+    url: https://developer.bill.com/changelog/2026-05-12-new-endpoints-export-operations
+    breaking: false
+    additions: true
+  - date: '2026-05-08'
+    title: New interactive BILL v3 API recipes
+    url: https://developer.bill.com/changelog/2026-05-08-interactive-recipes
+    breaking: false
+  - date: '2026-04-30'
+    title: New webhook subscription limits
+    url: https://developer.bill.com/changelog/2026-04-30-webhook-subscription-limits
+    breaking: false

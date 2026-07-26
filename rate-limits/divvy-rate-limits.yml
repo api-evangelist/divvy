@@ -1,0 +1,53 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+generated: '2026-07-18'
+method: searched
+provider: Divvy (BILL Spend & Expense)
+providerId: divvy
+source: https://developer.bill.com/docs/api-rate-limits
+docs: https://developer.bill.com/docs/api-rate-limits
+tags:
+  - Rate Limiting
+  - Payments
+  - Spend Management
+description: >-
+  Divvy is now BILL Spend & Expense, delivered through the BILL API platform.
+  The Spend & Expense API is rate limited per token per minute; the broader BILL
+  v3 API is rate limited per developer key per hour with a per-organization
+  concurrency cap. Exceeding a limit returns a BDC_ error; BILL recommends
+  exponential backoff (2 ^ retry_count).
+headers: {}
+responseCodes:
+  hourlyExceeded: BDC_1144
+  concurrentExceeded: BDC_1322
+limits:
+  - name: Spend & Expense API
+    scope: token
+    metric: requests_per_minute
+    limit: 60
+    limit_count: 60
+    timeFrame: minute
+  - name: BILL v3 API (AP/AR/network)
+    scope: developer_key
+    metric: requests_per_hour
+    limit: 20000
+    limit_count: 20000
+    timeFrame: hour
+  - name: BILL v3 API concurrency
+    scope: developer_key_per_organization
+    metric: concurrent_requests
+    limit: 3
+    limit_count: 3
+    timeFrame: concurrent
+  - name: Login endpoint
+    scope: developer_key
+    metric: requests_per_hour
+    limit: 200
+    limit_count: 200
+    timeFrame: hour
+  - name: Text message endpoints
+    scope: account
+    metric: messages_per_minute
+    limit: 5
+    limit_count: 5
+    timeFrame: minute

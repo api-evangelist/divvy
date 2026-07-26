@@ -1,0 +1,21 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/why-upgrade-v3
+docs: https://developer.bill.com/docs/environmental-differences
+description: >-
+  Lifecycle posture for the Divvy (BILL Spend & Expense) API on the BILL
+  developer platform. BILL runs a major v3 API that supersedes the legacy v2
+  API, and maintains a distinct sandbox environment separate from production.
+versioning:
+  scheme: uri-path major version
+  current: v3
+  previous: v2
+  migration_docs: https://developer.bill.com/docs/why-upgrade-v3
+  docs: https://developer.bill.com/docs/bill-v3-api-get-started
+deprecation:
+  policy_url: https://developer.bill.com/docs/why-upgrade-v3
+  note: BILL v2 API is the prior major version; v3 is the current recommended version.
+environments:
+  sandbox: https://developer.bill.com/docs/api-sandbox-sign-up
+  environment_differences: https://developer.bill.com/docs/environmental-differences
+  detail: sandbox/divvy-sandbox.yml

@@ -1,0 +1,21 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/environmental-differences
+docs: https://developer.bill.com/docs/api-sandbox-sign-up
+description: >-
+  The Divvy (BILL Spend & Expense) API is available in a dedicated BILL sandbox
+  environment that is separate from production, with its own developer sign-up
+  and sign-in. Test values are provisioned inside the sandbox rather than
+  published as fixed magic numbers, so none are reproduced here.
+environments:
+  - name: sandbox
+    separate_from_production: true
+    signup: https://developer.bill.com/docs/api-sandbox-sign-up
+    signin: https://developer.bill.com/docs/api-sandbox-sign-in
+  - name: production
+    docs: https://developer.bill.com/docs/production-bank-account-setup
+differences_docs: https://developer.bill.com/docs/environmental-differences
+notes:
+  - Spend & Expense API testing requires a Spend & Expense API token (apiToken header).
+  - Webhook subscriptions support a sendtestevent operation to deliver test notifications.
+  - Test event notification fields are test-only values that cannot be reused in other operations.

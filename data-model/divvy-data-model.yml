@@ -1,0 +1,46 @@
+generated: '2026-07-18'
+method: searched
+source: https://developer.bill.com/docs/spend-expense-api
+docs: https://developer.bill.com/reference
+description: >-
+  Entity-relationship sketch for the Divvy (BILL Spend & Expense) API core
+  objects, drawn from the BILL Spend & Expense API object reference. No OpenAPI
+  document is published for download, so relationships are captured from the
+  documented resources rather than derived from schema $refs.
+entities:
+  - name: Budget
+    ref: https://developer.bill.com/reference/listbudgets
+    operations: [listbudgets, createbudget, getbudget, updatebudget, deletebudget]
+  - name: User
+    ref: https://developer.bill.com/docs/budgets-and-users
+    operations: [listorganizationusers, listorganizationuserroles]
+  - name: CardAccount
+    ref: https://developer.bill.com/reference/getcardaccount
+    operations: [listpayablecardaccounts, getcardaccount, listcardaccountusers]
+  - name: VirtualCard
+    ref: https://developer.bill.com/docs/virtual-cards
+  - name: Transaction
+    ref: https://developer.bill.com/docs/transaction-management
+  - name: Reimbursement
+    ref: https://developer.bill.com/docs/reimbursements
+relationships:
+  - from: Budget
+    type: has_many
+    to: User
+    via: budget membership
+  - from: CardAccount
+    type: has_many
+    to: User
+    via: card account users
+  - from: Transaction
+    type: belongs_to
+    to: CardAccount
+    via: card
+  - from: Transaction
+    type: belongs_to
+    to: Budget
+    via: budget
+  - from: Reimbursement
+    type: belongs_to
+    to: User
+    via: user
