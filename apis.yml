@@ -53,7 +53,7 @@ tags:
 - Corporate Cards
 - Expense Management
 - Fintech
-- Bill
+- BILL
 tags_raw:
 - Company
 - Payments
@@ -69,6 +69,11 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: ParentCompany
+  url: https://apis.io/providers/bill/
+  name: BILL
+  x-relationship: acquired
+  x-evidence: "Divvy is a corporate card and spend-management platform (free software plus business credit cards) that was acquired by BILL and now operates as BILL Spend & Expense; getdivvy."
 - type: Website
   url: https://getdivvy.com/
 - type: DeveloperPortal
