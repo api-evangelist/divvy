@@ -1,0 +1,30 @@
+# Front Door AI Index — divvy — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: divvy
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: getdivvy.com
+  final_host: www.bill.com
+  ownership: own
+  owner: divvy
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 22
+  host_score: 22
+  density: 5.61
+  words: 3925
+  tiers:
+    agentic: 1
+    core: 21
+    model: 0
+  ambiguous: 11
+  top_terms:
+    AI: 21
+    intelligence: 4
+    smart: 3
+    agent: 2
+    automation: 2
+    AI agent: 1
