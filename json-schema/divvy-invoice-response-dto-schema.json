@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-invoice-response-dto-schema.json",
+  "title": "InvoiceResponseDto",
+  "description": "Invoices response.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/InvoiceResponseDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "BILL-generated ID of the invoice. The value begins with `00e`."
+    },
+    "archived": {
+      "type": "boolean",
+      "description": "Set as `true` if the invoice is archived"
+    },
+    "recordStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceRecordStatus"
+        },
+        {
+          "description": "Invoice record status.\n\nWhen `recordStatus` is `ACTIVE`, `archived` is set as `false`. For any other `recordStatus` value, `archived` is set as `true`."
+        }
+      ]
+    },
+    "invoiceNumber": {
+      "type": "string",
+      "description": "User-generated invoice number. This value can be your chosen number scheme.\n\nIf you do not set this field, `invoiceNumber` is auto-generated."
+    },
+    "invoiceDate": {
+      "type": "string",
+      "description": "Invoice creation date. This value is in the `yyyy-MM-dd` format.\n\nIf you do not set this field, `invoiceDate` is set as the date when the invoice is created.",
+      "format": "date"
+    },
+    "dueDate": {
+      "type": "string",
+      "description": "Invoice due date. The value is in the `yyyy-MM-dd` format.\n\nIf you do not set this field, `dueDate` is set as the date when the invoice is created.",
+      "format": "date"
+    },
+    "paymentTermId": {
+      "type": "string"
+    },
+    "customerId": {
+      "type": "string",
+      "description": "BILL-generated ID of the customer. The value begins with `0cu`."
+    },
+    "customerName": {
+      "type": "string",
+      "description": "Name of the customer the invoice is issued to."
+    },
+    "totalAmount": {
+      "type": "number",
+      "description": "Invoice total amount"
+    },
+    "dueAmount": {
+      "type": "number",
+      "description": "Invoice due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from `totalAmount`."
+    },
+    "scheduledAmount": {
+      "type": "number",
+      "description": "Invoice scheduled amount. The value is set as the customer payment amount that is pending clearance."
+    },
+    "creditAmount": {
+      "type": "number",
+      "description": "Credit amount applied to the invoice.\n\nWhen a credit amount is applied to an invoice, the invoice `status` is set as `PARTIAL_PAYMENT` or `PAID_IN_FULL` depending on the invoice `totalAmount`."
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceStatus"
+        },
+        {
+          "description": "Invoice status."
+        }
+      ]
+    },
+    "exchangeRate": {
+      "type": "number",
+      "description": "Invoice exchange rate"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "BILL-generated ID of the user that created the invoice. The value begins with `006`."
+    },
+    "createdTime": {
+      "type": "string",
+      "description": "Invoice created time",
+      "format": "date-time"
+    },
+    "updatedTime": {
+      "type": "string",
+      "description": "Invoice updated time",
+      "format": "date-time"
+    },
+    "invoiceLineItems": {
+      "type": "array",
+      "description": "Invoice line item information",
+      "items": {
+        "$ref": "#/$defs/InvoiceResponseLineItem"
+      }
+    },
+    "payToChartOfAccountId": {
+      "type": "string",
+      "description": "BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`."
+    },
+    "payments": {
+      "type": "array",
+      "description": "Invoice payments information",
+      "items": {
+        "$ref": "#/$defs/InvoicePayment"
+      }
+    },
+    "classifications": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceClassificationsDto"
+        },
+        {
+          "description": "General ledger classifications information for the invoice"
+        }
+      ]
+    },
+    "salesTaxItemId": {
+      "type": "string",
+      "description": "BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable."
+    },
+    "salesTaxTotal": {
+      "type": "number",
+      "description": "Invoice sales tax amount. The value is set based on `salesTaxItemId`."
+    },
+    "salesTaxPercentage": {
+      "type": "number",
+      "description": "Invoice sales tax percentage. The value is set based on `salesTaxItemId`."
+    },
+    "enableCardPayment": {
+      "type": "boolean",
+      "description": "Set as `true` if the card payment option is enabled for the invoice"
+    },
+    "convenienceFee": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ConvenienceFeeResponseDto"
+        },
+        {
+          "description": "Convenience fee information"
+        }
+      ]
+    },
+    "invoicePdfId": {
+      "type": "string",
+      "description": "BILL-generated ID of the invoice PDF. The value begins with `att`.\n\nThe invoice PDF is sent as an email attachment when you send an invoice to a customer. The invoice PDF also appears when the customer clicks the invoice payment link to complete the invoice payment."
+    }
+  },
+  "$defs": {
+    "ConvenienceFeeResponseDto": {
+      "type": "object",
+      "properties": {
+        "percentage": {
+          "type": "number",
+          "description": "Convenience fee percentage\n"
+        }
+      },
+      "description": "DTO for convenience fee in invoice responses."
+    },
+    "InvoiceClassificationsDto": {
+      "type": "object",
+      "properties": {
+        "accountingClassId": {
+          "type": "string",
+          "description": "BILL-generated ID of the accounting class. The value begins with `cls`."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "BILL-generated ID of the department. The value begins with `0de`."
+        },
+        "jobId": {
+          "type": "string",
+          "description": "BILL-generated ID of the job. The value begins with `job`."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "BILL-generated ID of the location. The value begins with `loc`."
+        }
+      },
+      "description": "DTO for Invoice classifications."
+    },
+    "InvoiceLineItemClassificationsDto": {
+      "type": "object",
+      "properties": {
+        "chartOfAccountId": {
+          "type": "string",
+          "description": "BILL-generated ID of the chart of accounts. The value begins with `0ca`."
+        },
+        "accountingClassId": {
+          "type": "string",
+          "description": "BILL-generated ID of the accounting class. The value begins with `cls`."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "BILL-generated ID of the department. The value begins with `0de`."
+        },
+        "jobId": {
+          "type": "string",
+          "description": "BILL-generated ID of the job. The value begins with `job`."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "BILL-generated ID of the location. The value begins with `loc`."
+        },
+        "itemId": {
+          "type": "string",
+          "description": "BILL-generated ID of the item. The value begins with `0ii`."
+        }
+      },
+      "description": "DTO for Bill Line Item classifications."
+    },
+    "InvoicePayment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the invoice payment. The value begins with `0ip`.\n\nThis ID is generated when a payment is applied to the listed invoice."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Invoice amount paid"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InvoicePaymentStatus"
+            },
+            {
+              "description": "Invoice payment status."
+            }
+          ]
+        },
+        "date": {
+          "type": "string",
+          "description": "Invoice payment date. The value is in the `yyyy-MM-dd` format.",
+          "format": "date"
+        }
+      },
+      "description": "Invoice payments information."
+    },
+    "InvoicePaymentStatus": {
+      "type": "string",
+      "description": "Invoice payment status enum.",
+      "enum": [
+        "PAID",
+        "VOID",
+        "SCHEDULED",
+        "CANCELED",
+        "INITIATED",
+        "UNDEFINED"
+      ]
+    },
+    "InvoiceRecordStatus": {
+      "type": "string",
+      "description": "Record status enum for invoices.",
+      "enum": [
+        "ACTIVE",
+        "INACTIVE",
+        "DRAFT",
+        "UNDEFINED"
+      ]
+    },
+    "InvoiceResponseLineItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the invoice line item. The value begins with `00f`."
+        },
+        "description": {
+          "type": "string",
+          "description": "Invoice line item description"
+        },
+        "price": {
+          "type": "number",
+          "description": "Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Invoice line item unit quantity"
+        },
+        "classifications": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InvoiceLineItemClassificationsDto"
+            },
+            {
+              "description": "General ledger classifications information for the invoice line item"
+            }
+          ]
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Set as true if the invoice line item is taxable"
+        }
+      },
+      "description": "Invoice Response Line Item."
+    },
+    "InvoiceStatus": {
+      "type": "string",
+      "description": "Invoice status enum.",
+      "enum": [
+        "PAID_IN_FULL",
+        "OPEN",
+        "PARTIAL_PAYMENT",
+        "SCHEDULED",
+        "UNDEFINED"
+      ]
+    }
+  }
+}

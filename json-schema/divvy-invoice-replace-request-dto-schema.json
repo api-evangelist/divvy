@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-invoice-replace-request-dto-schema.json",
+  "title": "InvoiceReplaceRequestDto",
+  "description": "Replace an invoice (line item added)",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/InvoiceReplaceRequestDto",
+  "required": [
+    "customer",
+    "invoiceLineItems"
+  ],
+  "type": "object",
+  "properties": {
+    "invoiceNumber": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "User-generated invoice number. This value can be your chosen number scheme.\n\nIf you do not set this field, `invoiceNumber` is auto-generated."
+    },
+    "invoiceDate": {
+      "type": "string",
+      "description": "Invoice creation date. This value is in the `yyyy-MM-dd` format.\n\nIf you do not set this field, `invoiceDate` is set as the date when the invoice is created.",
+      "format": "date"
+    },
+    "dueDate": {
+      "type": "string",
+      "description": "Invoice due date. The value is in the `yyyy-MM-dd` format.\n\nIf you do not set this field, `dueDate` is set as the date when the invoice is created.",
+      "format": "date"
+    },
+    "paymentTermId": {
+      "type": "string"
+    },
+    "customer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceCustomer"
+        },
+        {
+          "description": "Customer contact information.\n* Set the customer `id` for associating an existing customer to the invoice.\n* Set `name` and `email` for creating a new customer with the invoice.\n\nIn the response, a new BILL-generated customer `id` is available."
+        }
+      ]
+    },
+    "invoiceLineItems": {
+      "type": "array",
+      "description": "Invoice line item information",
+      "items": {
+        "$ref": "#/$defs/InvoiceReplaceLineItem"
+      }
+    },
+    "processingOptions": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceProcessingOptions"
+        },
+        {
+          "description": "Invoice processing options"
+        }
+      ]
+    },
+    "payToChartOfAccountId": {
+      "type": "string",
+      "description": "BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`."
+    },
+    "classifications": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoiceClassificationsDto"
+        },
+        {
+          "description": "General ledger classifications information for the invoice"
+        }
+      ]
+    },
+    "creditAmount": {
+      "minimum": 0,
+      "type": "number",
+      "description": "Credit amount applied to the invoice.\n\nBILL applies the credit amount from the total of all the credit memos available for the customer."
+    },
+    "salesTaxItemId": {
+      "type": "string",
+      "description": "BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable.\n\nYou can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`."
+    },
+    "enableCardPayment": {
+      "type": "boolean",
+      "description": "Set as `true` if the card payment option is enabled for the invoice"
+    },
+    "convenienceFee": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ConvenienceFeeRequestDto"
+        },
+        {
+          "description": "Convenience fee information. The customer is charged the convenience fee when they pay the invoice using a card. To set the convenience fee, `enableCardPayment` must be set as `true`."
+        }
+      ]
+    },
+    "invoicePdfId": {
+      "type": "string",
+      "description": "BILL-generated ID of the invoice PDF. The value begins with `att`.\n\nThe invoice PDF is sent as an email attachment when you send an invoice to a customer. The invoice PDF also appears when the customer clicks the invoice payment link to complete the invoice payment.\n\n**Note**: You can get the list of invoice attachments with `GET /v3/attachments/invoices/{invoiceId}`. All the attachments in the list (including the invoice PDF) are sent as email attachments when you send the invoice to the customer."
+    }
+  },
+  "$defs": {
+    "ConvenienceFeeRequestDto": {
+      "type": "object",
+      "properties": {
+        "percentage": {
+          "maximum": 3,
+          "minimum": 0,
+          "type": "number",
+          "description": "Convenience fee percentage"
+        }
+      },
+      "description": "DTO for convenience fee in invoice requests."
+    },
+    "CurrencyCode": {
+      "type": "string",
+      "description": "Enumeration based on the ISO2 country code specification.",
+      "enum": [
+        "AED",
+        "AFN",
+        "ALL",
+        "AMD",
+        "ANG",
+        "AOA",
+        "ARS",
+        "AUD",
+        "AWG",
+        "AZN",
+        "BAM",
+        "BBD",
+        "BDT",
+        "BGN",
+        "BHD",
+        "BIF",
+        "BMD",
+        "BND",
+        "BOB",
+        "BRL",
+        "BSD",
+        "BTN",
+        "BWP",
+        "BYN",
+        "BZD",
+        "CAD",
+        "CDF",
+        "CHF",
+        "CLP",
+        "CNY",
+        "COP",
+        "CRC",
+        "CUC",
+        "CUP",
+        "CVE",
+        "CZK",
+        "DJF",
+        "DKK",
+        "DOP",
+        "DZD",
+        "EGP",
+        "ERN",
+        "ETB",
+        "EUR",
+        "FJD",
+        "FKP",
+        "GBP",
+        "GEL",
+        "GGP",
+        "GHS",
+        "GIP",
+        "GMD",
+        "GNF",
+        "GTQ",
+        "GYD",
+        "HKD",
+        "HNL",
+        "HRK",
+        "HTG",
+        "HUF",
+        "IDR",
+        "ILS",
+        "IMP",
+        "INR",
+        "IQD",
+        "IRR",
+        "ISK",
+        "JEP",
+        "JMD",
+        "JOD",
+        "JPY",
+        "KES",
+        "KGS",
+        "KHR",
+        "KMF",
+        "KPW",
+        "KRW",
+        "KWD",
+        "KYD",
+        "KZT",
+        "LAK",
+        "LBP",
+        "LKR",
+        "LRD",
+        "LSL",
+        "LYD",
+        "MAD",
+        "MDL",
+        "MGA",
+        "MKD",
+        "MMK",
+        "MNT",
+        "MOP",
+        "MRU",
+        "MUR",
+        "MVR",
+        "MWK",
+        "MXN",
+        "MYR",
+        "MZN",
+        "NAD",
+        "NGN",
+        "NIO",
+        "NOK",
+        "NPR",
+        "NZD",
+        "OMR",
+        "PAB",
+        "PEN",
+        "PGK",
+        "PHP",
+        "PKR",
+        "PLN",
+        "PYG",
+        "QAR",
+        "RON",
+        "RSD",
+        "RUB",
+        "RWF",
+        "SAR",
+        "SBD",
+        "SCR",
+        "SDG",
+        "SEK",
+        "SGD",
+        "SHP",
+        "SLE",
+        "SLL",
+        "SOS",
+        "SPL",
+        "SRD",
+        "STN",
+        "SVC",
+        "SYP",
+        "SZL",
+        "THB",
+        "TJS",
+        "TMT",
+        "TND",
+        "TOP",
+        "TRY",
+        "TTD",
+        "TVD",
+        "TWD",
+        "TZS",
+        "UAH",
+        "UGX",
+        "USD",
+        "UYU",
+        "UZS",
+        "VEF",
+        "VND",
+        "VUV",
+        "WST",
+        "XAF",
+        "XCD",
+        "XDR",
+        "XOF",
+        "XPF",
+        "YER",
+        "ZAR",
+        "ZMW",
+        "ZWD"
+      ]
+    },
+    "InvoiceClassificationsDto": {
+      "type": "object",
+      "properties": {
+        "accountingClassId": {
+          "type": "string",
+          "description": "BILL-generated ID of the accounting class. The value begins with `cls`."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "BILL-generated ID of the department. The value begins with `0de`."
+        },
+        "jobId": {
+          "type": "string",
+          "description": "BILL-generated ID of the job. The value begins with `job`."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "BILL-generated ID of the location. The value begins with `loc`."
+        }
+      },
+      "description": "DTO for Invoice classifications."
+    },
+    "InvoiceCustomer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the customer. The value begins with `0cu`."
+        },
+        "name": {
+          "maxLength": 100,
+          "type": "string",
+          "description": "Customer name"
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer email address"
+        },
+        "invoiceCurrency": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/CurrencyCode"
+            },
+            {
+              "description": "Invoice currency. Three-letter abbreviation in the ISO 4217 format.\n\nThis value is required for an international customer. International customers pay invoices in this currency."
+            }
+          ]
+        }
+      },
+      "description": "Customer info for an invoice."
+    },
+    "InvoiceLineItemClassificationsDto": {
+      "type": "object",
+      "properties": {
+        "chartOfAccountId": {
+          "type": "string",
+          "description": "BILL-generated ID of the chart of accounts. The value begins with `0ca`."
+        },
+        "accountingClassId": {
+          "type": "string",
+          "description": "BILL-generated ID of the accounting class. The value begins with `cls`."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "BILL-generated ID of the department. The value begins with `0de`."
+        },
+        "jobId": {
+          "type": "string",
+          "description": "BILL-generated ID of the job. The value begins with `job`."
+        },
+        "locationId": {
+          "type": "string",
+          "description": "BILL-generated ID of the location. The value begins with `loc`."
+        },
+        "itemId": {
+          "type": "string",
+          "description": "BILL-generated ID of the item. The value begins with `0ii`."
+        }
+      },
+      "description": "DTO for Bill Line Item classifications."
+    },
+    "InvoiceProcessingOptions": {
+      "type": "object",
+      "properties": {
+        "sendEmail": {
+          "type": "boolean",
+          "description": "Set as `true` to send an email to the customer"
+        }
+      },
+      "description": "User provided options for sending an email."
+    },
+    "InvoiceReplaceLineItem": {
+      "required": [
+        "quantity"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the invoice line item. The value begins with `00f`."
+        },
+        "description": {
+          "maxLength": 4000,
+          "type": "string",
+          "description": "Invoice line item description"
+        },
+        "price": {
+          "type": "number",
+          "description": "Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Invoice line item unit quantity"
+        },
+        "classifications": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InvoiceLineItemClassificationsDto"
+            },
+            {
+              "description": "General ledger classifications information for the invoice line item"
+            }
+          ]
+        },
+        "taxable": {
+          "type": "boolean",
+          "description": "Set as true if the invoice line item is taxable"
+        }
+      },
+      "description": "Invoice Replace Request Line Item."
+    }
+  }
+}

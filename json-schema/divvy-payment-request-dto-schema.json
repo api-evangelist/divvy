@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-payment-request-dto-schema.json",
+  "title": "PaymentRequestDto",
+  "description": "Create a payment",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentRequestDto",
+  "required": [
+    "amount",
+    "fundingAccount",
+    "processingOptions"
+  ],
+  "type": "object",
+  "properties": {
+    "vendorId": {
+      "type": "string",
+      "description": "BILL-generated ID of the vendor to be paid. The value begins with `009`.\n* If `vendorId` is set, it must match your bill’s vendor ID.\n* If `vendorId` is not set, the bill’s `vendorId` is automatically set."
+    },
+    "billId": {
+      "type": "string",
+      "description": "BILL-generated ID of the bill to be paid. The value begins with `00n`. If `createBill` is `true`, do not set `billId` in your payment request."
+    },
+    "description": {
+      "maxLength": 70,
+      "type": "string",
+      "description": "Bill payment description. This value is included in the check memo or in the bank descriptor for electronic payments."
+    },
+    "processDate": {
+      "type": "string",
+      "description": "Payment process date in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender's funding account.\n\nIf the funding account `type` is set as `WALLET` or `AP_CARD`, `processDate` is required. For other funding account types, if `processDate` is not set, the date is automatically set as the next US business day.\n\n**Note**: When you add a vendor bank account in the production environment, BILL requires 2 business days to complete a one-time verification of the bank account. To pay such a vendor, you must set a `processDate` that is 2 business days from the current date.",
+      "format": "date"
+    },
+    "exchangeRateBatchId": {
+      "type": "integer",
+      "description": "Exchange rate batch ID. This field is required for paying international vendors when the vendor bill currency is not `USD`.\n\nGet the current BILL exchange rate and exchange rate batch ID with `GET /v3/payments/exchange-rate`.\n",
+      "format": "int32"
+    },
+    "fundingAccount": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/FundingAccountRequest"
+        },
+        {
+          "description": "Payment funding information (Bank account, card account, or wallet)"
+        }
+      ]
+    },
+    "amount": {
+      "type": "number",
+      "description": "Payment amount. For a payment in an international currency (not USD), this value is in the local currency.\n\n**Note**: You cannot overpay a bill."
+    },
+    "processingOptions": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ProcessingOptionsRequest"
+        },
+        {
+          "description": "Payment processing options"
+        }
+      ]
+    },
+    "paymentPurpose": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PaymentPurposeRequest"
+        },
+        {
+          "description": "Payment purpose information for compliance with international payment rules of the vendor country. This one-time configuration is required for enabling electronic payments to international vendors.\n\nYou can set `paymentPurpose` at the time of creating a vendor, updating vendor details, or creating a payment. To set `paymentPurpose` at the time of creating a payment, use the information from `GET /v3/vendors/{vendorId}/configuration`.\n\n**Note**: Set `paymentPurpose` only when it is required. Vendor countries, like Japan, do not require any payment purpose information. For such countries, setting `paymentPurpose` in your request results in an error response.\n\nSee [Create an international vendor](https://developer.bill.com/docs/creating-an-international-vendor) for more information on how to set `paymentPurpose`."
+        }
+      ]
+    },
+    "transactionNumber": {
+      "maxLength": 50,
+      "type": "string",
+      "description": "Payment transaction reference used as an external identifier.\n\nYou can set this field as a unique alphanumeric value for your system to track the payment transaction. The value must be 50 characters or fewer. If you do not set `transactionNumber`, BILL sets this field as a unique alphanumeric payment identification value."
+    },
+    "cardFundingPurpose": {
+      "type": "string",
+      "description": "Card funding purpose. This field is required for the `CARD_ACCOUNT` funding account `type` if BILL cannot identify the vendor industry.\n\nSee [Get card funding purpose](https://developer.bill.com/reference/listcardfundingpurposes) for more information."
+    },
+    "vendorCredits": {
+      "type": "array",
+      "description": "Vendor credits applied to the bill payment. To edit the vendor credit amount applied to the bill, set the same vendor credit `id` in your payment request. To apply an additional vendor credit to the bill, set the new vendor credit `id` in your payment request.",
+      "items": {
+        "$ref": "#/$defs/PaymentVendorCreditRequestDto"
+      }
+    }
+  },
+  "$defs": {
+    "CheckDeliveryTypeRequest": {
+      "type": "string",
+      "description": "Enum for Check delivery type.",
+      "enum": [
+        "STANDARD",
+        "UPS_1DAY",
+        "UPS_2DAY",
+        "UPS_3DAY",
+        "RTP_DELIVERY"
+      ]
+    },
+    "FundingAccountRequest": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/FundingAccountTypeRequest"
+            },
+            {
+              "description": "Payment funding type.\n* `BANK_ACCOUNT`: Bank account\n* `CARD_ACCOUNT`: Credit card or debit card\n* `WALLET`: BILL balance\n* `AP_CARD`: AP Card\n\nSee the BILL Help FAQ sections for [BILL balance](https://help.bill.com/direct/s/article/4409933681677) and [AP Card](https://help.bill.com/direct/s/article/000003348) for more information."
+            }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the selected payment funding type. For the `WALLET` type, the `id` is not required."
+        }
+      },
+      "description": "Funding account details in Payments API."
+    },
+    "FundingAccountTypeRequest": {
+      "type": "string",
+      "description": "Funading account type for Payments API.",
+      "enum": [
+        "BANK_ACCOUNT",
+        "CARD_ACCOUNT",
+        "WALLET",
+        "AP_CARD"
+      ]
+    },
+    "PaymentPurposeCodeRequest": {
+      "required": [
+        "name"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      },
+      "description": "Payment purpose code request."
+    },
+    "PaymentPurposeRequest": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "maxLength": 250,
+          "type": "string",
+          "description": "Payment purpose text. This can be any user-defined text. If you set `text`, do not set `code`."
+        },
+        "code": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PaymentPurposeCodeRequest"
+            },
+            {
+              "description": "Payment purpose code. If you set the `code` object, do not set `text`."
+            }
+          ]
+        }
+      },
+      "description": "Payment purpose request."
+    },
+    "PaymentVendorCreditRequestDto": {
+      "required": [
+        "amount",
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string",
+          "description": "BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`."
+        },
+        "amount": {
+          "minimum": 0,
+          "type": "number",
+          "description": "Credit amount"
+        }
+      },
+      "description": "Payment vendor credit request DTO."
+    },
+    "ProcessingOptionsRequest": {
+      "type": "object",
+      "properties": {
+        "requestPayFaster": {
+          "type": "boolean",
+          "description": "Set as `true` to use BILL Pay Faster. This field is required if `requestCheckDeliveryType` is set.\n\n  See [Payments](https://developer.bill.com/docs/ap-payments)   in the Guides section for information about BILL Pay Faster payments."
+        },
+        "createBill": {
+          "type": "boolean",
+          "description": "* Set as `false` to create a vendor payment for an existing bill.\n* Set as `true` to create a bill for a vendor payment. If `createBill` is `true`, do not set `billId` in your payment request."
+        },
+        "requestCheckDeliveryType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/CheckDeliveryTypeRequest"
+            },
+            {
+              "description": "BILL Pay Faster payment delivery type. The `RTP_DELIVERY` option is not available for vendor payments by check."
+            }
+          ]
+        }
+      },
+      "description": "User provided options for processing the payments request."
+    }
+  }
+}

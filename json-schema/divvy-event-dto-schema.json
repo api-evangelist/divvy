@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-event-dto-schema.json",
+  "title": "EventDto",
+  "description": "Event information.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-connect-events-api-openapi.yml#/components/schemas/EventDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "BILL-generated ID of the event"
+    },
+    "type": {
+      "type": "string",
+      "description": "Event type"
+    },
+    "version": {
+      "type": "string",
+      "description": "Event type version"
+    },
+    "subscriptionId": {
+      "type": "string",
+      "description": "BILL-generated ID of the subscription"
+    },
+    "payload": {
+      "type": "string",
+      "description": "Event payload. The payload is JSON escaped and presented as a string."
+    },
+    "createdTime": {
+      "type": "string",
+      "description": "Event created date and time",
+      "format": "date-time"
+    },
+    "statusCode": {
+      "type": "integer",
+      "description": "HTTP status code received from the notification URL",
+      "format": "int32"
+    }
+  }
+}

@@ -1,0 +1,214 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-mcp-candidate.py
+source:
+- openapi/divvy-bill-v3-api-openapi.yml
+- openapi/divvy-connect-events-api-openapi.yml
+status: candidate
+deployment:
+  mode: none
+  auth: unknown
+  verified: derived
+note: No MCP server was found. No probe result in the dossier. Candidate tools below are derived from the 325 operation(s) in the provider's own
+  OpenAPI (40 listed); they describe what a server WOULD expose, not one that exists.
+tools:
+- name: list_customer_attachments
+  operationId: listCustomerAttachments
+  method: GET
+  path: /v3/attachments/customers/{customerId}
+  description: Get list of customer attachments
+- name: get_event_catalog
+  operationId: getEventCatalog
+  method: GET
+  path: /v3/events/catalog
+  description: Get events catalog
+- name: create_customer_attachment
+  operationId: createCustomerAttachment
+  method: POST
+  path: /v3/attachments/customers/{customerId}
+  description: Upload customer attachment
+- name: get_events_for_subscription
+  operationId: getEventsForSubscription
+  method: GET
+  path: /v3/events/subscription/{subscriptionId}
+  description: Get list of event notifications
+- name: list_invoice_attachments
+  operationId: listInvoiceAttachments
+  method: GET
+  path: /v3/attachments/invoices/{invoiceId}
+  description: Get list of invoice attachments
+- name: resend_event
+  operationId: resendEvent
+  method: POST
+  path: /v3/events/subscription/{subscriptionId}/event/{eventId}
+  description: Resend an event
+- name: create_invoice_attachment
+  operationId: createInvoiceAttachment
+  method: POST
+  path: /v3/attachments/invoices/{invoiceId}
+  description: Upload invoice attachment
+- name: get_all_subscriptions
+  operationId: getAllSubscriptions
+  method: GET
+  path: /v3/subscriptions
+  description: Get list of subscriptions
+- name: list_vendor_attachments
+  operationId: listVendorAttachments
+  method: GET
+  path: /v3/attachments/vendors/{vendorId}
+  description: Get list of vendor attachments
+- name: create_subscription
+  operationId: createSubscription
+  method: POST
+  path: /v3/subscriptions
+  description: Create a subscription
+- name: create_vendor_attachment
+  operationId: createVendorAttachment
+  method: POST
+  path: /v3/attachments/vendors/{vendorId}
+  description: Upload vendor attachment
+- name: get_subscription
+  operationId: getSubscription
+  method: GET
+  path: /v3/subscriptions/{subscriptionId}
+  description: Get subscription details
+- name: get_attachment
+  operationId: getAttachment
+  method: GET
+  path: /v3/attachments/{attachmentId}
+  description: Get attachment details
+- name: replace_subscription
+  operationId: replaceSubscription
+  method: PUT
+  path: /v3/subscriptions/{subscriptionId}
+  description: Replace a subscription
+- name: delete_attachment
+  operationId: deleteAttachment
+  method: DELETE
+  path: /v3/attachments/{attachmentId}
+  description: Delete an attachment
+- name: delete_subscription
+  operationId: deleteSubscription
+  method: DELETE
+  path: /v3/subscriptions/{subscriptionId}
+  description: Delete a subscription
+- name: bill_approve_deny_actions
+  operationId: billApproveDenyActions
+  method: POST
+  path: /v3/bill-approvals/actions
+  description: Approve or deny a bill
+- name: update_subscription
+  operationId: updateSubscription
+  method: PATCH
+  path: /v3/subscriptions/{subscriptionId}
+  description: Update a subscription
+- name: list_bill_user_approvals
+  operationId: listBillUserApprovals
+  method: GET
+  path: /v3/bill-approvals/pending-user-approvals
+  description: Get list of bills pending approval
+- name: create_new_security_key
+  operationId: createNewSecurityKey
+  method: POST
+  path: /v3/subscriptions/{subscriptionId}/security_key
+  description: Create a security key
+- name: list_bill_approval_policies
+  operationId: listBillApprovalPolicies
+  method: GET
+  path: /v3/bill-approvals/policies
+  description: Get list of bill approval policies
+- name: send_test_event
+  operationId: sendTestEvent
+  method: POST
+  path: /v3/subscriptions/{subscriptionId}/test
+  description: Generate a test event notification
+- name: create_bill_approval_policy
+  operationId: createBillApprovalPolicy
+  method: POST
+  path: /v3/bill-approvals/policies
+  description: Create a bill approval policy
+- name: update_bill_approval_policy
+  operationId: updateBillApprovalPolicy
+  method: PUT
+  path: /v3/bill-approvals/policies/{policyId}
+  description: Update a bill approval policy
+- name: delete_policy
+  operationId: deletePolicy
+  method: DELETE
+  path: /v3/bill-approvals/policies/{policyId}
+  description: Delete a bill approval policy
+- name: list_bills
+  operationId: listBills
+  method: GET
+  path: /v3/bills
+  description: Get list of bills
+- name: create_bill
+  operationId: createBill
+  method: POST
+  path: /v3/bills
+  description: Create a bill
+- name: create_bulk_bills
+  operationId: createBulkBills
+  method: POST
+  path: /v3/bills/bulk
+  description: Create multiple bills
+- name: record_payment
+  operationId: recordPayment
+  method: POST
+  path: /v3/bills/record-payment
+  description: Record AP payment
+- name: get_bill
+  operationId: getBill
+  method: GET
+  path: /v3/bills/{billId}
+  description: Get bill details
+- name: replace_bill
+  operationId: replaceBill
+  method: PUT
+  path: /v3/bills/{billId}
+  description: Replace a bill
+- name: update_bill
+  operationId: updateBill
+  method: PATCH
+  path: /v3/bills/{billId}
+  description: Update a bill
+- name: archive_bill
+  operationId: archiveBill
+  method: POST
+  path: /v3/bills/{billId}/archive
+  description: Archive a bill
+- name: restore_bill
+  operationId: restoreBill
+  method: POST
+  path: /v3/bills/{billId}/restore
+  description: Restore an archived bill
+- name: list_classification_accounting_classes
+  operationId: listClassificationAccountingClasses
+  method: GET
+  path: /v3/classifications/accounting-classes
+  description: Get list of accounting classes
+- name: create_classification_accounting_class
+  operationId: createClassificationAccountingClass
+  method: POST
+  path: /v3/classifications/accounting-classes
+  description: Create an accounting class
+- name: bulk_create_classification_accounting_class
+  operationId: bulkCreateClassificationAccountingClass
+  method: POST
+  path: /v3/classifications/accounting-classes/bulk
+  description: Create multiple accounting classes
+- name: bulk_update_classification_accounting_class
+  operationId: bulkUpdateClassificationAccountingClass
+  method: PATCH
+  path: /v3/classifications/accounting-classes/bulk
+  description: Update multiple accounting classes
+- name: bulk_archive_classification_accounting_class
+  operationId: bulkArchiveClassificationAccountingClass
+  method: POST
+  path: /v3/classifications/accounting-classes/bulk/archive
+  description: Archive multiple accounting classes
+- name: bulk_restore_classification_accounting_class
+  operationId: bulkRestoreClassificationAccountingClass
+  method: POST
+  path: /v3/classifications/accounting-classes/bulk/restore
+  description: Restore multiple accounting classes

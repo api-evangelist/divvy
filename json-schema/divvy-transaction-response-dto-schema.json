@@ -1,0 +1,669 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-transaction-response-dto-schema.json",
+  "title": "TransactionResponseDto",
+  "description": "Transactions response.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/TransactionResponseDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "BILL-generated ID of the transaction",
+      "deprecated": true
+    },
+    "uuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the transaction"
+    },
+    "childTransactionIds": {
+      "type": "array",
+      "description": "BILL-generated IDs of child transactions associated with the current transaction",
+      "deprecated": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "childTransactionUuids": {
+      "type": "array",
+      "description": "BILL-generated IDs of child transactions associated with the current transaction",
+      "items": {
+        "type": "string"
+      }
+    },
+    "isLocked": {
+      "type": "boolean",
+      "description": "Set as `true` if the transaction is locked"
+    },
+    "isReconciled": {
+      "type": "boolean",
+      "description": "Set as `true` if the transaction is reconciled"
+    },
+    "transactionType": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/TransactionType"
+        },
+        {
+          "description": "Transaction type."
+        }
+      ]
+    },
+    "parentTransactionId": {
+      "type": "string",
+      "description": "BILL-generated ID of the parent transaction. This field is set on child transactions when a parent transaction is split.",
+      "deprecated": true
+    },
+    "userId": {
+      "type": "string",
+      "description": "BILL-generated ID of the user who created the transaction",
+      "deprecated": true
+    },
+    "userUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the user who created the transaction"
+    },
+    "userName": {
+      "type": "string",
+      "description": "Display name of the user who created the transaction"
+    },
+    "rawMerchantName": {
+      "type": "string",
+      "description": "Raw merchant name for the transaction"
+    },
+    "merchantName": {
+      "type": "string",
+      "description": "Readable (cleaned) merchant name for the transaction"
+    },
+    "budgetId": {
+      "type": "string",
+      "description": "BILL-generated ID of the budget linked with the transaction",
+      "deprecated": true
+    },
+    "budgetUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the budget linked with the transaction"
+    },
+    "budgetName": {
+      "type": "string",
+      "description": "Name of the budget linked with the transaction"
+    },
+    "parentBudgetUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the parent budget linked with the transaction"
+    },
+    "originalAuthTransactionId": {
+      "type": "string",
+      "description": "BILL-generated ID of the originating authorization transaction",
+      "deprecated": true
+    },
+    "originalAuthTransactionUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the originating authorization transaction.\n\nAfter a transaction is authorized, it is set as cleared when it is complete. The `originalAuthTransactionUuid` ties the cleared transaction to the authorized transaction. The value is `null` when the transaction is not authorized."
+    },
+    "isCredit": {
+      "type": "boolean",
+      "description": "Set as `true` if the transaction is a credit"
+    },
+    "currencyData": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/CurrencyData"
+        },
+        {
+          "description": "Transaction currency information"
+        }
+      ]
+    },
+    "receiptRequired": {
+      "type": "boolean",
+      "description": "Set as `true` if a receipt is required to complete the transaction"
+    },
+    "reviewRequired": {
+      "type": "boolean",
+      "description": "Set as `true` if a review is required to complete the transaction"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/TransactionStatusTagType"
+        },
+        {
+          "description": "Transaction status"
+        }
+      ]
+    },
+    "occurredTime": {
+      "type": "string",
+      "description": "Created date and time",
+      "format": "date-time"
+    },
+    "updatedTime": {
+      "type": "string",
+      "description": "Updated date and time",
+      "format": "date-time"
+    },
+    "authorizedTime": {
+      "type": "string",
+      "description": "Transaction authorized date and time",
+      "format": "date-time"
+    },
+    "complete": {
+      "type": "boolean",
+      "description": "Set as `true` if the transaction has all the required fields completed"
+    },
+    "pointsAwarded": {
+      "type": "integer",
+      "description": "Points awarded for the transaction. This value is `0` until the transaction is cleared.\n\n**Note**: Only `ADMIN` users can view any awarded points.",
+      "format": "int64"
+    },
+    "customFields": {
+      "type": "array",
+      "description": "Transaction custom fields information",
+      "items": {
+        "$ref": "#/$defs/CustomFieldDto"
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "description": "List of receipts attached to the transaction",
+      "items": {
+        "$ref": "#/$defs/ReceiptImage"
+      }
+    },
+    "network": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ProgramNetworkType"
+        },
+        {
+          "description": "Transaction network type."
+        }
+      ]
+    },
+    "isParent": {
+      "type": "boolean",
+      "description": "Set as `true` if the transaction is the parent of another transaction"
+    },
+    "reviews": {
+      "type": "array",
+      "description": "Transaction review information",
+      "items": {
+        "$ref": "#/$defs/Review"
+      }
+    },
+    "amount": {
+      "type": "number",
+      "description": "Transaction amount including fees.\n\nWhen `amount` is negative, the transaction is a reversal or refund.\n* **Reversal**: For a reversal (cancel before funds are settled), `transactionType` is set as `AUTHORIZATION` and `amount` is a negative value.\n* **Refund**: For a refund (cancel after funds are settled), `transactionType` is set as `CLEAR` and `amount` is a negative value."
+    },
+    "transactedAmount": {
+      "type": "number",
+      "description": "Transaction amount not including fees"
+    },
+    "fees": {
+      "type": "number",
+      "description": "Sum of transaction fees (including `foreignExchangeFee`)"
+    },
+    "foreignExchangeFee": {
+      "type": "number",
+      "description": "Foreign exchange fee for the transaction (if any)"
+    },
+    "receiptStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ReceiptStatusType"
+        },
+        {
+          "description": "Receipt status."
+        }
+      ]
+    },
+    "matchedClearTransactionId": {
+      "type": "string",
+      "description": "BILL-generated ID of the cleared transaction. Use this ID to identify the transaction after it is cleared.",
+      "deprecated": true
+    },
+    "matchedClearTransactionUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the cleared transaction. Use this ID to identify the transaction after it is cleared."
+    },
+    "accountingIntegrationTransactions": {
+      "type": "array",
+      "description": "Accounting system integration information",
+      "items": {
+        "$ref": "#/$defs/AccountingIntegrationTransaction"
+      }
+    },
+    "reviewers": {
+      "type": "array",
+      "description": "Transaction reviewers information",
+      "items": {
+        "$ref": "#/$defs/Reviewer"
+      }
+    },
+    "cardId": {
+      "type": "string",
+      "description": "BILL-generated ID of the card used to make the transaction",
+      "deprecated": true
+    },
+    "cardUuid": {
+      "type": "string",
+      "description": "BILL-generated UUID of the card used to make the transaction"
+    },
+    "cardLastFour": {
+      "type": "string",
+      "description": "Last four digits of the card number used to make the transaction"
+    },
+    "cardType": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/CardType"
+        },
+        {
+          "description": "Type of the card used to make the transaction"
+        }
+      ]
+    },
+    "receiptSyncStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ReceiptSyncStatusType"
+        },
+        {
+          "description": "Transaction receipt sync status."
+        }
+      ]
+    },
+    "merchantCategoryCode": {
+      "type": "string",
+      "description": "Merchant category code"
+    },
+    "declineReason": {
+      "type": "string",
+      "description": "Human-readable transaction decline reason. This field is available when `transactionType` is set as `DECLINE`."
+    },
+    "declineInternalReasonCode": {
+      "type": "string",
+      "description": "Transaction decline reason code. This field is available when `transactionType` is set as `DECLINE`."
+    },
+    "cardPresent": {
+      "type": "boolean",
+      "description": "Set as `true` if a physical card was present for the transaction"
+    },
+    "merchantLocation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/TxMerchantLocationDto"
+        },
+        {
+          "description": "Merchant location information for the transaction. This information is available when `cardPresent` is set as `true`."
+        }
+      ]
+    },
+    "disputeStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/DisputeStatusType"
+        },
+        {
+          "description": "Dispute status for the transaction. This information is available when the transaction has been disputed."
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "AccountingIntegrationTransaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the transaction in your accounting system"
+        },
+        "billable": {
+          "type": "boolean",
+          "description": "Set as `true` if the transaction can be billed to a client or customer"
+        },
+        "integrationTxId": {
+          "type": "string",
+          "description": "Unique transaction ID in your accounting system"
+        },
+        "syncStatus": {
+          "type": "string",
+          "description": "Current sync status of the transaction with your accounting system"
+        },
+        "syncMessage": {
+          "type": "string",
+          "description": "Message describing the result of the previous sync attempt"
+        },
+        "integrationType": {
+          "type": "string",
+          "description": "Accounting system integration type"
+        },
+        "integrationId": {
+          "type": "string",
+          "description": "BILL-generated ID of the accounting system integration"
+        },
+        "syncRequestId": {
+          "type": "string",
+          "description": "Unique ID of the sync request that processed the transaction"
+        }
+      },
+      "description": "Spend \\& Expense accounting integration transaction information."
+    },
+    "ApproverType": {
+      "type": "string",
+      "description": "Spend \\& Expense transactions approver type.",
+      "enum": [
+        "ADMIN",
+        "MANAGER",
+        "NEXT_MANAGER",
+        "BUDGET_OWNER",
+        "BOOKKEEPER",
+        "SPECIFIC_PERSON"
+      ]
+    },
+    "CardType": {
+      "type": "string",
+      "description": "CardType.",
+      "enum": [
+        "PHYSICAL",
+        "VIRTUAL_MEMBER",
+        "VIRTUAL_VENDOR",
+        "VIRTUAL"
+      ]
+    },
+    "CurrencyData": {
+      "type": "object",
+      "properties": {
+        "exchangeRate": {
+          "type": "number",
+          "description": "Exchange rate for currency conversion"
+        },
+        "exponent": {
+          "type": "integer",
+          "description": "Number of decimal places in the currency format",
+          "format": "int64"
+        },
+        "originalCurrencyAmount": {
+          "type": "string",
+          "description": "Transaction amount in the original currency before conversion"
+        },
+        "originalCurrencyCode": {
+          "type": "string",
+          "description": "Three-letter ISO currency code of the original currency"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Currency symbol for display purposes (e.g. $, €, £)"
+        }
+      },
+      "description": "CurrencyData class for Spend \\& Expense Transactions."
+    },
+    "CustomFieldDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the custom field",
+          "deprecated": true
+        },
+        "uuid": {
+          "type": "string",
+          "description": "BILL-generated UUID of the custom field"
+        },
+        "name": {
+          "type": "string",
+          "description": "Custom field name"
+        },
+        "note": {
+          "type": "string",
+          "description": "Custom field note"
+        },
+        "isRequired": {
+          "type": "boolean",
+          "description": "Set as `true` if the custom field is required"
+        },
+        "selectedValues": {
+          "type": "array",
+          "description": "List of selected values for this custom field.\n\n**NOTE**: In the response, you get up to 20 selected values for a custom field. Use `GET /v3/spend/custom-fields/{customFieldId}/values` to get the complete list of selected values.",
+          "items": {
+            "$ref": "#/$defs/CustomFieldValueDto"
+          }
+        }
+      },
+      "description": "Transaction custom field response."
+    },
+    "CustomFieldValueDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the custom field value",
+          "deprecated": true
+        },
+        "uuid": {
+          "type": "string",
+          "description": "BILL-generated UUID of the custom field value"
+        },
+        "value": {
+          "type": "string",
+          "description": "Custom field value"
+        }
+      },
+      "description": "Custom field value DTO object representing the custom field value return on Custom fields for transactions and reimbursements."
+    },
+    "DisputeStatusType": {
+      "type": "string",
+      "description": "Dispute status enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "SUBMITTED",
+        "IN_PROGRESS",
+        "CLOSED_WON",
+        "CLOSED_LOST"
+      ]
+    },
+    "ProgramNetworkType": {
+      "type": "string",
+      "description": "ProgramNetworkType enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "VISA",
+        "MASTERCARD"
+      ]
+    },
+    "ReceiptImage": {
+      "required": [
+        "filename",
+        "url",
+        "uuid"
+      ],
+      "type": "object",
+      "properties": {
+        "url": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Uploaded receipt URL"
+        },
+        "filename": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Receipt file name"
+        },
+        "uuid": {
+          "minLength": 1,
+          "type": "string",
+          "description": "BILL-generated UUID for the receipt image"
+        }
+      },
+      "description": "DTO representing an image from the Spend API."
+    },
+    "ReceiptStatusType": {
+      "type": "string",
+      "description": "ReceiptStatusType enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "VALIDATED",
+        "NOT_VALIDATED",
+        "ATTACHED",
+        "MISSING",
+        "NOT_REQUIRED",
+        "NOT_ATTACHED"
+      ]
+    },
+    "ReceiptSyncStatusType": {
+      "type": "string",
+      "description": "ReceiptSyncStatusType enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "NOT_SYNCED",
+        "SYNCED",
+        "SYNC_ERROR",
+        "NO_ATTACHMENTS"
+      ]
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the review"
+        },
+        "isApproved": {
+          "type": "boolean",
+          "description": "Set as `true` if the transaction was approved"
+        },
+        "note": {
+          "type": "string",
+          "description": "Review note"
+        },
+        "createdTime": {
+          "type": "string",
+          "description": "Review created date and time",
+          "format": "date-time"
+        },
+        "deletedTime": {
+          "type": "string",
+          "description": "Review deleted date and time (if available)",
+          "format": "date-time"
+        },
+        "reviewerId": {
+          "type": "string",
+          "description": "BILL-generated ID of the user who reviewed the transaction",
+          "deprecated": true
+        },
+        "reviewerUuid": {
+          "type": "string",
+          "description": "BILL-generated UUID of the user who reviewed the transaction"
+        }
+      },
+      "description": "Review class for Spend \\& Expense Transactions."
+    },
+    "Reviewer": {
+      "type": "object",
+      "properties": {
+        "approverType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApproverType"
+            },
+            {
+              "description": "Approver type."
+            }
+          ]
+        },
+        "reviewedTime": {
+          "type": "string",
+          "description": "Transaction review date and time",
+          "format": "date-time"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TransactionReviewerStatusType"
+            },
+            {
+              "description": "Review status."
+            }
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "description": "BILL-generated ID of the user assigned to review the transaction",
+          "deprecated": true
+        },
+        "userUuid": {
+          "type": "string",
+          "description": "BILL-generated UUID of the user assigned to review the transaction"
+        },
+        "userName": {
+          "type": "string",
+          "description": "Display name of the user assigned to review the transaction"
+        }
+      },
+      "description": "Spend \\& Expense transactions reviewer information."
+    },
+    "TransactionReviewerStatusType": {
+      "type": "string",
+      "description": "Spend \\& Expense transactions reviewer status type.",
+      "enum": [
+        "WAITING",
+        "APPROVED",
+        "DENIED"
+      ]
+    },
+    "TransactionStatusTagType": {
+      "type": "string",
+      "description": "StatusTag enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "APPROVED",
+        "COMPLETE",
+        "DECLINED",
+        "DENIED",
+        "DISPUTE_LOST",
+        "DISPUTE_UPDATE",
+        "DISPUTE_WON",
+        "DISPUTED",
+        "DO_NOT_SYNC",
+        "INCOMPLETE",
+        "NONE",
+        "PENDING",
+        "PTR_INCOMPLETE",
+        "PTR_NEEDS_YOUR_APPROVAL",
+        "PTR_PENDING_APPROVAL",
+        "PTR_UPCOMING_APPROVAL",
+        "REVIEWED"
+      ]
+    },
+    "TransactionType": {
+      "type": "string",
+      "description": "TransactionType.",
+      "enum": [
+        "CLEAR",
+        "DECLINE",
+        "AUTHORIZATION",
+        "OTHER"
+      ]
+    },
+    "TxMerchantLocationDto": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "Merchant city"
+        },
+        "state": {
+          "type": "string",
+          "description": "Merchant state or region"
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Merchant zip or postal code"
+        },
+        "country": {
+          "type": "string",
+          "description": "Merchant country"
+        }
+      },
+      "description": "Transaction merchant address info."
+    }
+  }
+}

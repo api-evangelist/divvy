@@ -1,0 +1,414 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/divvy-bill-v3-api-openapi.yml
+- openapi/divvy-connect-events-api-openapi.yml
+vocabulary:
+  name: Divvy Domain Vocabulary
+  description: 'Terms declared by Divvy''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: BdcError
+    definition: 'Object declared by the contract with fields: timestamp, code, severity, category, message, params, detail, help.'
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BdcError
+  - term: Category
+    definition: 'Enumeration declared by the contract with values: REQUEST, APPLICATION, SERVER, DOWNSTREAM.'
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/Category
+  - term: LoginRequestDto
+    definition: API login
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/LoginRequestDto
+  - term: LoginResponseDto
+    definition: Login response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/LoginResponseDto
+  - term: Param
+    definition: 'Object declared by the contract with fields: additional, name, value.'
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/Param
+  - term: Severity
+    definition: 'Enumeration declared by the contract with values: ERROR, WARNING, INFORMATION.'
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/Severity
+  - term: MfaStatus
+    definition: 'Enumeration declared by the contract with values: DISABLED, SETUP, CHALLENGE, COMPLETE, UNDEFINED.'
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaStatus
+  - term: SessionInfoResponseDto
+    definition: Login session info.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/SessionInfoResponseDto
+  - term: AllOrganizationsResponseDto
+    definition: Get list of organizations response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/AllOrganizationsResponseDto
+  - term: ConsoleOrganization
+    definition: Console organization response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ConsoleOrganization
+  - term: ListAllOrganizationsResponseDto
+    definition: Get list of organizations response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListAllOrganizationsResponseDto
+  - term: ListAllResponseDto_AllOrganizationsResponseDto_
+    definition: Response from a list API request with paging references.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListAllResponseDto_AllOrganizationsResponseDto_
+  - term: OrganizationDto
+    definition: Organization response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/OrganizationDto
+  - term: HealthCheckDto
+    definition: App health response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/HealthCheckDto
+  - term: MfaChallengeRequestDto
+    definition: Generate MFA challenge
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaChallengeRequestDto
+  - term: MfaChallengeResponseDto
+    definition: Response for MFA challenge.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaChallengeResponseDto
+  - term: MfaChallengeValidateRequestDto
+    definition: Validate MFA challenge
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaChallengeValidateRequestDto
+  - term: MfaChallengeValidateResponseDto
+    definition: Response for MFA challenge validation.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaChallengeValidateResponseDto
+  - term: ListMfaPhoneResponseDto
+    definition: List type for MFA Phones list.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListMfaPhoneResponseDto
+  - term: MfaPhoneResponseDto
+    definition: MFA Phone.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaPhoneResponseDto
+  - term: MfaPhoneType
+    definition: Response for MFA Phone Type.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaPhoneType
+  - term: MfaSetupRequestDto
+    definition: Add phone for MFA setup
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaSetupRequestDto
+  - term: MfaSetupResponseDto
+    definition: MFA Setup response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaSetupResponseDto
+  - term: MfaSetupType
+    definition: Enum for different ways to do mfa setup.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaSetupType
+  - term: MfaSetupValidateRequestDto
+    definition: Validate MFA setup
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaSetupValidateRequestDto
+  - term: ResponseStatus
+    definition: Status of the response.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ResponseStatus
+  - term: StatusDto
+    definition: The type Delete response dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/StatusDto
+  - term: MfaStepUpRequestDto
+    definition: Step-up request for MFA
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaStepUpRequestDto
+  - term: MfaStepUpResponseDto
+    definition: Step-up response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/MfaStepUpResponseDto
+  - term: BillApproveDenyAction
+    definition: Bill approval and denial actions.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApproveDenyAction
+  - term: BillApproveDenyActionRequestDto
+    definition: Bill approve/deny action request
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApproveDenyActionRequestDto
+  - term: BillUserApprovalsResponseDto
+    definition: Bill User Approvals Response Dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillUserApprovalsResponseDto
+  - term: ListBillUserApprovalsResponseDto
+    definition: List Bill User Approvals Response Dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListBillUserApprovalsResponseDto
+  - term: ApproverGroupDto
+    definition: Groups containing users.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ApproverGroupDto
+  - term: ApproverUserDto
+    definition: User Approvers for a bill approval policy.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ApproverUserDto
+  - term: BillApprovalPolicyResponseDto
+    definition: Response DTO for bill approval policy.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalPolicyResponseDto
+  - term: BillApprovalPolicyRuleResponseDto
+    definition: Rules for a bill approval policy.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalPolicyRuleResponseDto
+  - term: BillApprovalRuleOperatorResponse
+    definition: Response enum of operators supported for bill policy approval rules.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalRuleOperatorResponse
+  - term: BillApproversDto
+    definition: Approvers for a bill approval policy.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApproversDto
+  - term: GroupUsers
+    definition: Users that are part of an approval group.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/GroupUsers
+  - term: RuleKeyResponse
+    definition: Response enum of allowed keys for bill policy approval.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RuleKeyResponse
+  - term: RuleValueDto
+    definition: Rule value DTO.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RuleValueDto
+  - term: BillApprovalPolicyCreateRuleDto
+    definition: Rules for a bill approval policy.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalPolicyCreateRuleDto
+  - term: BillApprovalPolicyRequestDto
+    definition: Create a bill approval policy
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalPolicyRequestDto
+  - term: RuleKeyCreateDto
+    definition: Keys for approval rules.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RuleKeyCreateDto
+  - term: RuleOperatorCreateDto
+    definition: Operators for approval rules.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RuleOperatorCreateDto
+  - term: BillApprovalStatusResponse
+    definition: Approval status of a bill response.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillApprovalStatusResponse
+  - term: BillClassificationsDto
+    definition: DTO for Bill classifications.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillClassificationsDto
+  - term: BillLineItemClassificationsDto
+    definition: DTO for Bill Line Item classifications.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillLineItemClassificationsDto
+  - term: BillPaymentStatusDto
+    definition: Payment Status of a bill.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillPaymentStatusDto
+  - term: BillReadWithoutApproversResponseDto
+    definition: Bills read response without approvers.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillReadWithoutApproversResponseDto
+  - term: BillRecordStatus
+    definition: Record status enum for bills.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillRecordStatus
+  - term: BillResponseLineItem
+    definition: Line items that define a bill's overall amount.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillResponseLineItem
+  - term: Invoice
+    definition: Invoice linked to a bill.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/Invoice
+  - term: ListBillResponseDto
+    definition: Response from a list API request with paging references.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListBillResponseDto
+  - term: ListResponseDto_BillReadWithoutApproversResponseDto_
+    definition: Response from a list API request with paging references.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ListResponseDto_BillReadWithoutApproversResponseDto_
+  - term: ApproverDto
+    definition: Approver DTO.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ApproverDto
+  - term: ApproverStatusDto
+    definition: Approver status DTO.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/ApproverStatusDto
+  - term: BillCreateLineItemDto
+    definition: Line items that define a bill's overall amount.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillCreateLineItemDto
+  - term: BillCreateRequestDto
+    definition: Create a bill
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillCreateRequestDto
+  - term: BillResponseDto
+    definition: Bills response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillResponseDto
+  - term: BillVendorCreditRequestItemDto
+    definition: API level DTO for apply vendor credit to bill request item.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillVendorCreditRequestItemDto
+  - term: BillWithoutApproversResponseDto
+    definition: Bills response without approvers.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillWithoutApproversResponseDto
+  - term: BillPaymentDto
+    definition: A single payment applied to a bill.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillPaymentDto
+  - term: BillReadResponseDto
+    definition: Bills read response.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillReadResponseDto
+  - term: DisbursementStatus
+    definition: The enum type for disbursement status.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/DisbursementStatus
+  - term: DisbursementType
+    definition: Enum for Disbursement type.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/DisbursementType
+  - term: PaymentClassificationsDto
+    definition: Payment classifications dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentClassificationsDto
+  - term: PaymentSingleStatus
+    definition: 'Enumeration declared by the contract with values: DISBURSEMENT_FAILED_ACTION_NEEDED, DISBURSEMENT_FAILED_VENDOR_BANK_REJECTED,
+      FUNDING_FAILED_ACTION_NEEDED, EXPIRING, FUNDS_ESCHEATED, CANCELED, FUNDING_FAILED_VOIDED, VOIDED, CLEARED, DELIVERED, DISBURSEMENT_ON_HOLD,
+      VOID_PENDING. (12 more)'
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentSingleStatus
+  - term: PaymentStatus
+    definition: The enum Payment status dto.
+    tags:
+    - Enumeration
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentStatus
+  - term: PaymentVendorCreditRequestDto
+    definition: Payment vendor credit request DTO.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentVendorCreditRequestDto
+  - term: PaymentVendorCreditResponseDto
+    definition: Payment vendor credit response DTO.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentVendorCreditResponseDto
+  - term: RecordBillPayRequestDto
+    definition: Record bill pay request dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RecordBillPayRequestDto
+  - term: RecordBillPayResponseDto
+    definition: Record bill pay response dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RecordBillPayResponseDto
+  - term: RecordPaymentRequestDto
+    definition: Record AP payment
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RecordPaymentRequestDto
+  - term: RecordPaymentResponseDto
+    definition: Record offline payment response dto.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/RecordPaymentResponseDto
+  - term: BillReplaceLineItemDto
+    definition: Line items that define a bill's overall amount.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillReplaceLineItemDto
+  - term: BillReplaceRequestDto
+    definition: Replace a bill (line item added)
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillReplaceRequestDto
+  - term: BillUpdateInvoiceRequestDto
+    definition: Invoice linked to a bill.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillUpdateInvoiceRequestDto
+  - term: BillUpdateLineItemDto
+    definition: Line items that define a bill's overall amount.
+    tags:
+    - Object
+    source: openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/BillUpdateLineItemDto

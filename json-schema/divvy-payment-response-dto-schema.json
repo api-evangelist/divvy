@@ -1,0 +1,683 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-payment-response-dto-schema.json",
+  "title": "PaymentResponseDto",
+  "description": "Payments response.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-bill-v3-api-openapi.yml#/components/schemas/PaymentResponseDto",
+  "required": [
+    "amount"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "BILL-generated ID of the payment. The value begins with `stp`."
+    },
+    "vendorId": {
+      "type": "string",
+      "description": "BILL-generated ID of the vendor to be paid. The value begins with `009`."
+    },
+    "vendorName": {
+      "type": "string",
+      "description": "Vendor name"
+    },
+    "billId": {
+      "type": "string",
+      "description": "BILL-generated ID of the bill to be paid. The value begins with `00n`."
+    },
+    "billPayments": {
+      "type": "array",
+      "description": "List of bill payments. When a payment is applied to a bill, the bill payment is identified by a bill payment `id`. The value begins with `blp`.",
+      "items": {
+        "$ref": "#/$defs/BillPayment"
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Bill payment description. This value is included in the check memo or in the bank descriptor for electronic payments."
+    },
+    "processDate": {
+      "type": "string",
+      "description": "Payment process date in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender's funding account.",
+      "format": "date"
+    },
+    "fundingAccount": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/FundingAccountResponse"
+        },
+        {
+          "description": "Payment funding information"
+        }
+      ]
+    },
+    "amount": {
+      "type": "number",
+      "description": "Payment amount. For a payment in an international currency (not USD), this value is in the local currency."
+    },
+    "processingOptions": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ProcessingOptionsResponse"
+        },
+        {
+          "description": "Payment processing options"
+        }
+      ]
+    },
+    "transactionNumber": {
+      "type": "string",
+      "description": "Payment transaction reference used as an external identifier.\n\nYou can set this field as a unique alphanumeric value for your system to track the payment transaction. The value must be 50 characters or fewer. If you do not set `transactionNumber`, BILL sets this field as a unique alphanumeric payment identification value."
+    },
+    "confirmationNumber": {
+      "type": "string",
+      "description": "BILL-generated bill payment confirmation value"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PaymentStatus"
+        },
+        {
+          "description": "Payment status."
+        }
+      ]
+    },
+    "exchangeRate": {
+      "type": "number",
+      "description": "Exchange rate for the payment in an international currency (not USD)"
+    },
+    "fundingAmount": {
+      "type": "number",
+      "description": "Payment amount in USD"
+    },
+    "onlinePayment": {
+      "type": "boolean",
+      "description": "Payment source.\n* `true`: Payment is made with BILL (online)\n* `false`: Payment is made outside BILL and then recorded in BILL (offline)"
+    },
+    "disbursementType": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/DisbursementType"
+        },
+        {
+          "description": "Disbursement type. This value is set when you create a payment. See `disbursementInfo` for information about the disbursement method used when BILL processes your payment."
+        }
+      ]
+    },
+    "remittanceEmail": {
+      "type": "string",
+      "description": "Remittance email address set for the vendor"
+    },
+    "createdTime": {
+      "type": "string",
+      "description": "Payment created date and time",
+      "format": "date-time"
+    },
+    "updatedTime": {
+      "type": "string",
+      "description": "Payment updated date and time",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "BILL-generated ID of the user that created the payment. The value begins with `006`."
+    },
+    "voidInfo": {
+      "type": "array",
+      "description": "Void request information",
+      "items": {
+        "$ref": "#/$defs/VoidInfo"
+      }
+    },
+    "disbursementStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/DisbursementStatus"
+        },
+        {
+          "description": "Payment disbursement status"
+        }
+      ]
+    },
+    "disbursementInfo": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/DisbursementInfo"
+        },
+        {
+          "description": "Payment disbursement information. This information is based on the disbursement method used when BILL processes your payment.\n\nFor example, when BILL processes an ACH payment, `disbursementInfo` includes the `sentDate` and `arrivesByDate` fields."
+        }
+      ]
+    },
+    "paymentPurpose": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PaymentPurposeResponse"
+        },
+        {
+          "description": "Payment purpose information"
+        }
+      ]
+    },
+    "cardFundingPurpose": {
+      "type": "string",
+      "description": "Card funding purpose"
+    },
+    "cancelRequestSubmitted": {
+      "type": "boolean",
+      "description": "This field is set as `true` if a cancel payment request is submitted.\n\n**Note**: If the payment is cancelled, the payment `status` is set as `CANCELLED`."
+    },
+    "singleStatus": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PaymentSingleStatus"
+        },
+        {
+          "description": "Unified payment status. This field provides BILL payment lifecycle updates based on the `status` and `disbursementStatus` values in the response.\n\nSee [Single status payment values](https://developer.bill.com/docs/single-status-payment-values) in the Guides section for the list of available values."
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "AchDisbursement": {
+      "type": "object",
+      "properties": {
+        "sentDate": {
+          "type": "string",
+          "description": "ACH payment sent date",
+          "format": "date"
+        },
+        "arrivesByDate": {
+          "type": "string",
+          "description": "ACH payment arrives by date",
+          "format": "date"
+        }
+      },
+      "description": "ACH disbursement dto when the disbursement type is ach."
+    },
+    "BillPayment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the bill payment. The value begins with `blp`."
+        },
+        "billId": {
+          "type": "string",
+          "description": "BILL-generated ID of the bill to be paid. The value begins with `00n`."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Payment amount. For a payment in an international currency (not USD), this value is in the local currency."
+        },
+        "vendorCredits": {
+          "type": "array",
+          "description": "Vendor credits applied to the bill payment",
+          "items": {
+            "$ref": "#/$defs/PaymentVendorCreditResponseDto"
+          }
+        }
+      },
+      "description": "Details of bill payment."
+    },
+    "CheckDeliveryTypeResponse": {
+      "type": "string",
+      "description": "Enum for Check delivery type.",
+      "enum": [
+        "STANDARD",
+        "UPS_1DAY",
+        "UPS_2DAY",
+        "UPS_3DAY",
+        "RTP_DELIVERY",
+        "UNDEFINED"
+      ]
+    },
+    "CheckDisbursement": {
+      "type": "object",
+      "properties": {
+        "sentDate": {
+          "type": "string",
+          "description": "Check payment sent date",
+          "format": "date"
+        },
+        "arrivesByDate": {
+          "type": "string",
+          "description": "Check payment arrives by date",
+          "format": "date"
+        },
+        "checkNumber": {
+          "type": "integer",
+          "description": "Check number",
+          "format": "int64"
+        },
+        "trackingInformation": {
+          "type": "string",
+          "description": "UPS tracking number for the check. You get a tracking number only for a BILL Pay Faster check payment."
+        }
+      },
+      "description": "Check disbursement dto when the disbursement type is check."
+    },
+    "DisbursementInfo": {
+      "type": "object",
+      "properties": {
+        "isVoidable": {
+          "type": "boolean",
+          "description": "Set as `true` if the payment disbursement type can be voided"
+        },
+        "checkDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/CheckDisbursement"
+            },
+            {
+              "description": "Check payment disbursement information"
+            }
+          ]
+        },
+        "achDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/AchDisbursement"
+            },
+            {
+              "description": "ACH payment disbursement information"
+            }
+          ]
+        },
+        "rppsDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/RppsDisbursement"
+            },
+            {
+              "description": "ACH payment to verified national vendor disbursement information"
+            }
+          ]
+        },
+        "internationalDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InternationalDisbursement"
+            },
+            {
+              "description": "International ePayment disbursement information"
+            }
+          ]
+        },
+        "vcardDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/VcardDisbursement"
+            },
+            {
+              "description": "Virtual card payment disbursement information"
+            }
+          ]
+        },
+        "walletDisbursement": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/WalletDisbursement"
+            },
+            {
+              "description": "Instant Transfer (wallet) payment disbursement information"
+            }
+          ]
+        }
+      },
+      "description": "Disbursement info."
+    },
+    "DisbursementStatus": {
+      "type": "string",
+      "description": "The enum type for disbursement status.",
+      "enum": [
+        "SCHEDULE",
+        "DONE",
+        "FAILED",
+        "VOID",
+        "HOLD",
+        "FXHOLD",
+        "ESCHEATED",
+        "UNDEFINED"
+      ]
+    },
+    "DisbursementSubType": {
+      "type": "string",
+      "description": "PayBy.",
+      "enum": [
+        "NONE",
+        "WIRE",
+        "IACH",
+        "LOCAL",
+        "MULTIPLE",
+        "ACH",
+        "UNDEFINED"
+      ]
+    },
+    "DisbursementType": {
+      "type": "string",
+      "description": "Enum for Disbursement type.",
+      "enum": [
+        "CHECK",
+        "ACH",
+        "RPPS",
+        "PAYPAL",
+        "OFFLINE",
+        "INTERNATIONAL_E_PAYMENT",
+        "AMEX",
+        "VIRTUAL_CARD",
+        "WALLET",
+        "CREDIT_CARD",
+        "UNDEFINED"
+      ]
+    },
+    "FundingAccountResponse": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/FundingAccountTypeResponse"
+            },
+            {
+              "description": "Payment funding type.\n* `BANK_ACCOUNT`: Bank account\n* `CARD_ACCOUNT`: Credit card or debit card\n* `WALLET`: BILL balance\n* `AP_CARD`: AP Card\n\nSee the BILL Help FAQ sections for [BILL balance](https://help.bill.com/direct/s/article/4409933681677) and [AP Card](https://help.bill.com/direct/s/article/000003348) for more information."
+            }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the selected payment funding type. For the `WALLET` type, the `id` is not required."
+        }
+      },
+      "description": "Funding account details in Payments API."
+    },
+    "FundingAccountTypeResponse": {
+      "type": "string",
+      "description": "Funading account type for Payments API.",
+      "enum": [
+        "BANK_ACCOUNT",
+        "CARD_ACCOUNT",
+        "WALLET",
+        "AP_CARD",
+        "UNDEFINED"
+      ]
+    },
+    "InternationalDisbursement": {
+      "type": "object",
+      "properties": {
+        "sentDate": {
+          "type": "string",
+          "description": "International ePayment sent date",
+          "format": "date"
+        },
+        "arrivesByDate": {
+          "type": "string",
+          "description": "International ePayment arrives by date",
+          "format": "date"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Disbursement amount"
+        },
+        "disbursementSubType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DisbursementSubType"
+            },
+            {
+              "description": "Payment delivery method for making the International ePayment"
+            }
+          ]
+        }
+      },
+      "description": "International disbursement dto when the disbursement type is international."
+    },
+    "PaymentPurposeCodeResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value"
+        }
+      },
+      "description": "Payment purpose code response."
+    },
+    "PaymentPurposeResponse": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Payment purpose text"
+        },
+        "code": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PaymentPurposeCodeResponse"
+            },
+            {
+              "description": "Payment purpose code"
+            }
+          ]
+        }
+      },
+      "description": "Payment purpose response."
+    },
+    "PaymentSingleStatus": {
+      "type": "string",
+      "enum": [
+        "DISBURSEMENT_FAILED_ACTION_NEEDED",
+        "DISBURSEMENT_FAILED_VENDOR_BANK_REJECTED",
+        "FUNDING_FAILED_ACTION_NEEDED",
+        "EXPIRING",
+        "FUNDS_ESCHEATED",
+        "CANCELED",
+        "FUNDING_FAILED_VOIDED",
+        "VOIDED",
+        "CLEARED",
+        "DELIVERED",
+        "DISBURSEMENT_ON_HOLD",
+        "VOID_PENDING",
+        "SENT",
+        "DISBURSEMENT_ON_HOLD_PAYER_IN_REVIEW",
+        "PROCESSED",
+        "FUNDING_STARTED",
+        "FUNDING_ON_HOLD",
+        "WAITING_ON_APPROVAL",
+        "SCHEDULED",
+        "READY_TO_FUND",
+        "CANCELLATION_IN_PROGRESS",
+        "UNDEFINED",
+        "PARTIALLY_CLAIMED",
+        "PAID_OFFLINE"
+      ]
+    },
+    "PaymentStatus": {
+      "type": "string",
+      "description": "The enum Payment status dto.",
+      "enum": [
+        "APPROVING",
+        "SCHEDULED",
+        "PAID",
+        "CANCELLED",
+        "VOID",
+        "ESCHEATED",
+        "UNDEFINED"
+      ]
+    },
+    "PaymentVendorCreditResponseDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Credit amount"
+        }
+      },
+      "description": "Payment vendor credit response DTO."
+    },
+    "ProcessingOptionsResponse": {
+      "type": "object",
+      "properties": {
+        "requestPayFaster": {
+          "type": "boolean",
+          "description": "Set as `true` to use BILL Pay Faster. This field is required if `requestCheckDeliveryType` is set.\n\n  See [Payments](https://developer.bill.com/docs/ap-payments)   in the Guides section for information about BILL Pay Faster payments."
+        },
+        "createBill": {
+          "type": "boolean",
+          "description": "* Set as `false` to create a vendor payment for an existing bill.\n* Set as `true` to create a bill for a vendor payment. If `createBill` is `true`, do not set `billId` in your payment request."
+        },
+        "requestCheckDeliveryType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/CheckDeliveryTypeResponse"
+            },
+            {
+              "description": "BILL Pay Faster payment delivery type. The `RTP_DELIVERY` option is not available for vendor payments by check."
+            }
+          ]
+        }
+      },
+      "description": "User provided options for processing the payments request."
+    },
+    "RppsDisbursement": {
+      "type": "object",
+      "properties": {
+        "sentDate": {
+          "type": "string",
+          "description": "ACH payment to verified national vendor sent date",
+          "format": "date"
+        },
+        "arrivesByDate": {
+          "type": "string",
+          "description": "ACH payment to verified national vendor arrives by date",
+          "format": "date"
+        },
+        "traceNumber": {
+          "type": "integer",
+          "description": "Payment trace number. This value is used to uniquely identify a payment in a batch.",
+          "format": "int32"
+        },
+        "batchNumber": {
+          "type": "integer",
+          "description": "Payment batch number",
+          "format": "int32"
+        }
+      },
+      "description": "Rpps disbursement dto when the disbursement type is ACH to verified national vendor."
+    },
+    "VcardDisbursement": {
+      "type": "object",
+      "properties": {
+        "arrivesByDate": {
+          "type": "string",
+          "description": "Virtual card payment arrives by date",
+          "format": "date"
+        },
+        "validUntil": {
+          "type": "string",
+          "description": "Date until when the card is valid",
+          "format": "date"
+        },
+        "last4CardNumber": {
+          "type": "string",
+          "description": "Masked number for virtual card"
+        }
+      },
+      "description": "Virtual card disbursement dto when the disbursement type is virtual card."
+    },
+    "VoidInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "BILL-generated ID of the void payment request. The value begins with `vrq`."
+        },
+        "requestedBy": {
+          "type": "string",
+          "description": "BILL-generated ID of the user that requested a void payment. The value begins with `006`."
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/VoidType"
+            },
+            {
+              "description": "Void payment request type."
+            }
+          ]
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/VoidStatus"
+            },
+            {
+              "description": "Void payment request status."
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "description": "Void payment request reason"
+        },
+        "createdTime": {
+          "type": "string",
+          "description": "Void payment request created date and time",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "description": "Void payment request updated date and time",
+          "format": "date-time"
+        }
+      },
+      "description": "Void information for the Payments DTO."
+    },
+    "VoidStatus": {
+      "type": "string",
+      "description": "Void status enum.",
+      "enum": [
+        "TO_BE_PROCESSED",
+        "ACCEPTED",
+        "REJECTED",
+        "NO_OP",
+        "ARCHIVED"
+      ]
+    },
+    "VoidType": {
+      "type": "string",
+      "description": "Void type enum.",
+      "enum": [
+        "VOID_AND_CREDIT",
+        "VOID_AND_REISSUE",
+        "VOID_ONLY",
+        "VOID_AND_REISSUE_VCARD"
+      ]
+    },
+    "WalletDisbursement": {
+      "type": "object",
+      "properties": {
+        "arrivesByDate": {
+          "type": "string",
+          "description": "Instant Transfer (wallet) payment arrives by date",
+          "format": "date"
+        }
+      },
+      "description": "Wallet disbursement dto when the disbursement type is wallet."
+    }
+  }
+}

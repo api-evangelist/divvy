@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-subscription-request-dto-schema.json",
+  "title": "SubscriptionRequestDto",
+  "description": "Create a subscription",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-connect-events-api-openapi.yml#/components/schemas/SubscriptionRequestDto",
+  "required": [
+    "events",
+    "name",
+    "notificationUrl",
+    "status"
+  ],
+  "type": "object",
+  "properties": {
+    "name": {
+      "minLength": 1,
+      "type": "string",
+      "description": "Subscription name"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/SubscriptionStatusDto"
+        },
+        {
+          "description": "Subscription status information"
+        }
+      ]
+    },
+    "events": {
+      "minItems": 1,
+      "type": "array",
+      "description": "Subscription events information. You can retrieve event `type` and `version` with `GET /v3/events/catalog`.",
+      "items": {
+        "$ref": "#/$defs/SubscriptionEventDto"
+      }
+    },
+    "notificationUrl": {
+      "minLength": 1,
+      "type": "string",
+      "description": "Event notification URL. The URL must be HTTPS. BILL uses this URL to send you event notifications."
+    }
+  },
+  "$defs": {
+    "SubscriptionEventDto": {
+      "required": [
+        "type",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Event type"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Event type version"
+        }
+      },
+      "description": "Subscription events information."
+    },
+    "SubscriptionStatusDto": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Set as `true` if the subscription is enabled. When you create a new subscription, this value is set as `true` by default."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for changing the subscription status. This field is used by BILL for informing you when the `enabled` field is set as `false`."
+        }
+      },
+      "description": "Subscription status information."
+    }
+  }
+}

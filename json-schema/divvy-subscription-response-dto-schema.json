@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-subscription-response-dto-schema.json",
+  "title": "SubscriptionResponseDto",
+  "description": "Subscription response information.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-connect-events-api-openapi.yml#/components/schemas/SubscriptionResponseDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "BILL-generated ID of the subscription"
+    },
+    "name": {
+      "type": "string",
+      "description": "Subscription name"
+    },
+    "organizationId": {
+      "type": "string",
+      "description": "BILL-generated ID of the organization. BILL sends you event notifications only for the BILL organization used to set up a subscription."
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/SubscriptionStatusWithActorDto"
+        },
+        {
+          "description": "Subscription status information"
+        }
+      ]
+    },
+    "events": {
+      "type": "array",
+      "description": "Subscription events information. You can retrieve event `type` and `version` with `GET /v3/events/catalog`.",
+      "items": {
+        "$ref": "#/$defs/SubscriptionEventDto"
+      }
+    },
+    "notificationUrl": {
+      "type": "string",
+      "description": "Event notification URL. The URL must be HTTPS. BILL uses this URL to send you event notifications."
+    },
+    "createdTime": {
+      "type": "string",
+      "description": "Subscription created date and time",
+      "format": "date-time"
+    },
+    "updatedTime": {
+      "type": "string",
+      "description": "Subscription updated date and time",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "SubscriptionActorDto": {
+      "type": "string",
+      "description": "Subscription change actor information.",
+      "enum": [
+        "CLIENT",
+        "SYSTEM"
+      ]
+    },
+    "SubscriptionEventDto": {
+      "required": [
+        "type",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Event type"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Event type version"
+        }
+      },
+      "description": "Subscription events information."
+    },
+    "SubscriptionStatusWithActorDto": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Set as `true` if the subscription is enabled. When you create a new subscription, this value is set as `true` by default."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for changing the subscription status. This field is used by BILL for informing you when the `enabled` field is set as `false`."
+        },
+        "actor": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/SubscriptionActorDto"
+            },
+            {
+              "description": "Entity that set the subscription status"
+            }
+          ]
+        }
+      },
+      "description": "Subscription status and change actor information."
+    }
+  }
+}

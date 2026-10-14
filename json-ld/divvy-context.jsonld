@@ -1,0 +1,706 @@
+{
+  "@context": {
+    "@vocab": "https://getdivvy.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "divvy": "https://getdivvy.com/schema#",
+    "BdcError": "divvy:BdcError",
+    "timestamp": {
+      "@id": "divvy:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "code": {
+      "@id": "divvy:code",
+      "@type": "xsd:string"
+    },
+    "severity": {
+      "@id": "divvy:severity",
+      "@type": "@id"
+    },
+    "category": {
+      "@id": "divvy:category",
+      "@type": "@id"
+    },
+    "message": {
+      "@id": "divvy:message",
+      "@type": "xsd:string"
+    },
+    "params": {
+      "@id": "divvy:params",
+      "@container": "@list"
+    },
+    "detail": {
+      "@id": "divvy:detail",
+      "@type": "xsd:string"
+    },
+    "help": {
+      "@id": "divvy:help",
+      "@type": "xsd:string"
+    },
+    "Category": "divvy:Category",
+    "LoginRequestDto": "divvy:LoginRequestDto",
+    "devKey": {
+      "@id": "divvy:devKey",
+      "@type": "xsd:string"
+    },
+    "username": {
+      "@id": "divvy:username",
+      "@type": "xsd:string"
+    },
+    "password": {
+      "@id": "divvy:password",
+      "@type": "xsd:string"
+    },
+    "consoleApiToken": {
+      "@id": "divvy:consoleApiToken",
+      "@type": "xsd:string"
+    },
+    "organizationId": {
+      "@id": "divvy:organizationId",
+      "@type": "xsd:string"
+    },
+    "rememberMeId": {
+      "@id": "divvy:rememberMeId",
+      "@type": "xsd:string"
+    },
+    "device": {
+      "@id": "divvy:device",
+      "@type": "xsd:string"
+    },
+    "LoginResponseDto": "divvy:LoginResponseDto",
+    "sessionId": {
+      "@id": "divvy:sessionId",
+      "@type": "xsd:string"
+    },
+    "userId": {
+      "@id": "divvy:userId",
+      "@type": "xsd:string"
+    },
+    "trusted": {
+      "@id": "divvy:trusted",
+      "@type": "xsd:boolean"
+    },
+    "Param": "divvy:Param",
+    "additional": {
+      "@id": "divvy:additional"
+    },
+    "name": {
+      "@id": "divvy:name",
+      "@type": "xsd:string"
+    },
+    "value": {
+      "@id": "divvy:value",
+      "@type": "xsd:string"
+    },
+    "Severity": "divvy:Severity",
+    "MfaStatus": "divvy:MfaStatus",
+    "SessionInfoResponseDto": "divvy:SessionInfoResponseDto",
+    "mfaStatus": {
+      "@id": "divvy:mfaStatus"
+    },
+    "mfaBypass": {
+      "@id": "divvy:mfaBypass",
+      "@type": "xsd:boolean"
+    },
+    "AllOrganizationsResponseDto": "divvy:AllOrganizationsResponseDto",
+    "organizations": {
+      "@id": "divvy:organizations",
+      "@container": "@list"
+    },
+    "consoleOrganizations": {
+      "@id": "divvy:consoleOrganizations",
+      "@container": "@list"
+    },
+    "ConsoleOrganization": "divvy:ConsoleOrganization",
+    "id": {
+      "@id": "divvy:id",
+      "@type": "xsd:string"
+    },
+    "ListAllResponseDto_AllOrganizationsResponseDto_": "divvy:ListAllResponseDto_AllOrganizationsResponseDto_",
+    "nextPage": {
+      "@id": "divvy:nextPage",
+      "@type": "xsd:string"
+    },
+    "prevPage": {
+      "@id": "divvy:prevPage",
+      "@type": "xsd:string"
+    },
+    "results": {
+      "@id": "divvy:results",
+      "@type": "@id"
+    },
+    "OrganizationDto": "divvy:OrganizationDto",
+    "consoleOrganizationId": {
+      "@id": "divvy:consoleOrganizationId",
+      "@type": "xsd:string"
+    },
+    "HealthCheckDto": "divvy:HealthCheckDto",
+    "status": {
+      "@id": "divvy:status",
+      "@type": "xsd:string"
+    },
+    "MfaChallengeRequestDto": "divvy:MfaChallengeRequestDto",
+    "useBackup": {
+      "@id": "divvy:useBackup",
+      "@type": "xsd:boolean"
+    },
+    "MfaChallengeResponseDto": "divvy:MfaChallengeResponseDto",
+    "challengeId": {
+      "@id": "divvy:challengeId",
+      "@type": "xsd:string"
+    },
+    "MfaChallengeValidateRequestDto": "divvy:MfaChallengeValidateRequestDto",
+    "token": {
+      "@id": "divvy:token",
+      "@type": "xsd:string"
+    },
+    "machineName": {
+      "@id": "divvy:machineName",
+      "@type": "xsd:string"
+    },
+    "rememberMe": {
+      "@id": "divvy:rememberMe",
+      "@type": "xsd:boolean"
+    },
+    "MfaChallengeValidateResponseDto": "divvy:MfaChallengeValidateResponseDto",
+    "ListMfaPhoneResponseDto": "divvy:ListMfaPhoneResponseDto",
+    "MfaPhoneResponseDto": "divvy:MfaPhoneResponseDto",
+    "type": {
+      "@id": "divvy:type"
+    },
+    "last4digits": {
+      "@id": "divvy:last4digits",
+      "@type": "xsd:string"
+    },
+    "primary": {
+      "@id": "divvy:primary",
+      "@type": "xsd:boolean"
+    },
+    "MfaPhoneType": "divvy:MfaPhoneType",
+    "MfaSetupRequestDto": "divvy:MfaSetupRequestDto",
+    "phone": {
+      "@id": "divvy:phone",
+      "@type": "xsd:string"
+    },
+    "MfaSetupResponseDto": "divvy:MfaSetupResponseDto",
+    "setupId": {
+      "@id": "divvy:setupId",
+      "@type": "xsd:string"
+    },
+    "MfaSetupType": "divvy:MfaSetupType",
+    "MfaSetupValidateRequestDto": "divvy:MfaSetupValidateRequestDto",
+    "ResponseStatus": "divvy:ResponseStatus",
+    "StatusDto": "divvy:StatusDto",
+    "MfaStepUpRequestDto": "divvy:MfaStepUpRequestDto",
+    "MfaStepUpResponseDto": "divvy:MfaStepUpResponseDto",
+    "BillApproveDenyAction": "divvy:BillApproveDenyAction",
+    "BillApproveDenyActionRequestDto": "divvy:BillApproveDenyActionRequestDto",
+    "billId": {
+      "@id": "divvy:billId",
+      "@type": "xsd:string"
+    },
+    "action": {
+      "@id": "divvy:action"
+    },
+    "comment": {
+      "@id": "divvy:comment",
+      "@type": "xsd:string"
+    },
+    "BillUserApprovalsResponseDto": "divvy:BillUserApprovalsResponseDto",
+    "vendorId": {
+      "@id": "divvy:vendorId",
+      "@type": "xsd:string"
+    },
+    "amount": {
+      "@id": "divvy:amount",
+      "@type": "xsd:decimal"
+    },
+    "dueDate": {
+      "@id": "divvy:dueDate",
+      "@type": "xsd:date"
+    },
+    "ListBillUserApprovalsResponseDto": "divvy:ListBillUserApprovalsResponseDto",
+    "bills": {
+      "@id": "divvy:bills",
+      "@container": "@list"
+    },
+    "ApproverGroupDto": "divvy:ApproverGroupDto",
+    "groupName": {
+      "@id": "divvy:groupName",
+      "@type": "xsd:string"
+    },
+    "groupId": {
+      "@id": "divvy:groupId",
+      "@type": "xsd:string"
+    },
+    "users": {
+      "@id": "divvy:users",
+      "@container": "@list"
+    },
+    "ApproverUserDto": "divvy:ApproverUserDto",
+    "fullName": {
+      "@id": "divvy:fullName",
+      "@type": "xsd:string"
+    },
+    "BillApprovalPolicyResponseDto": "divvy:BillApprovalPolicyResponseDto",
+    "policyName": {
+      "@id": "divvy:policyName",
+      "@type": "xsd:string"
+    },
+    "rules": {
+      "@id": "divvy:rules",
+      "@container": "@list"
+    },
+    "approvers": {
+      "@id": "divvy:approvers"
+    },
+    "BillApprovalPolicyRuleResponseDto": "divvy:BillApprovalPolicyRuleResponseDto",
+    "key": {
+      "@id": "divvy:key"
+    },
+    "op": {
+      "@id": "divvy:op"
+    },
+    "values": {
+      "@id": "divvy:values",
+      "@container": "@list"
+    },
+    "BillApprovalRuleOperatorResponse": "divvy:BillApprovalRuleOperatorResponse",
+    "BillApproversDto": "divvy:BillApproversDto",
+    "groups": {
+      "@id": "divvy:groups",
+      "@container": "@list"
+    },
+    "GroupUsers": "divvy:GroupUsers",
+    "RuleKeyResponse": "divvy:RuleKeyResponse",
+    "RuleValueDto": "divvy:RuleValueDto",
+    "displayName": {
+      "@id": "divvy:displayName",
+      "@type": "xsd:string"
+    },
+    "BillApprovalPolicyCreateRuleDto": "divvy:BillApprovalPolicyCreateRuleDto",
+    "BillApprovalPolicyRequestDto": "divvy:BillApprovalPolicyRequestDto",
+    "RuleKeyCreateDto": "divvy:RuleKeyCreateDto",
+    "RuleOperatorCreateDto": "divvy:RuleOperatorCreateDto",
+    "BillApprovalStatusResponse": "divvy:BillApprovalStatusResponse",
+    "BillClassificationsDto": "divvy:BillClassificationsDto",
+    "chartOfAccountId": {
+      "@id": "divvy:chartOfAccountId",
+      "@type": "xsd:string"
+    },
+    "accountingClassId": {
+      "@id": "divvy:accountingClassId",
+      "@type": "xsd:string"
+    },
+    "departmentId": {
+      "@id": "divvy:departmentId",
+      "@type": "xsd:string"
+    },
+    "locationId": {
+      "@id": "divvy:locationId",
+      "@type": "xsd:string"
+    },
+    "itemId": {
+      "@id": "divvy:itemId",
+      "@type": "xsd:string"
+    },
+    "BillLineItemClassificationsDto": "divvy:BillLineItemClassificationsDto",
+    "employeeId": {
+      "@id": "divvy:employeeId",
+      "@type": "xsd:string"
+    },
+    "jobId": {
+      "@id": "divvy:jobId",
+      "@type": "xsd:string"
+    },
+    "customerId": {
+      "@id": "divvy:customerId",
+      "@type": "xsd:string"
+    },
+    "BillPaymentStatusDto": "divvy:BillPaymentStatusDto",
+    "BillReadWithoutApproversResponseDto": "divvy:BillReadWithoutApproversResponseDto",
+    "recordStatus": {
+      "@id": "divvy:recordStatus"
+    },
+    "archived": {
+      "@id": "divvy:archived",
+      "@type": "xsd:boolean"
+    },
+    "vendorName": {
+      "@id": "divvy:vendorName",
+      "@type": "xsd:string"
+    },
+    "fundingAmount": {
+      "@id": "divvy:fundingAmount",
+      "@type": "xsd:decimal"
+    },
+    "paidAmount": {
+      "@id": "divvy:paidAmount",
+      "@type": "xsd:decimal"
+    },
+    "dueAmount": {
+      "@id": "divvy:dueAmount",
+      "@type": "xsd:decimal"
+    },
+    "scheduledAmount": {
+      "@id": "divvy:scheduledAmount",
+      "@type": "xsd:decimal"
+    },
+    "creditAmount": {
+      "@id": "divvy:creditAmount",
+      "@type": "xsd:decimal"
+    },
+    "exchangeRate": {
+      "@id": "divvy:exchangeRate",
+      "@type": "xsd:decimal"
+    },
+    "description": {
+      "@id": "divvy:description",
+      "@type": "xsd:string"
+    },
+    "paymentTermId": {
+      "@id": "divvy:paymentTermId",
+      "@type": "xsd:string"
+    },
+    "invoice": {
+      "@id": "divvy:invoice"
+    },
+    "billLineItems": {
+      "@id": "divvy:billLineItems",
+      "@container": "@list"
+    },
+    "payFromChartOfAccountId": {
+      "@id": "divvy:payFromChartOfAccountId",
+      "@type": "xsd:string"
+    },
+    "paymentStatus": {
+      "@id": "divvy:paymentStatus"
+    },
+    "approvalStatus": {
+      "@id": "divvy:approvalStatus"
+    },
+    "createdBy": {
+      "@id": "divvy:createdBy",
+      "@type": "xsd:string"
+    },
+    "createdTime": {
+      "@id": "divvy:createdTime",
+      "@type": "xsd:dateTime"
+    },
+    "updatedTime": {
+      "@id": "divvy:updatedTime",
+      "@type": "xsd:dateTime"
+    },
+    "classifications": {
+      "@id": "divvy:classifications"
+    },
+    "purchaseOrderNumber": {
+      "@id": "divvy:purchaseOrderNumber",
+      "@type": "xsd:string"
+    },
+    "BillRecordStatus": "divvy:BillRecordStatus",
+    "BillResponseLineItem": "divvy:BillResponseLineItem",
+    "quantity": {
+      "@id": "divvy:quantity",
+      "@type": "xsd:decimal"
+    },
+    "price": {
+      "@id": "divvy:price",
+      "@type": "xsd:decimal"
+    },
+    "Invoice": "divvy:Invoice",
+    "invoiceNumber": {
+      "@id": "divvy:invoiceNumber",
+      "@type": "xsd:string"
+    },
+    "invoiceDate": {
+      "@id": "divvy:invoiceDate",
+      "@type": "xsd:date"
+    },
+    "ListResponseDto_BillReadWithoutApproversResponseDto_": "divvy:ListResponseDto_BillReadWithoutApproversResponseDto_",
+    "ApproverDto": "divvy:ApproverDto",
+    "approverOrder": {
+      "@id": "divvy:approverOrder",
+      "@type": "xsd:decimal"
+    },
+    "statusChangedTime": {
+      "@id": "divvy:statusChangedTime",
+      "@type": "xsd:dateTime"
+    },
+    "ApproverStatusDto": "divvy:ApproverStatusDto",
+    "BillCreateLineItemDto": "divvy:BillCreateLineItemDto",
+    "BillCreateRequestDto": "divvy:BillCreateRequestDto",
+    "vendorCredits": {
+      "@id": "divvy:vendorCredits",
+      "@container": "@list"
+    },
+    "billApprovals": {
+      "@id": "divvy:billApprovals",
+      "@type": "xsd:boolean"
+    },
+    "allowDuplicateInvoiceNumber": {
+      "@id": "divvy:allowDuplicateInvoiceNumber",
+      "@type": "xsd:boolean"
+    },
+    "BillResponseDto": "divvy:BillResponseDto",
+    "BillVendorCreditRequestItemDto": "divvy:BillVendorCreditRequestItemDto",
+    "BillWithoutApproversResponseDto": "divvy:BillWithoutApproversResponseDto",
+    "BillPaymentDto": "divvy:BillPaymentDto",
+    "processDate": {
+      "@id": "divvy:processDate",
+      "@type": "xsd:date"
+    },
+    "BillReadResponseDto": "divvy:BillReadResponseDto",
+    "payments": {
+      "@id": "divvy:payments",
+      "@container": "@list"
+    },
+    "DisbursementStatus": "divvy:DisbursementStatus",
+    "DisbursementType": "divvy:DisbursementType",
+    "PaymentClassificationsDto": "divvy:PaymentClassificationsDto",
+    "PaymentSingleStatus": "divvy:PaymentSingleStatus",
+    "PaymentStatus": "divvy:PaymentStatus",
+    "PaymentVendorCreditRequestDto": "divvy:PaymentVendorCreditRequestDto",
+    "PaymentVendorCreditResponseDto": "divvy:PaymentVendorCreditResponseDto",
+    "RecordBillPayRequestDto": "divvy:RecordBillPayRequestDto",
+    "RecordBillPayResponseDto": "divvy:RecordBillPayResponseDto",
+    "RecordPaymentRequestDto": "divvy:RecordPaymentRequestDto",
+    "toPrintCheck": {
+      "@id": "divvy:toPrintCheck",
+      "@type": "xsd:boolean"
+    },
+    "syncReference": {
+      "@id": "divvy:syncReference",
+      "@type": "xsd:string"
+    },
+    "allowExport": {
+      "@id": "divvy:allowExport",
+      "@type": "xsd:boolean"
+    },
+    "RecordPaymentResponseDto": "divvy:RecordPaymentResponseDto",
+    "billPayments": {
+      "@id": "divvy:billPayments",
+      "@container": "@list"
+    },
+    "transactionNumber": {
+      "@id": "divvy:transactionNumber",
+      "@type": "xsd:string"
+    },
+    "confirmationNumber": {
+      "@id": "divvy:confirmationNumber",
+      "@type": "xsd:string"
+    },
+    "onlinePayment": {
+      "@id": "divvy:onlinePayment",
+      "@type": "xsd:boolean"
+    },
+    "disbursementType": {
+      "@id": "divvy:disbursementType"
+    },
+    "remittanceEmail": {
+      "@id": "divvy:remittanceEmail",
+      "@type": "xsd:string"
+    },
+    "disbursementStatus": {
+      "@id": "divvy:disbursementStatus"
+    },
+    "singleStatus": {
+      "@id": "divvy:singleStatus"
+    },
+    "BillReplaceLineItemDto": "divvy:BillReplaceLineItemDto",
+    "BillReplaceRequestDto": "divvy:BillReplaceRequestDto",
+    "BillUpdateInvoiceRequestDto": "divvy:BillUpdateInvoiceRequestDto",
+    "BillUpdateLineItemDto": "divvy:BillUpdateLineItemDto",
+    "BillUpdateRequestDto": "divvy:BillUpdateRequestDto",
+    "policyRematch": {
+      "@id": "divvy:policyRematch",
+      "@type": "xsd:boolean"
+    },
+    "CreditStatusDto": "divvy:CreditStatusDto",
+    "ListResponseDto_VendorCreditWithUsageResponseDto_": "divvy:ListResponseDto_VendorCreditWithUsageResponseDto_",
+    "UpdateVendorCreditLineItemDto": "divvy:UpdateVendorCreditLineItemDto",
+    "VendorCreditLineItemClassificationsDto": "divvy:VendorCreditLineItemClassificationsDto",
+    "VendorCreditUsageDto": "divvy:VendorCreditUsageDto",
+    "paymentId": {
+      "@id": "divvy:paymentId",
+      "@type": "xsd:string"
+    },
+    "VendorCreditWithUsageResponseDto": "divvy:VendorCreditWithUsageResponseDto",
+    "referenceNumber": {
+      "@id": "divvy:referenceNumber",
+      "@type": "xsd:string"
+    },
+    "creditDate": {
+      "@id": "divvy:creditDate",
+      "@type": "xsd:date"
+    },
+    "applyToChartOfAccountId": {
+      "@id": "divvy:applyToChartOfAccountId",
+      "@type": "xsd:string"
+    },
+    "applyToBankAccountId": {
+      "@id": "divvy:applyToBankAccountId",
+      "@type": "xsd:string"
+    },
+    "appliedAmount": {
+      "@id": "divvy:appliedAmount",
+      "@type": "xsd:decimal"
+    },
+    "vendorCreditLineItems": {
+      "@id": "divvy:vendorCreditLineItems",
+      "@container": "@list"
+    },
+    "usage": {
+      "@id": "divvy:usage",
+      "@container": "@list"
+    },
+    "CreateVendorCreditLineItemDto": "divvy:CreateVendorCreditLineItemDto",
+    "CreateVendorCreditRequestDto": "divvy:CreateVendorCreditRequestDto",
+    "VendorCreditLineItemResponseDto": "divvy:VendorCreditLineItemResponseDto",
+    "VendorCreditResponseDto": "divvy:VendorCreditResponseDto",
+    "ReplaceVendorCreditLineItemDto": "divvy:ReplaceVendorCreditLineItemDto",
+    "ReplaceVendorCreditWithIdRequestDto": "divvy:ReplaceVendorCreditWithIdRequestDto",
+    "VendorCreditBulkResponseDto": "divvy:VendorCreditBulkResponseDto",
+    "UpdateVendorCreditWithIdRequestDto": "divvy:UpdateVendorCreditWithIdRequestDto",
+    "ReplaceVendorCreditRequestDto": "divvy:ReplaceVendorCreditRequestDto",
+    "UpdateVendorCreditRequestDto": "divvy:UpdateVendorCreditRequestDto",
+    "AchDisbursement": "divvy:AchDisbursement",
+    "sentDate": {
+      "@id": "divvy:sentDate",
+      "@type": "xsd:date"
+    },
+    "arrivesByDate": {
+      "@id": "divvy:arrivesByDate",
+      "@type": "xsd:date"
+    },
+    "BillPayment": "divvy:BillPayment",
+    "CheckDeliveryTypeResponse": "divvy:CheckDeliveryTypeResponse",
+    "CheckDisbursement": "divvy:CheckDisbursement",
+    "checkNumber": {
+      "@id": "divvy:checkNumber",
+      "@type": "xsd:integer"
+    },
+    "trackingInformation": {
+      "@id": "divvy:trackingInformation",
+      "@type": "xsd:string"
+    },
+    "DisbursementInfo": "divvy:DisbursementInfo",
+    "isVoidable": {
+      "@id": "divvy:isVoidable",
+      "@type": "xsd:boolean"
+    },
+    "checkDisbursement": {
+      "@id": "divvy:checkDisbursement"
+    },
+    "achDisbursement": {
+      "@id": "divvy:achDisbursement"
+    },
+    "rppsDisbursement": {
+      "@id": "divvy:rppsDisbursement"
+    },
+    "internationalDisbursement": {
+      "@id": "divvy:internationalDisbursement"
+    },
+    "vcardDisbursement": {
+      "@id": "divvy:vcardDisbursement"
+    },
+    "walletDisbursement": {
+      "@id": "divvy:walletDisbursement"
+    },
+    "DisbursementSubType": "divvy:DisbursementSubType",
+    "FundingAccountResponse": "divvy:FundingAccountResponse",
+    "FundingAccountTypeResponse": "divvy:FundingAccountTypeResponse",
+    "InternationalDisbursement": "divvy:InternationalDisbursement",
+    "disbursementSubType": {
+      "@id": "divvy:disbursementSubType"
+    },
+    "ListResponseDto_PaymentResponseDto_": "divvy:ListResponseDto_PaymentResponseDto_",
+    "PaymentPurposeCodeResponse": "divvy:PaymentPurposeCodeResponse",
+    "PaymentPurposeResponse": "divvy:PaymentPurposeResponse",
+    "text": {
+      "@id": "divvy:text",
+      "@type": "xsd:string"
+    },
+    "PaymentResponseDto": "divvy:PaymentResponseDto",
+    "fundingAccount": {
+      "@id": "divvy:fundingAccount"
+    },
+    "processingOptions": {
+      "@id": "divvy:processingOptions"
+    },
+    "voidInfo": {
+      "@id": "divvy:voidInfo",
+      "@container": "@list"
+    },
+    "disbursementInfo": {
+      "@id": "divvy:disbursementInfo"
+    },
+    "paymentPurpose": {
+      "@id": "divvy:paymentPurpose"
+    },
+    "cardFundingPurpose": {
+      "@id": "divvy:cardFundingPurpose",
+      "@type": "xsd:string"
+    },
+    "cancelRequestSubmitted": {
+      "@id": "divvy:cancelRequestSubmitted",
+      "@type": "xsd:boolean"
+    },
+    "ProcessingOptionsResponse": "divvy:ProcessingOptionsResponse",
+    "requestPayFaster": {
+      "@id": "divvy:requestPayFaster",
+      "@type": "xsd:boolean"
+    },
+    "createBill": {
+      "@id": "divvy:createBill",
+      "@type": "xsd:boolean"
+    },
+    "requestCheckDeliveryType": {
+      "@id": "divvy:requestCheckDeliveryType"
+    },
+    "RppsDisbursement": "divvy:RppsDisbursement",
+    "traceNumber": {
+      "@id": "divvy:traceNumber",
+      "@type": "xsd:integer"
+    },
+    "batchNumber": {
+      "@id": "divvy:batchNumber",
+      "@type": "xsd:integer"
+    },
+    "VcardDisbursement": "divvy:VcardDisbursement",
+    "validUntil": {
+      "@id": "divvy:validUntil",
+      "@type": "xsd:date"
+    },
+    "last4CardNumber": {
+      "@id": "divvy:last4CardNumber",
+      "@type": "xsd:string"
+    },
+    "VoidInfo": "divvy:VoidInfo",
+    "requestedBy": {
+      "@id": "divvy:requestedBy",
+      "@type": "xsd:string"
+    },
+    "reason": {
+      "@id": "divvy:reason",
+      "@type": "xsd:string"
+    },
+    "VoidStatus": "divvy:VoidStatus",
+    "VoidType": "divvy:VoidType",
+    "WalletDisbursement": "divvy:WalletDisbursement",
+    "CheckDeliveryTypeRequest": "divvy:CheckDeliveryTypeRequest",
+    "FundingAccountRequest": "divvy:FundingAccountRequest",
+    "FundingAccountTypeRequest": "divvy:FundingAccountTypeRequest",
+    "PaymentPurposeCodeRequest": "divvy:PaymentPurposeCodeRequest",
+    "PaymentPurposeRequest": "divvy:PaymentPurposeRequest"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Divvy API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Divvy's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/divvy-bill-v3-api-openapi.yml, openapi/divvy-connect-events-api-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/divvy-bill-v3-api-openapi.yml",
+    "openapi/divvy-connect-events-api-openapi.yml"
+  ]
+}

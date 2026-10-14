@@ -1,0 +1,1001 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/divvy/main/json-schema/divvy-send-test-event-request-dto-schema.json",
+  "title": "SendTestEventRequestDto",
+  "description": "Generate a test event notification",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/divvy-connect-events-api-openapi.yml#/components/schemas/SendTestEventRequestDto",
+  "type": "object",
+  "properties": {
+    "eventType": {
+      "type": "string",
+      "description": "Event type. You can get the BILL events catalog with `GET /v3/events/catalog`."
+    },
+    "version": {
+      "type": "string",
+      "description": "Event type version"
+    },
+    "vendor": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VendorPayloadV1"
+        },
+        {
+          "description": "Test `vendor` event payload"
+        }
+      ]
+    },
+    "bill": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BillPayloadV1"
+        },
+        {
+          "description": "Test `bill` event payload"
+        }
+      ]
+    },
+    "bank-account": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BankAccountPayloadV1"
+        },
+        {
+          "description": "Test `bank-account` event payload"
+        }
+      ]
+    },
+    "card-account": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/CardAccountPayloadV1"
+        },
+        {
+          "description": "Test `card-account` event payload"
+        }
+      ]
+    },
+    "payment": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PaymentPayloadV1"
+        },
+        {
+          "description": "Test `payment` event payload"
+        }
+      ]
+    },
+    "risk-verification": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/RiskVerificationPayloadV1"
+        },
+        {
+          "description": "Test `risk-verification` event payload"
+        }
+      ]
+    },
+    "invoice": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/InvoicePayloadV1"
+        },
+        {
+          "description": "Test `invoice` event payload"
+        }
+      ]
+    },
+    "transaction": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/TransactionPayloadV1"
+        },
+        {
+          "description": "Test `spend.transaction` event payload"
+        }
+      ]
+    },
+    "threeDsChallenge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ThreeDsChallengePayloadV1"
+        },
+        {
+          "description": "Test `spend.threeDsChallenge` event payload"
+        }
+      ]
+    },
+    "reimbursement": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ReimbursementPayloadV1"
+        },
+        {
+          "description": "Test `spend.reimbursement` event payload"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "AdditionalInfo": {
+      "type": "object",
+      "properties": {
+        "taxId": {
+          "type": "string"
+        },
+        "taxIdType": {
+          "type": "string"
+        },
+        "track1099": {
+          "type": "boolean"
+        },
+        "leadTimeInDays": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "combinePayments": {
+          "type": "boolean"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "paymentTermId": {
+          "type": "string"
+        }
+      },
+      "description": "Vendor additional information."
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "line1": {
+          "type": "string"
+        },
+        "line2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "stateOrProvince": {
+          "type": "string"
+        },
+        "zipOrPostalCode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      },
+      "description": "Vendor address information."
+    },
+    "AutoPay": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "description": "Vendor auto-pay information."
+    },
+    "Balance": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "lastUpdatedDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Vendor account balance information."
+    },
+    "BankAccountDefaults": {
+      "type": "object",
+      "properties": {
+        "payables": {
+          "type": "boolean"
+        },
+        "receivables": {
+          "type": "boolean"
+        }
+      },
+      "description": "Bank payment default values for BILL AP and AR operations."
+    },
+    "BankAccountPayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "nameOnAccount": {
+          "type": "string"
+        },
+        "routingNumber": {
+          "type": "string"
+        },
+        "bankName": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "ownerType": {
+          "type": "string"
+        },
+        "default": {
+          "$ref": "#/$defs/BankAccountDefaults"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Bank Account transformed payload."
+    },
+    "BillClassificationsDto": {
+      "type": "object",
+      "properties": {
+        "chartOfAccountId": {
+          "type": "string"
+        },
+        "accountingClassId": {
+          "type": "string"
+        },
+        "departmentId": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        }
+      },
+      "description": "General ledger classifications information for the bill."
+    },
+    "BillPayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "vendorId": {
+          "type": "string"
+        },
+        "vendorName": {
+          "type": "string"
+        },
+        "invoice": {
+          "$ref": "#/$defs/Invoice"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "payFromChartOfAccountId": {
+          "type": "string"
+        },
+        "paymentStatus": {
+          "type": "string"
+        },
+        "classifications": {
+          "$ref": "#/$defs/BillClassificationsDto"
+        },
+        "purchaseOrderNumber": {
+          "type": "string"
+        }
+      },
+      "description": "Bill transformed payload."
+    },
+    "CardAccountDefaults": {
+      "type": "object",
+      "properties": {
+        "payables": {
+          "type": "boolean"
+        },
+        "receivables": {
+          "type": "boolean"
+        },
+        "funding": {
+          "type": "boolean"
+        },
+        "disbursement": {
+          "type": "boolean"
+        }
+      },
+      "description": "Card payment default values for BILL operations."
+    },
+    "CardAccountExpiration": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "string"
+        },
+        "month": {
+          "type": "string"
+        }
+      },
+      "description": "Card expiration month and year."
+    },
+    "CardAccountPayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nameOnAccount": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "last4": {
+          "type": "string"
+        },
+        "expiration": {
+          "$ref": "#/$defs/CardAccountExpiration"
+        },
+        "default": {
+          "$ref": "#/$defs/CardAccountDefaults"
+        }
+      },
+      "description": "Card Account transformed payload."
+    },
+    "CurrencyData": {
+      "type": "object",
+      "properties": {
+        "exchangeRate": {
+          "type": "number"
+        },
+        "exponent": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "originalCurrencyAmount": {
+          "type": "string"
+        },
+        "originalCurrencyCode": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        }
+      },
+      "description": "CurrencyData class for Spend \\& Expense Transactions."
+    },
+    "CustomField": {
+      "required": [
+        "name",
+        "note",
+        "selectedValues",
+        "uuid"
+      ],
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "selectedValues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CustomFieldValue"
+          }
+        }
+      },
+      "description": "Custom field object used for custom field return values. Used on Transaction and Reimbursement returns"
+    },
+    "CustomFieldValue": {
+      "required": [
+        "uuid",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "description": "Custom field value object representing the custom field value return on Custom fields for transactions and reimbursements."
+    },
+    "Disbursement": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "arrivesByDate": {
+          "type": "string"
+        },
+        "disbursementAccount": {
+          "$ref": "#/$defs/DisbursementAccount"
+        }
+      },
+      "description": "Payment disbursement information."
+    },
+    "DisbursementAccount": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        }
+      },
+      "description": "Disbursement account details."
+    },
+    "FulfillmentType": {
+      "type": "string",
+      "description": "Enum for fulfillment type.",
+      "enum": [
+        "PAYROLL",
+        "ACH",
+        "UNSPECIFIED"
+      ]
+    },
+    "Funding": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "fundingAccount": {
+          "$ref": "#/$defs/FundingAccount"
+        }
+      },
+      "description": "Payment funding information."
+    },
+    "FundingAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "last4": {
+          "type": "string"
+        }
+      },
+      "description": "Funding account details."
+    },
+    "Invoice": {
+      "type": "object",
+      "properties": {
+        "invoiceNumber": {
+          "type": "string"
+        },
+        "invoiceDate": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "description": "Invoice information."
+    },
+    "InvoicePayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "invoiceNumber": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "totalAmount": {
+          "type": "number"
+        },
+        "dueAmount": {
+          "type": "number"
+        },
+        "scheduledAmount": {
+          "type": "number"
+        },
+        "creditAmount": {
+          "type": "number"
+        },
+        "invoiceDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "payToChartOfAccountId": {
+          "type": "string"
+        },
+        "salesTaxPercentage": {
+          "type": "number"
+        },
+        "salesTaxTotal": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "invoice transformed payload."
+    },
+    "PaymentInformation": {
+      "type": "object",
+      "properties": {
+        "payByType": {
+          "type": "string"
+        },
+        "virtualCard": {
+          "$ref": "#/$defs/VirtualCard"
+        },
+        "email": {
+          "type": "string"
+        },
+        "payeeName": {
+          "type": "string"
+        },
+        "lastPaymentDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Vendor payment information."
+    },
+    "PaymentPayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "billIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transactionNumber": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "processDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "funding": {
+          "$ref": "#/$defs/Funding"
+        },
+        "disbursement": {
+          "$ref": "#/$defs/Disbursement"
+        },
+        "vendor": {
+          "$ref": "#/$defs/Vendor"
+        },
+        "billingType": {
+          "type": "string"
+        }
+      },
+      "description": "Payload for Payment."
+    },
+    "ReceiptStatusType": {
+      "type": "string",
+      "description": "ReceiptStatusType enum for Spend \\& Expense Transactions.",
+      "enum": [
+        "VALIDATED",
+        "NOT_VALIDATED",
+        "ATTACHED",
+        "MISSING",
+        "NOT_REQUIRED",
+        "NOT_ATTACHED",
+        "UNSPECIFIED"
+      ]
+    },
+    "ReimbursementPayloadV1": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "merchantName": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/ReimbursementStatus"
+        },
+        "fulfillmentType": {
+          "$ref": "#/$defs/FulfillmentType"
+        },
+        "budgetUuid": {
+          "type": "string"
+        },
+        "companyUuid": {
+          "type": "string"
+        },
+        "userUuid": {
+          "type": "string"
+        },
+        "occurredTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retiredTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "submittedTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Spend reimbursement transformed payload."
+    },
+    "ReimbursementStatus": {
+      "type": "string",
+      "description": "Enum for reimbursement status.",
+      "enum": [
+        "UNSPECIFIED",
+        "CREATED",
+        "AWAITING_APPROVAL",
+        "APPROVAL_UNDONE",
+        "AWAITING_TIER2_APPROVAL",
+        "TIER2_APPROVAL_UNDONE",
+        "APPROVED",
+        "CANCEL_PAYMENT",
+        "FUNDING_RECEIVED",
+        "PAID",
+        "PAYMENT_FAILED",
+        "DENIED",
+        "DENIAL_UNDONE",
+        "DELETED"
+      ]
+    },
+    "RiskVerificationPayloadV1": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string"
+        }
+      },
+      "description": "Payload for Risk Verification."
+    },
+    "ThreeDsChallengePayloadV1": {
+      "type": "object",
+      "properties": {
+        "merchantName": {
+          "type": "string"
+        },
+        "merchantCategoryCode": {
+          "type": "string"
+        },
+        "acsTransactionId": {
+          "type": "string"
+        },
+        "userUuid": {
+          "type": "string"
+        },
+        "occurredTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "cardUuid": {
+          "type": "string"
+        },
+        "companyUuid": {
+          "type": "string"
+        },
+        "currencyCode": {
+          "type": "string"
+        }
+      },
+      "description": "3ds challenge transformed payload."
+    },
+    "TransactionPayloadV1": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "fees": {
+          "type": "number"
+        },
+        "foreignExchangeFee": {
+          "type": "number"
+        },
+        "transactionType": {
+          "$ref": "#/$defs/TransactionType"
+        },
+        "parentTransactionUuid": {
+          "type": "string"
+        },
+        "userUuid": {
+          "type": "string"
+        },
+        "rawMerchantName": {
+          "type": "string"
+        },
+        "merchantName": {
+          "type": "string"
+        },
+        "budgetUuid": {
+          "type": "string"
+        },
+        "originalAuthTransactionUuid": {
+          "type": "string"
+        },
+        "occurredTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "authorizedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CustomField"
+          }
+        },
+        "currencyData": {
+          "$ref": "#/$defs/CurrencyData"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "receiptStatus": {
+          "$ref": "#/$defs/ReceiptStatusType"
+        },
+        "cardUuid": {
+          "type": "string"
+        },
+        "companyUuid": {
+          "type": "string"
+        },
+        "merchantCategoryCode": {
+          "type": "string"
+        },
+        "declineReason": {
+          "type": "string"
+        },
+        "declineInternalReasonCode": {
+          "type": "string"
+        }
+      },
+      "description": "Spend Transaction transformed payload."
+    },
+    "TransactionType": {
+      "type": "string",
+      "description": "TransactionType.",
+      "enum": [
+        "CLEAR",
+        "DECLINE",
+        "AUTHORIZATION"
+      ]
+    },
+    "Vendor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "description": "Vendor information."
+    },
+    "VendorPayloadV1": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "shortName": {
+          "type": "string"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "paymentNetworkId": {
+          "type": "string"
+        },
+        "rppsId": {
+          "type": "string"
+        },
+        "networkStatus": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "paymentInformation": {
+          "$ref": "#/$defs/PaymentInformation"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "recurringPayments": {
+          "type": "boolean"
+        },
+        "billCurrency": {
+          "type": "string"
+        },
+        "autoPay": {
+          "$ref": "#/$defs/AutoPay"
+        },
+        "balance": {
+          "$ref": "#/$defs/Balance"
+        },
+        "additionalInfo": {
+          "$ref": "#/$defs/AdditionalInfo"
+        }
+      },
+      "description": "Vendor transformed payload."
+    },
+    "VirtualCard": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "remitEmail": {
+          "type": "string"
+        },
+        "enrollDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "declineDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "alternatePayByType": {
+          "type": "string"
+        }
+      },
+      "description": "Vendor virtual card enrollment information."
+    }
+  }
+}
