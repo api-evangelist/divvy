@@ -1,0 +1,1017 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Bill Approvals API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: bill-approvals
+paths:
+  /v3/bill-approvals/actions:
+    post:
+      tags:
+      - bill-approvals
+      summary: Approve or deny a bill
+      description: Approve or deny a bill. Approved bills can be paid. In the request, create an array of objects, where each object represents a single bill along with its approval or denial status.
+      operationId: billApproveDenyActions
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BillApproveDenyActionRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Approve or deny a bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bill-approvals/pending-user-approvals:
+    get:
+      tags:
+      - bill-approvals
+      summary: Get list of bills pending approval
+      description: Get a list of bills that are pending approval by a user. In the response, you get the list of bills that are pending approval for the currently signed-in user.
+      operationId: listBillUserApprovals
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get list of bills pending approval response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBillUserApprovalsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bill-approvals/policies:
+    get:
+      tags:
+      - bill-approvals
+      summary: Get list of bill approval policies
+      description: Get a list of bill approval policy objects.
+      operationId: listBillApprovalPolicies
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get list of bill approval policies response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BillApprovalPolicyResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - bill-approvals
+      summary: Create a bill approval policy
+      description: 'Create a new bill approval policy.
+
+
+        In your request, set `rules` and `approvers` in the specified format. For example, to create a bill approval policy for all bills greater than or equal to `$1000`, set `rules` for `BILL_AMOUNT`.
+
+        ```
+
+        {
+
+        "policyName": "Approval policy for bills >= $1000",
+
+        "rules": [
+
+        {
+
+        "key": "BILL_AMOUNT",
+
+        "op": "gte",
+
+        "values": [
+
+        "1000"
+
+        ]
+
+        }
+
+        ],
+
+        "approvers": [
+
+        "{approver_user_id}"
+
+        ]
+
+        }
+
+        ```'
+      operationId: createBillApprovalPolicy
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillApprovalPolicyRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a bill approval policy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillApprovalPolicyResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bill-approvals/policies/{policyId}:
+    put:
+      tags:
+      - bill-approvals
+      summary: Update a bill approval policy
+      description: Update an existing bill approval policy.
+      operationId: updateBillApprovalPolicy
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the approval policy. The value is in the `{organization_id}-{unique_id}` format.
+          example: '{{bill_approval_policy_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillApprovalPolicyRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a bill approval policy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillApprovalPolicyResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - bill-approvals
+      summary: Delete a bill approval policy
+      description: Delete an existing bill approval policy. A deleted approval policy cannot be restored. The deleted policy is not available in the list of approval policies.
+      operationId: deletePolicy
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the approval policy. The value is in the `{organization_id}-{unique_id}` format.
+          example: '{{bill_approval_policy_id}}'
+      responses:
+        '200':
+          description: Delete a bill approval policy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    RuleOperatorCreateDto:
+      type: string
+      description: Operators for approval rules.
+      enum:
+      - lt
+      - gte
+      - in
+    ApproverUserDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        fullName:
+          type: string
+          description: User full name
+      description: User Approvers for a bill approval policy.
+    BillApprovalPolicyCreateRuleDto:
+      type: object
+      properties:
+        key:
+          allOf:
+          - $ref: '#/components/schemas/RuleKeyCreateDto'
+          - description: 'Rule key.
+
+
+              **Note**: Currently, only `BILL_AMOUNT` is supported with the API.'
+        op:
+          allOf:
+          - $ref: '#/components/schemas/RuleOperatorCreateDto'
+          - description: 'Rule operator.
+
+              * `lt`: Less than
+
+              * `gte`: Greater than or equal to
+
+              * `in`: Any value in a list
+
+              '
+        values:
+          type: array
+          description: Rule values
+          items:
+            type: string
+      description: Rules for a bill approval policy.
+    RuleKeyCreateDto:
+      type: string
+      description: Keys for approval rules.
+      enum:
+      - BILL_AMOUNT
+      - BILL_LINE_ITEM_AMOUNT
+      - CHART_OF_ACCOUNT_ID
+      - VENDOR_ID
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    ResponseStatus:
+      type: string
+      description: Status of the response.
+      enum:
+      - SUCCESS
+      - FAILURE
+    RuleValueDto:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Value
+        displayName:
+          type: string
+          description: Display name
+      description: Rule value DTO.
+    BillApprovalPolicyRuleResponseDto:
+      type: object
+      properties:
+        key:
+          allOf:
+          - $ref: '#/components/schemas/RuleKeyResponse'
+          - description: Rule key
+        op:
+          allOf:
+          - $ref: '#/components/schemas/BillApprovalRuleOperatorResponse'
+          - description: Rule operator
+        values:
+          type: array
+          description: Rule values
+          items:
+            $ref: '#/components/schemas/RuleValueDto'
+      description: Rules for a bill approval policy.
+    BillApproversDto:
+      type: object
+      properties:
+        users:
+          type: array
+          description: List of approver users
+          items:
+            $ref: '#/components/schemas/ApproverUserDto'
+        groups:
+          type: array
+          description: List of approval groups
+          items:
+            $ref: '#/components/schemas/ApproverGroupDto'
+      description: Approvers for a bill approval policy.
+    BillApprovalPolicyResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the approval policy. The value is in the `{organization_id}-{unique_id}` format.
+        policyName:
+          type: string
+          description: Bill approval policy name
+        status:
+          type: string
+          description: Bill approval policy status
+        rules:
+          type: array
+          description: Bill approval policy rules
+          items:
+            $ref: '#/components/schemas/BillApprovalPolicyRuleResponseDto'
+        approvers:
+          allOf:
+          - $ref: '#/components/schemas/BillApproversDto'
+          - description: List of approvers
+      description: Response DTO for bill approval policy.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    BillApproveDenyActionRequestDto:
+      required:
+      - action
+      - billId
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        action:
+          allOf:
+          - $ref: '#/components/schemas/BillApproveDenyAction'
+          - description: Approve or deny the bill. Approved bills can be paid.
+        comment:
+          type: string
+          description: Reason of the decision
+      description: Bill approve/deny action request
+      example: "[\n  {\n    \"billId\": \"{{bill_id}}\",\n    \"action\": \"APPROVE\",\n    \"comment\": \"Approved for payment\"\n  }\n]"
+    BillApprovalRuleOperatorResponse:
+      type: string
+      description: Response enum of operators supported for bill policy approval rules.
+      enum:
+      - lt
+      - gte
+      - in
+      - nin
+      - UNDEFINED
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    RuleKeyResponse:
+      type: string
+      description: Response enum of allowed keys for bill policy approval.
+      enum:
+      - BILL_AMOUNT
+      - BILL_LINE_ITEM_AMOUNT
+      - ACCOUNTING_CLASS_ID
+      - CHART_OF_ACCOUNT_ID
+      - CUSTOMER_ID
+      - DEPARTMENT_ID
+      - EMPLOYEE_ID
+      - JOB_ID
+      - LOCATION_ID
+      - VENDOR_ID
+      - UNDEFINED
+    StatusDto:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResponseStatus'
+          - description: Request status
+      description: The type Delete response dto.
+    BillUserApprovalsResponseDto:
+      required:
+      - billId
+      - vendorId
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        amount:
+          type: number
+          description: Bill amount. This value is in USD.
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Bill User Approvals Response Dto.
+    GroupUsers:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        fullName:
+          type: string
+          description: User full name
+      description: Users that are part of an approval group.
+    BillApprovalPolicyRequestDto:
+      required:
+      - approvers
+      - policyName
+      - rules
+      type: object
+      properties:
+        policyName:
+          type: string
+          description: Bill approval policy name
+        rules:
+          type: array
+          description: 'Bill approval policy rules. You can set multiple rules for a policy.
+
+
+            **Note**: Policy rules are applied in the specified order.'
+          items:
+            $ref: '#/components/schemas/BillApprovalPolicyCreateRuleDto'
+        approvers:
+          type: array
+          description: 'List of approvers. For each approver, set the BILL-generated ID of the user. The value begins with `006`.
+
+
+            **Note**: BILL requests approvals in the specified order.'
+          items:
+            type: string
+      description: Create a bill approval policy
+      example:
+        policyName: Approval policy for bills >= $1000
+        rules:
+        - key: BILL_AMOUNT
+          op: gte
+          values:
+          - '1000'
+        approvers:
+        - '{{bill_approver_user_id}}'
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ApproverGroupDto:
+      type: object
+      properties:
+        groupName:
+          type: string
+          description: Approval group name
+        groupId:
+          type: string
+          description: BILL-generated ID of the approval group. The value begins with `agp`.
+        users:
+          type: array
+          description: Approval group user information
+          items:
+            $ref: '#/components/schemas/GroupUsers'
+      description: Groups containing users.
+    ListBillUserApprovalsResponseDto:
+      type: object
+      properties:
+        bills:
+          type: array
+          description: List of bills pending approval
+          items:
+            $ref: '#/components/schemas/BillUserApprovalsResponseDto'
+      description: List Bill User Approvals Response Dto.
+    BillApproveDenyAction:
+      type: string
+      description: Bill approval and denial actions.
+      enum:
+      - APPROVE
+      - DENY
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

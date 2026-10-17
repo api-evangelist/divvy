@@ -1,0 +1,1657 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Organizations API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Organizations
+paths:
+  /v3/organizations/industries:
+    get:
+      tags:
+      - Organizations
+      summary: Get list of organization industries
+      description: Get a list of available values for the `industry` field for an organization. Use this information to set the `industry` field in your `POST /v3/partner/organizations` or `PATCH /v3/organizations/{organizationId}` request.
+      operationId: listIndustries
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get list of organization industries response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListIndustriesResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/organizations/{organizationId}:
+    get:
+      tags:
+      - Organizations
+      summary: Get organization details
+      description: 'Get details about an existing organization. The currently signed-in user must have the `ADMINISTRATOR` user role in the BILL organization to perform this operation.
+
+
+        See Organizations and Users in the Guides section for more information, sample requests, and responses.'
+      operationId: getOrganization
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{organization_id}}'
+      responses:
+        '200':
+          description: Get organization details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Organizations
+      summary: Update an organization
+      description: 'Update details about an existing organization. The currently signed-in user must have the `ADMINISTRATOR` user role in the BILL organization to perform this operation.
+
+
+        See Organizations and Users in the Guides section for more information, sample requests, and responses.'
+      operationId: updateOrganization
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{organization_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update an organization response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/organizations/{organizationId}/billing-statements:
+    get:
+      tags:
+      - Organizations
+      summary: Get list of billing statements
+      description: 'Get a list of billing statements for the organization. BILL generates a monthly billing invoice statement for all the billing activities in the organization.
+
+
+        In the request, set `invoiceDateFrom` and `invoiceDateTo` to get the billing invoice statements for the specified date range.
+
+
+        You can set `max` and `page` in the request only when both `invoiceDateFrom` and `invoiceDateTo` are not set. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listBillingStatements
+      parameters:
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{organization_id}}'
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results. You can set `max` only when both `invoiceDateFrom` and `invoiceDateTo` are not set.
+          format: int32
+      - name: invoiceDateFrom
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Billing invoice start date. The value is in the `yyyy-MM-dd` format. This field is required if `invoiceDateTo` is set.
+      - name: invoiceDateTo
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Billing invoice end date. The value is in the `yyyy-MM-dd` format. This field is required if `invoiceDateFrom` is set.
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results. You can set `page` only when both `invoiceDateFrom` and `invoiceDateTo` are not set.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of billing statements response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBillingStatementResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/organizations/{organizationId}/billing-statements/{billingStatementId}:
+    get:
+      tags:
+      - Organizations
+      summary: Get billing statement details
+      description: 'Get details about a billing statement for the organization. BILL generates a monthly billing invoice statement for all the billing activities in the organization.
+
+
+        From the response, use `downloadLink` in a GET request to download a billing statement.
+
+
+        ```
+
+        curl ''{downloadLink}'' --header ''sessionId: {session_id}'' --output {statement_name}
+
+        ```'
+      operationId: getBillingStatementDetail
+      parameters:
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{organization_id}}'
+      - name: billingStatementId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the billing statement. The value begins with `0S0`.
+          example: '{{billing_statement_id}}'
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get billing statement details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingStatementDetailResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/organizations/{organizationId}/price-plan:
+    get:
+      tags:
+      - Organizations
+      summary: Get organization price plan details
+      description: 'Get the BILL price plan details for an existing organization. The currently signed-in user must have the `ADMINISTRATOR` user role in the BILL organization to perform this operation.
+
+
+        A BILL price plan for an organization provides a range of information, including monthly subscription fees and the terms and conditions for additional charges in the price plan.
+
+
+        In the response, the `planTerms` object includes information about charges for price plan features based on a combination of charge `tier`, `quantity`, and `price`. We explain plan terms with an example.
+
+        * If `"tier": 1`, `"quantity": 5`, and `"price": 10`, the first 5 users will be charged $10 each.
+
+        * If `"tier": 2`, `"quantity": 10`, and `"price": 8`, the next 10 users will be charged $8 each. At this level, if there is no `tier` information, all users after tier 1 will be charged $8 each.'
+      operationId: getPricePlan
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{organization_id}}'
+      responses:
+        '200':
+          description: Get organization price plan details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricePlanResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    TaxIdTypeRequest:
+      type: string
+      description: The enum Tax id type enum.
+      enum:
+      - EIN
+      - SSN
+    BillingStatementDetailResponseDto:
+      required:
+      - amount
+      - billingPeriod
+      - description
+      - downloadLink
+      - id
+      - invoiceDate
+      - invoiceNumber
+      - paymentStatus
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the billing statement. The value begins with `0S0`.
+        invoiceNumber:
+          type: string
+          description: Billing invoice number
+        invoiceDate:
+          type: string
+          description: Billing invoice date
+          format: date
+        description:
+          type: string
+          description: Billing invoice description
+        billingPeriod:
+          allOf:
+          - $ref: '#/components/schemas/BillingPeriodDto'
+          - description: Billing period information
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillingStatementPaymentStatus'
+          - description: Billing invoice payment status
+        paymentDate:
+          type: string
+          description: Billing invoice payment date
+          format: date
+        amount:
+          type: number
+          description: Billing invoice amount
+        statementDetails:
+          type: array
+          description: Statement details. This includes billing invoice line item information.
+          items:
+            $ref: '#/components/schemas/BillingStatementDetailLineItemDto'
+        downloadLink:
+          allOf:
+          - $ref: '#/components/schemas/DownloadLinkDto'
+          - description: Billing statement download link information
+      description: BillingStatementDetail response Dto.
+    BusinessCategoryRequest:
+      type: string
+      description: Business Category.
+      enum:
+      - CORPORATION
+      - LLC
+      - NON_PROFIT
+      - GOVERNMENT
+      - SOLE_PROPRIETOR
+      - INDIVIDUAL
+      - TRUST
+      - UNKNOWN
+    DownloadLinkDto:
+      required:
+      - csv
+      - pdf
+      type: object
+      properties:
+        csv:
+          type: string
+          description: CSV format
+        pdf:
+          type: string
+          description: PDF format
+      description: DownloadLink response Dto.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    PlanTerm:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Plan charge type
+        name:
+          allOf:
+          - $ref: '#/components/schemas/PlanTermItemName'
+          - description: Plan charge name
+        tier:
+          type: number
+          description: Plan charge tier
+        quantity:
+          type: number
+          description: Quantity for the plan charge
+        price:
+          type: number
+          description: Plan charge
+      description: Plan Term.
+    CountryCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BM
+      - BN
+      - BO
+      - BR
+      - BS
+      - BT
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CV
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IN
+      - IO
+      - IQ
+      - IS
+      - IT
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MG
+      - MH
+      - MK
+      - ML
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - ST
+      - SV
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - UM
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+    OrganizationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+        archived:
+          type: boolean
+          description: Set as `true` if the organization is archived. You cannot archive an organization with the API.
+        name:
+          type: string
+          description: Organization name
+        displayName:
+          type: string
+          description: Organization display name (DBA trade name)
+        address:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Organization physical address
+        mailingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Organization mailing address
+        phone:
+          type: string
+          description: Organization phone number
+        companyOwner:
+          allOf:
+          - $ref: '#/components/schemas/CompanyOwner'
+          - description: Company owner information
+        taxId:
+          type: string
+          description: Organization tax ID. This value is required by the IRS for tax purposes.
+        taxIdType:
+          allOf:
+          - $ref: '#/components/schemas/TaxIdTypeResponse'
+          - description: Organization tax ID type.
+        industry:
+          type: string
+          description: Organization industry
+        businessCategory:
+          allOf:
+          - $ref: '#/components/schemas/BusinessCategoryResponse'
+          - description: Organization business category.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAccountTypeResponse'
+          - description: Organization account type.
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationProcessingOptions'
+          - description: Organization processing options
+        partnerName:
+          type: string
+          description: 'Partner name.
+
+
+            This field is available only when select BILL partners create an organization. Partner name is part of the information that BILL uses to identify partners.'
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Organization response.
+    TaxIdTypeResponse:
+      type: string
+      description: The enum Tax id type enum.
+      enum:
+      - EIN
+      - SSN
+      - UNDEFINED
+    OrganizationAccountTypeResponse:
+      type: string
+      description: Organization Account Type.
+      enum:
+      - BUSINESS
+      - CONTRACTOR
+      - EMPLOYEE_OR_INDIVIDUAL
+      - OTHER
+      - CONSUMER
+      - UNDEFINED
+    ListBillingStatementResponseDto:
+      type: object
+      description: Response DTO for listing billing statements.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_BillingStatementResponseDto_'
+    PricePlanResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the price plan. The value begins with `ppl`.
+        name:
+          type: string
+          description: Price plan name
+        monthlyPrice:
+          type: number
+          description: Price plan monthly subscription fee
+        allowTrial:
+          type: boolean
+          description: Set as `true` if the price plan allows a trial
+        priceVariesPerUser:
+          type: boolean
+          description: Set as `true` if the price plan has per-user pricing
+        planTerms:
+          type: array
+          description: Terms and conditions for additional charges in the price plan. These charges are for price plan features based on a combination of charge `type`, `tier`, `quantity`, and `price`.
+          items:
+            $ref: '#/components/schemas/PlanTerm'
+      description: Organization price plan response.
+    BillingStatementDetailLineItemDto:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: Billing invoice line item quantity
+          format: int32
+        description:
+          type: string
+          description: Billing invoice line item description
+        type:
+          type: string
+          description: Billing invoice line item type
+        amount:
+          type: number
+          description: Billing invoice line item amount
+      description: BillingStatementDetailLineItem response Dto.
+    AddressUpdate:
+      type: object
+      properties:
+        line1:
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+      description: The type Address Update dto.
+    BusinessCategoryResponse:
+      type: string
+      description: Business Category.
+      enum:
+      - UNDEFINED
+      - CORPORATION
+      - LLC
+      - NON_PROFIT
+      - GOVERNMENT
+      - SOLE_PROPRIETOR
+      - INDIVIDUAL
+      - TRUST
+      - UNKNOWN
+    ListResponseDto_BillingStatementResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingStatementResponseDto'
+      description: Response from a list API request with paging references.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    OrganizationAccountTypeRequest:
+      type: string
+      description: Organization Account Type.
+      enum:
+      - BUSINESS
+      - CONTRACTOR
+      - EMPLOYEE_OR_INDIVIDUAL
+      - OTHER
+      - CONSUMER
+    AddressResponse:
+      required:
+      - city
+      - country
+      - line1
+      - zipOrPostalCode
+      type: object
+      properties:
+        line1:
+          minLength: 1
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          minLength: 1
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          minLength: 1
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+        countryName:
+          type: string
+          description: Country name.
+      description: Address response.
+    OrganizationProcessingOptions:
+      type: object
+      properties:
+        mailingAddressSameAsPhysical:
+          type: boolean
+          description: Set as `true` if the mailing address is the same as the physical address. The default value is `true`.
+        individualTransferOut:
+          type: boolean
+          description: 'Rule for how ACH transfers are made from the organization funding bank account to vendors.
+
+            * Set as `true` for an individual ACH transfer for each payment made.
+
+            * Set as `false` for a single batch ACH transfer for all payments made in a day. The default value is `false`.
+
+
+            **Note**: You can set this field only when you update an organization (`PATCH /v3/organizations/{organizationId}`).'
+        individualTransferIn:
+          type: boolean
+          description: 'Rule for how ACH transfers are made from customers to the organization funding bank account.
+
+            * Set as `true` for an individual ACH transfer for each payment received.
+
+            * Set as `false` for a single batch ACH transfer for all payments received in a day. The default value is `false`.
+
+
+            **Note**: You can set this field only when you update an organization (`PATCH /v3/organizations/{organizationId}`).'
+      description: User provided options for having the same mailing address as the physical address.
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    BillingStatementPaymentStatus:
+      type: string
+      description: Enum representing the payment status of a billing statement.
+      enum:
+      - UNPAID
+      - PAID
+      - PENDING
+      - FAILED
+      - VOIDED
+      - UNDEFINED
+    BillingStatementResponseDto:
+      required:
+      - amount
+      - billingPeriod
+      - description
+      - id
+      - invoiceDate
+      - invoiceNumber
+      - paymentStatus
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the billing statement. The value begins with `0S0`.
+        invoiceNumber:
+          type: string
+          description: Billing invoice number
+        invoiceDate:
+          type: string
+          description: Billing invoice date
+          format: date
+        description:
+          type: string
+          description: Billing invoice description
+        billingPeriod:
+          allOf:
+          - $ref: '#/components/schemas/BillingPeriodDto'
+          - description: Billing period information
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillingStatementPaymentStatus'
+          - description: Billing invoice payment status
+        paymentDate:
+          type: string
+          description: Billing invoice payment date
+          format: date
+        amount:
+          type: number
+          description: Billing invoice amount
+      description: BillingStatement response Dto.
+    ListIndustriesResponseDto:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: string
+      description: List type for Industries list.
+    CompanyOwner:
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          type: string
+          description: Company owner name
+        dateOfBirth:
+          type: string
+          description: Company owner date of birth. The value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Company owner.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    PlanTermItemName:
+      type: string
+      description: The enum plan term item name.
+      enum:
+      - users
+      - credit
+      - debit
+      - documents
+      - check_US
+      - consoleUser
+      - company
+      - check_NonUS
+      - ePayment
+      - fax
+      - zenBill
+      - recvdEPayment
+      - AR
+      - PayPal
+      - mailInvoices
+      - supportChat
+      - supportEmail
+      - supportPhone
+      - syncPremium
+      - customRoles
+      - trainingLvl1
+      - trainingLvl2
+      - trainingLvl3
+      - acctMgmtLvl1
+      - acctMgmtLvl2
+      - acctMgmtLvl3
+      - demoAccounts
+      - centralBilling
+      - firmBranding
+      - salesTools
+      - multipleModules
+      - consoleCompany
+      - accountantUser
+      - unlimitedConsoles
+      - discount
+      - remoteCheckDeposit
+      - xeroSync
+      - approvalPolicy
+      - featureUser
+      - approvalUser
+      - netsuite2
+      - intacct
+      - salesforce
+      - fasterPayment_checkOvernight
+      - fasterPayment_check2Day
+      - fasterPayment_check3Day
+      - fasterPayment_ach
+      - fasterPayment_rpps
+      - apLvl1
+      - apLvl2
+      - apLvl3
+      - arLvl1
+      - arLvl2
+      - arLvl3
+      - qbe
+      - desBill
+      - OLBUser
+      - collaboratorUser
+      - intlEPmtUSDWire
+      - intlEPmtFxWire
+      - intlEPmtFxIACH
+      - voidCheck
+      - voidCheckReturned
+      - docUpload
+      - billCreated
+      - olbUserLastLogin
+      - collaboratorLastLogin
+      - invoiceEmailed
+      - nsf
+      - lastSupportAccess
+      - amexPayment
+      - netSuiteSyncImplementation
+      - intacctSyncImplementation
+      - syncSetup
+      - hybridDataEntry
+      - vcardPayment
+      - vcardPaymentVoidReissue
+      - suaProcessedCount
+      - suaProcessedAmount
+      - suaReturnedCount
+      - suaReturnedAmount
+      - premiumSupport
+      - premiumSupportPlus
+      - apiLicenseKeyFee
+      - apiUserLicenseFee
+      - apiMaintenanceFee
+      - developerSupportFee
+      - implementation
+      - syncMigration
+      - training
+      - docsOnCD
+      - contractBilling
+      - receivedCCPaymentCount
+      - walletPmt_IntlUSD
+      - walletPmt_IntlFX
+      - implementationNetSuite
+      - implementationIntacct
+      - implementationQuickBooksEnterprise
+      - implementationMicrosoftDynamics
+      - implementationSSO
+      - cardFunded_ePayment
+      - cardFunded_check
+      - dynamicApprovals
+      - syncImplementation
+      - vCardProcessedCount
+      - vCardProcessedAmount
+      - vCardReturnedCount
+      - vCardReturnedAmount
+      - guestPay_ePayment
+      - auditorUser
+      - payByCardProcessedCount
+      - payByCardProcessedAmount
+      - payByCardChargeBackCount
+      - payByCardChargeBackAmount
+      - payByCardCheckUSCount
+      - payByCardEPaymentCount
+      - intlUSDTransactionCount
+      - intlFXTransactionCount
+      - intlFXTransactionAmount
+      - noAccessUser
+      - intlFXReturnedCount
+      - intlFXReturnedAmount
+      - fasterPayment_rtp
+      - cardFunded_intlEPmtUSDWire
+      - fasterPayment_vcard
+      - applicableTax
+      - other
+    OrganizationUpdateRequestDto:
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          type: string
+          description: Organization name
+        displayName:
+          maxLength: 100
+          type: string
+          description: Organization display name (DBA trade name)
+        address:
+          allOf:
+          - $ref: '#/components/schemas/AddressUpdate'
+          - description: Organization physical address
+        mailingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressUpdate'
+          - description: Organization mailing address
+        phone:
+          pattern: ^(\+?[1-9]\d{0,2}[-\s]?)?(\(\d{3}\))?([0-9-\s]{7,20})$
+          type: string
+          description: Organization phone number
+        companyOwner:
+          allOf:
+          - $ref: '#/components/schemas/CompanyOwner'
+          - description: Company owner information
+        taxId:
+          type: string
+          description: Organization tax ID. This value is required by the IRS for tax purposes.
+        taxIdType:
+          allOf:
+          - $ref: '#/components/schemas/TaxIdTypeRequest'
+          - description: Organization tax ID type
+        industry:
+          maxLength: 500
+          type: string
+          description: Organization industry
+        businessCategory:
+          allOf:
+          - $ref: '#/components/schemas/BusinessCategoryRequest'
+          - description: Organization business category
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAccountTypeRequest'
+          - description: Organization account type
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationProcessingOptions'
+          - description: Organization processing options
+      description: Update an organization (zip code updated)
+      example:
+        address:
+          zipOrPostalCode: '95002'
+    BillingPeriodDto:
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Billing period start date
+          format: date
+        endDate:
+          type: string
+          description: Billing period end date
+          format: date
+      description: BillingPeriod response Dto.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

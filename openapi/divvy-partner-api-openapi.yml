@@ -1,0 +1,2379 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Partner API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Partner
+paths:
+  /v3/partner/login:
+    post:
+      tags:
+      - Partner
+      summary: API partner login
+      description: 'Sign in to your BILL partner account. In the response, your partner API session is created and a BILL-generated `sessionId` is available. Use the `sessionId` in all subsequent API calls to confirm that you are in a signed-in session.
+
+
+        You get additional permissions with a partner account `sessionId`.
+
+        * Create a child BILL organization with `POST /v3/partner/organizations`.
+
+        * Create a user for the child BILL organization with `POST /v3/partner/users`.
+
+        * Sign in to the created organization as the created user of that organization with `/v3/partner/login-as-user`. After signing in, you can perform organization-level BILL API operations, such as creating a bill or paying a vendor. All organization-level BILL API operations require a `devKey` and `sessionId`.
+
+
+        **Note**: When you create an organization and then create a user for that organization, it is important that you initiate risk verification with `POST /v3/risk-verifications`. See Initiate risk verification for an organization for more information.
+
+
+        You can sign out with `POST /v3/logout`. If your API session is inactive for 35 minutes, the session expires and you are automatically signed out.'
+      operationId: partnerLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerLoginRequestDto'
+        required: true
+      responses:
+        '200':
+          description: API partner login response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerLoginResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/login-as-user:
+    post:
+      tags:
+      - Partner
+      summary: API login as user
+      description: 'Sign in to a created organization as a created user of that organization. In the response, your API session is created and a generated `sessionId` is available for organization-level BILL API operations.
+
+
+        This endpoint is required for a specific BILL partner-level workflow.
+
+        1. Sign in to your partner account with API partner login.
+
+        2. Create a child BILL organization with `POST /v3/partner/organizations`. In the response, a BILL-generated organization `id` is available.
+
+        3. Create a user for the child BILL organization with `POST /v3/partner/users`. In the response, a BILL-generated user `id` is available.
+
+        4. Sign in to the created organization as the created user of that organization with `POST /v3/partner/login-as-user`. After signing in, you can perform organization-level BILL API operations, such as creating a bill or paying a vendor. All organization-level BILL API operations require a `devKey` and `sessionId`.
+
+
+        **Note**: When you create an organization and then create a user for that organization, it is important that you initiate risk verification with `POST /v3/risk-verifications`. See Initiate risk verification for an organization for more information.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+
+        You can sign out with `POST /v3/logout`. If your API session is inactive for 35 minutes, the session expires and you are automatically signed out.
+
+
+        ### MFA-trusted API session
+
+        Set both `rememberMeId` and `device` as additional fields in your `POST /v3/partner/login-as-user` request to create an MFA-trusted API session.'
+      operationId: loginAsUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginAsUserRequestDto'
+        required: true
+      responses:
+        '200':
+          description: API login as user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginAsUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/organizations:
+    get:
+      tags:
+      - Partner
+      summary: Get list of organizations
+      description: 'Get a list of organization objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value'
+      operationId: listPartnerOrganizations
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{partner_organization_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of organizations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Partner
+      summary: Create an organization
+      description: 'Create a new organization.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+
+        See Organizations for BILL partners in the Guides section for more information, sample requests, and responses.'
+      operationId: createOrganization
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create an organization response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/organizations/{organizationId}/price-plan:
+    patch:
+      tags:
+      - Partner
+      summary: Update an organization price plan
+      description: 'Update the price plan for an existing organization.
+
+
+        When you onboard as a BILL partner, BILL works with you to set up price plans for the organizations you create. Your organizations can have up to 5 price plans. Each price plan is named in the `PricePlanN` format (`PricePlan1` up to `PricePlan5`).'
+      operationId: updateOrgPartnerPricePlan
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+          example: '{{partner_organization_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrgPricePlanRequest'
+        required: true
+      responses:
+        '200':
+          description: Update an organization price plan response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/risk-verifications/{userId}/phone:
+    post:
+      tags:
+      - Partner
+      summary: Add phone for risk verification
+      description: 'Add a phone number for a created user. BILL requires organization users to have a linked phone number for initiating risk verification for the organization.
+
+
+        You can check whether a phone number has been added for the user with `GET /v3/risk-verifications/phone`.
+
+
+        After you add a phone number with this endpoint, you can initiate risk verification for the organization with `POST /v3/risk-verifications`.'
+      operationId: createPhone
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+          example: '{{partner_user_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneVerificationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Add phone for risk verification response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/roles:
+    get:
+      tags:
+      - Partner
+      summary: Get list of user roles
+      description: 'Get a list of user role objects available in a BILL organization. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: listPartnerUserRoles
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{partner_user_role_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of user roles response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoleResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/roles/{roleId}:
+    get:
+      tags:
+      - Partner
+      summary: Get user role details
+      description: 'Get details about an existing user role in a BILL organization.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: getPartnerUserRole
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user role. The value begins with `0po`.
+          example: '{{partner_user_role_id}}'
+      responses:
+        '200':
+          description: Get user role details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/users:
+    get:
+      tags:
+      - Partner
+      summary: Get list of users
+      description: 'Get a list of user objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: listPartnerUsers
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{partner_user_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of users response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Partner
+      summary: Create a user
+      description: 'Create a new user. The new user is created for the organization (`organizationId`) in the request header.
+
+
+        In the request, set `username` as a unique alphanumeric value. The value must be 40 characters or fewer. This field is not case-sensitive. Do not set the value as an email address or any PII value. BILL uses this value to uniquely identify each user.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization
+
+
+        See Users for BILL partners in the Guides section for more information, sample requests, and responses.'
+      operationId: createPartnerUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerUserCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/users/{userId}:
+    get:
+      tags:
+      - Partner
+      summary: Get user details
+      description: 'Get details about an existing user.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: getPartnerUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+          example: '{{partner_user_id}}'
+      responses:
+        '200':
+          description: Get user details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Partner
+      summary: Update a user
+      description: 'Update details about an existing user.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: updatePartnerUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+          example: '{{partner_user_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerUserUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/users/{userId}/archive:
+    post:
+      tags:
+      - Partner
+      summary: Archive a user
+      description: 'Archive an existing user. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived user with `POST /v3/users/{userId}/restore`. There is no change when you archive an archived user.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: archivePartnerUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+          example: '{{partner_user_id}}'
+      responses:
+        '200':
+          description: Archive a user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/partner/users/{userId}/restore:
+    post:
+      tags:
+      - Partner
+      summary: Restore an archived user
+      description: 'Restore an archived user. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored users. There is no change when you restore a restored user.
+
+
+        This operation requires partner-level permissions.
+
+        * A `sessionId` header value generated with API partner login
+
+        * An `appKey` header value
+
+        * The `organizationId` of the organization'
+      operationId: restorePartnerUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/partner/login`
+          example: '{{partner_session_id}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account
+          example: '{{app_key}}'
+      - name: organizationId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the organization
+          example: '{{partner_organization_id}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+          example: '{{partner_user_id}}'
+      responses:
+        '200':
+          description: Restore an archived user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    TaxIdTypeRequest:
+      type: string
+      description: The enum Tax id type enum.
+      enum:
+      - EIN
+      - SSN
+    BusinessCategoryRequest:
+      type: string
+      description: Business Category.
+      enum:
+      - CORPORATION
+      - LLC
+      - NON_PROFIT
+      - GOVERNMENT
+      - SOLE_PROPRIETOR
+      - INDIVIDUAL
+      - TRUST
+      - UNKNOWN
+    ListUserResponseDto:
+      type: object
+      description: Get list of vendors response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_OrganizationUserResponseDto_'
+    ListOrganizationResponseDto:
+      type: object
+      description: Get list of organizations response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_OrganizationResponseDto_'
+    OrganizationCreateRequestDto:
+      required:
+      - address
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Organization name
+        displayName:
+          maxLength: 100
+          type: string
+          description: Organization display name (DBA trade name)
+        address:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAddress'
+          - description: Organization physical address
+        mailingAddress:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAddress'
+          - description: Organization mailing address
+        phone:
+          pattern: ^(\+?[1-9]\d{0,2}[-\s]?)?(\(\d{3}\))?([0-9-\s]{7,20})$
+          type: string
+          description: Organization phone number
+        companyOwner:
+          allOf:
+          - $ref: '#/components/schemas/CompanyOwner'
+          - description: 'Company owner information.
+
+
+              **Note**: It is important that you set the company owner `name` when you create an organization. This helps the organization user to get through the risk verification and add funding account steps without errors.'
+        taxId:
+          type: string
+          description: Organization tax ID. This value is required by the IRS for tax purposes.
+        taxIdType:
+          allOf:
+          - $ref: '#/components/schemas/TaxIdTypeRequest'
+          - description: Organization tax ID type
+        industry:
+          maxLength: 500
+          type: string
+          description: Organization industry
+        businessCategory:
+          allOf:
+          - $ref: '#/components/schemas/BusinessCategoryRequest'
+          - description: Organization business category
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAccountTypeRequest'
+          - description: Organization account type
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationProcessingOptions'
+          - description: Organization processing options
+      description: Create an organization
+      example:
+        name: Rice Cakes Inc
+        address:
+          line1: 987 Home St
+          city: San Jose
+          stateOrProvince: CA
+          zipOrPostalCode: '95002'
+          country: US
+        phone: '{{org_phone_no}}'
+        taxId: '999888777'
+        taxIdType: EIN
+        companyOwner:
+          name: Noodle Soupsmith
+          dateOfBirth: '1985-01-01'
+        industry: Restaurant Caterer or Bar
+        businessCategory: LLC
+        accountType: BUSINESS
+        processingOptions:
+          mailingAddressSameAsPhysical: 'true'
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    OrganizationUserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        archived:
+          type: boolean
+          description: Set as `true` if the user is archived
+        firstName:
+          type: string
+          description: User first name
+        lastName:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email address
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleResponseDto'
+          - description: User role information
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Users response.
+    CountryCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BM
+      - BN
+      - BO
+      - BR
+      - BS
+      - BT
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CV
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IN
+      - IO
+      - IQ
+      - IS
+      - IT
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MG
+      - MH
+      - MK
+      - ML
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - ST
+      - SV
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - UM
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+    ResponseStatus:
+      type: string
+      description: Status of the response.
+      enum:
+      - SUCCESS
+      - FAILURE
+    OrganizationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the organization. The value begins with `008`.
+        archived:
+          type: boolean
+          description: Set as `true` if the organization is archived. You cannot archive an organization with the API.
+        name:
+          type: string
+          description: Organization name
+        displayName:
+          type: string
+          description: Organization display name (DBA trade name)
+        address:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Organization physical address
+        mailingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Organization mailing address
+        phone:
+          type: string
+          description: Organization phone number
+        companyOwner:
+          allOf:
+          - $ref: '#/components/schemas/CompanyOwner'
+          - description: Company owner information
+        taxId:
+          type: string
+          description: Organization tax ID. This value is required by the IRS for tax purposes.
+        taxIdType:
+          allOf:
+          - $ref: '#/components/schemas/TaxIdTypeResponse'
+          - description: Organization tax ID type.
+        industry:
+          type: string
+          description: Organization industry
+        businessCategory:
+          allOf:
+          - $ref: '#/components/schemas/BusinessCategoryResponse'
+          - description: Organization business category.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationAccountTypeResponse'
+          - description: Organization account type.
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationProcessingOptions'
+          - description: Organization processing options
+        partnerName:
+          type: string
+          description: 'Partner name.
+
+
+            This field is available only when select BILL partners create an organization. Partner name is part of the information that BILL uses to identify partners.'
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Organization response.
+    ListResponseDto_OrganizationUserResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationUserResponseDto'
+      description: Response from a list API request with paging references.
+    TaxIdTypeResponse:
+      type: string
+      description: The enum Tax id type enum.
+      enum:
+      - EIN
+      - SSN
+      - UNDEFINED
+    OrganizationAccountTypeResponse:
+      type: string
+      description: Organization Account Type.
+      enum:
+      - BUSINESS
+      - CONTRACTOR
+      - EMPLOYEE_OR_INDIVIDUAL
+      - OTHER
+      - CONSUMER
+      - UNDEFINED
+    OrganizationAddress:
+      required:
+      - country
+      type: object
+      properties:
+        line1:
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+      description: Address information for create organization.
+    PhoneType:
+      type: string
+      description: Enum for phone type.
+      enum:
+      - MOBILE
+      - HOME
+    UpdateOrgPricePlanRequest:
+      required:
+      - pricePlanType
+      type: object
+      properties:
+        pricePlanType:
+          allOf:
+          - $ref: '#/components/schemas/PartnerPricePlanType'
+          - description: Price plan type
+      description: Update an organization price plan
+      example:
+        pricePlanType: PricePlan1
+    LoginAsUserResponseDto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: API session ID. Use this value in all subsequent API calls to confirm that you are in a signed-in session.
+        trusted:
+          type: boolean
+          description: This field is set as `true` if the current API session is MFA-trusted
+      description: API login as user response.
+    PartnerLoginRequestDto:
+      required:
+      - appKey
+      - password
+      - username
+      type: object
+      properties:
+        appKey:
+          type: string
+          description: Application key sent to you by BILL when you create a partner account
+        username:
+          type: string
+          description: Email address used to sign in to your BILL account
+        password:
+          type: string
+          description: Password used to sign in to your BILL account
+      description: API partner login
+      example:
+        username: '{{partner_username}}'
+        password: '{{partner_password}}'
+        appKey: '{{app_key}}'
+    PartnerPricePlanType:
+      type: string
+      description: The enum partner price plan.
+      enum:
+      - PricePlan1
+      - PricePlan2
+      - PricePlan3
+      - PricePlan4
+      - PricePlan5
+    LoginAsUserRequestDto:
+      required:
+      - organizationId
+      - userId
+      type: object
+      properties:
+        userId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user you want to sign in as
+        organizationId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the organization you want to sign in to
+        rememberMeId:
+          type: string
+          description: 'MFA ID. Set this field for creating an MFA-trusted API session.
+
+
+            This MFA ID is generated when you set `rememberMe` as `true` in your `POST /v3/mfa/challenge/validate` request. This value expires in 30 days.
+
+
+            See [Validate MFA challenge](https://developer.bill.com/reference/validatechallenge) for more information.'
+        device:
+          type: string
+          description: Mobile device name. This is a nickname for your mobile device. This field is required when you set `rememberMeId`.
+      description: API login as user
+      example:
+        userId: '{{partner_user_id}}'
+        organizationId: '{{partner_organization_id}}'
+    BusinessCategoryResponse:
+      type: string
+      description: Business Category.
+      enum:
+      - UNDEFINED
+      - CORPORATION
+      - LLC
+      - NON_PROFIT
+      - GOVERNMENT
+      - SOLE_PROPRIETOR
+      - INDIVIDUAL
+      - TRUST
+      - UNKNOWN
+    ListRoleResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_RoleResponseDto_'
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    ListResponseDto_RoleResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponseDto'
+      description: Response from a list API request with paging references.
+    OrganizationAccountTypeRequest:
+      type: string
+      description: Organization Account Type.
+      enum:
+      - BUSINESS
+      - CONTRACTOR
+      - EMPLOYEE_OR_INDIVIDUAL
+      - OTHER
+      - CONSUMER
+    AddressResponse:
+      required:
+      - city
+      - country
+      - line1
+      - zipOrPostalCode
+      type: object
+      properties:
+        line1:
+          minLength: 1
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          minLength: 1
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          minLength: 1
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+        countryName:
+          type: string
+          description: Country name.
+      description: Address response.
+    OrganizationProcessingOptions:
+      type: object
+      properties:
+        mailingAddressSameAsPhysical:
+          type: boolean
+          description: Set as `true` if the mailing address is the same as the physical address. The default value is `true`.
+        individualTransferOut:
+          type: boolean
+          description: 'Rule for how ACH transfers are made from the organization funding bank account to vendors.
+
+            * Set as `true` for an individual ACH transfer for each payment made.
+
+            * Set as `false` for a single batch ACH transfer for all payments made in a day. The default value is `false`.
+
+
+            **Note**: You can set this field only when you update an organization (`PATCH /v3/organizations/{organizationId}`).'
+        individualTransferIn:
+          type: boolean
+          description: 'Rule for how ACH transfers are made from customers to the organization funding bank account.
+
+            * Set as `true` for an individual ACH transfer for each payment received.
+
+            * Set as `false` for a single batch ACH transfer for all payments received in a day. The default value is `false`.
+
+
+            **Note**: You can set this field only when you update an organization (`PATCH /v3/organizations/{organizationId}`).'
+      description: User provided options for having the same mailing address as the physical address.
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    OrganizationUserRoleType:
+      type: string
+      description: Enumeration of organization user roles.
+      enum:
+      - ADMINISTRATOR
+      - CLERK
+      - APPROVER
+      - ACCOUNTANT
+      - CUSTOM
+      - PAYER
+      - PARTNER
+      - AUDITOR
+      - NO_ACCESS
+      - MEMBER
+      - MEMBER_PLUS
+      - INTERNAL
+      - PURCHASE_REQUESTER
+      - CONSOLE_CUSTOM
+      - RECEIVER
+      - PROCUREMENT_USER
+      - UNDEFINED
+    UserRoleResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the user role. The value begins with `0po`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationUserRoleType'
+          - description: User role type.
+        description:
+          type: string
+          description: User role description
+      description: User roles response.
+    StatusDto:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResponseStatus'
+          - description: Request status
+      description: The type Delete response dto.
+    CompanyOwner:
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          type: string
+          description: Company owner name
+        dateOfBirth:
+          type: string
+          description: Company owner date of birth. The value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Company owner.
+    PhoneVerificationRequestDto:
+      required:
+      - phoneNumber
+      - phoneType
+      type: object
+      properties:
+        phoneNumber:
+          pattern: (\d{10}$)
+          type: string
+          description: Phone number
+        phoneType:
+          allOf:
+          - $ref: '#/components/schemas/PhoneType'
+          - description: Phone type
+      description: Add a phone number for risk verification
+      example:
+        phoneNumber: '{{user_phone_no}}'
+        phoneType: MOBILE
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ListResponseDto_OrganizationResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationResponseDto'
+      description: Response from a list API request with paging references.
+    PartnerUserUpdateRequestDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: User first name
+        lastName:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email address
+        roleId:
+          type: string
+          description: 'BILL-generated ID of the user role. The value begins with `0po`.
+
+
+            If you do not set `roleId`, the default `ADMINISTRATOR` user role is assigned to the created user. You can get the list of available user roles with `GET /v3/partner/roles`.'
+      description: Update a user (last name updated)
+      example:
+        lastName: Soupsmithson
+    PartnerLoginResponseDto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: API session ID. Use this value in all subsequent API calls to confirm that you are in a signed-in session.
+      description: Login response.
+    RoleResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the user role. The value begins with `0po`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationUserRoleType'
+          - description: User role type.
+        description:
+          type: string
+          description: User role description
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: User roles response.
+    PartnerUserCreateRequestDto:
+      required:
+      - acceptTermsOfService
+      - email
+      - firstName
+      - username
+      type: object
+      properties:
+        firstName:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User first name
+        lastName:
+          maxLength: 100
+          type: string
+          description: User last name
+        email:
+          minLength: 1
+          type: string
+          description: User email address
+        roleId:
+          type: string
+          description: 'BILL-generated ID of the user role. The value begins with `0po`.
+
+
+            If you do not set `roleId`, the default `ADMINISTRATOR` user role is assigned to the created user. You can get the list of available user roles with `GET /v3/partner/roles`.'
+        username:
+          maxLength: 1000
+          minLength: 1
+          type: string
+          description: 'Username for signing in as the user.
+
+
+            Set `username` as a unique alphanumeric value. The value must be 40 characters or fewer. This field is not case-sensitive. Do not set the value as an email address or any PII value. BILL uses this value to uniquely identify each user.'
+        externalReferenceId:
+          type: string
+          description: 'Reference ID used as an external identifier.
+
+
+            You can set this field as a unique alphanumeric value for your system to refer to the created user.'
+        acceptTermsOfService:
+          type: boolean
+          description: Set as `true` if the user accepts the BILL terms of service
+      description: Create a user
+      example:
+        firstName: Tomato
+        lastName: Soupsmith
+        email: tsoupsmith@ricecakes.org
+        roleId: '{{partner_user_role_id}}'
+        username: tsoupsm!th1
+        acceptTermsOfService: true
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

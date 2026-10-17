@@ -1,0 +1,2681 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Customers API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Customers
+paths:
+  /v3/customers:
+    get:
+      tags:
+      - Customers
+      summary: Get list of customers
+      description: 'Get a list of customer objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listCustomers
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{customer_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of customers response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Customers
+      summary: Create a customer
+      description: 'Create a new customer.
+
+
+        See Customers in the Guides section for more information, sample requests, and responses.'
+      operationId: createCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a customer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}:
+    get:
+      tags:
+      - Customers
+      summary: Get customer details
+      description: Get details about an existing customer.
+      operationId: getCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      responses:
+        '200':
+          description: Get customer details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Customers
+      summary: Update a customer
+      description: Update details about an existing customer.
+      operationId: updateCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a customer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/archive:
+    post:
+      tags:
+      - Customers
+      summary: Archive a customer
+      description: 'Archive an existing customer. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived customer with `POST /v3/customers/{customerId}/restore`. There is no change when you archive an archived customer.'
+      operationId: archiveCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      responses:
+        '200':
+          description: Archive a customer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/bank-accounts:
+    get:
+      tags:
+      - Customers
+      summary: Get list of customer bank accounts
+      description: 'Get a list of customer bank account objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listCustomerBankAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: status:eq:VERIFIED
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of customer bank accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Customers
+      summary: Create a customer bank account
+      description: 'Create a new customer bank account. When you add customer bank account information, you can charge the customer for invoices.
+
+
+        Creating a customer bank account follows a set of rules.
+
+        * **Customer billing address**: The customer `billingAddress` information is required before you can create a customer bank account.
+
+        * **Customer bank account verification**: If the customer bank account requires verification, BILL requires up to 2 business days to complete a one-time verification of the bank account.
+
+
+        **Note**: When you add a customer bank account in the production environment, BILL validates the customer routing number before you can charge the customer. You will get an error message if the customer routing number is invalid in production.'
+      operationId: createCustomerBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerBankAccountRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a customer bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/bank-accounts/{bankAccountId}:
+    get:
+      tags:
+      - Customers
+      summary: Get customer bank account details
+      description: Get details about an existing customer bank account.
+      operationId: getCustomerBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer bank account. The value begins with `cba`.
+          example: '{{customer_bank_account_id}}'
+      responses:
+        '200':
+          description: Get customer bank account details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Customers
+      summary: Update a customer bank account
+      description: 'Update details about an existing customer bank account.
+
+
+        You can update only the `nickname` and `ownerType` fields for a customer bank account. If you want to update any of the other fields, create a new customer bank account with `POST /v3/customers/{customerId}/bank-accounts`.'
+      operationId: updateCustomerBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer bank account. The value begins with `cba`.
+          example: '{{customer_bank_account_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerBankAccountRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a customer bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/bank-accounts/{bankAccountId}/archive:
+    post:
+      tags:
+      - Customers
+      summary: Archive a customer bank account
+      description: Archive an existing customer bank account. In the response, the `archived` field is set as `true`. An archived customer bank account cannot be restored.
+      operationId: archiveCustomerBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer bank account. The value begins with `cba`.
+          example: '{{customer_bank_account_id}}'
+      responses:
+        '200':
+          description: Archive a customer bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/charge-authorization:
+    post:
+      tags:
+      - Customers
+      summary: Set charge customer authorization
+      description: 'Authorize your organization to charge a customer for invoices.
+
+
+        By default, your organization is not authorized to charge a customer. The customer `authorizedToCharge` field must be set as `true` for you to charge the customer for invoices.'
+      operationId: authorizeToChargeCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeAuthorizationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Set charge customer authorization response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeAuthorizationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/contacts:
+    get:
+      tags:
+      - Customers
+      summary: Get list of customer contacts
+      description: 'Get a list of customer contact objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listCustomerContacts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: firstName:asc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: archived:eq:false
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of customer contacts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Customers
+      summary: Create a customer contact
+      description: 'Create a new customer contact.
+
+
+        When you create a customer contact, BILL enables the customer to sign in to the BILL web app with the `email` value and a random password. The signed-in customer can view invoices, make payments, and manage their account.'
+      operationId: createCustomerContact
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerContactRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a customer contact response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/contacts/{contactId}:
+    get:
+      tags:
+      - Customers
+      summary: Get customer contact details
+      description: Get details about an existing customer contact.
+      operationId: getCustomerContact
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer contact. The value begins with `cpu`.
+          example: '{{customer_contact_id}}'
+      responses:
+        '200':
+          description: Get customer contact details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Customers
+      summary: Update a customer contact
+      description: Update details about an existing customer contact.
+      operationId: updateCustomerContact
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer contact. The value begins with `cpu`.
+          example: '{{customer_contact_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerContactRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a customer contact response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/contacts/{contactId}/archive:
+    post:
+      tags:
+      - Customers
+      summary: Archive a customer contact
+      description: 'Archive an existing customer contact. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived customer with `POST /v3/customers/{customerId}/contacts/{contactId}/restore`. There is no change when you archive an archived customer contact.'
+      operationId: archiveCustomerContact
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer contact. The value begins with `cpu`.
+          example: '{{customer_contact_id}}'
+      responses:
+        '200':
+          description: Archive a customer contact response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/contacts/{contactId}/restore:
+    post:
+      tags:
+      - Customers
+      summary: Restore a customer contact
+      description: 'Restore an archived customer contact. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored customer contacts. There is no change when you restore a restored customer contact.'
+      operationId: restoreCustomerContact
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      - name: contactId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer contact. The value begins with `cpu`.
+          example: '{{customer_contact_id}}'
+      responses:
+        '200':
+          description: Restore a customer contact response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContactResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/customers/{customerId}/restore:
+    post:
+      tags:
+      - Customers
+      summary: Restore an archived customer
+      description: 'Restore an archived customer. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored customers. There is no change when you restore a restored customer.'
+      operationId: restoreCustomer
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      responses:
+        '200':
+          description: Restore an archived customer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    CustomerAccountTypeRequest:
+      type: string
+      description: CustomerAccountType.
+      enum:
+      - NONE
+      - BUSINESS
+      - PERSON
+    ChargeAuthorizationRequestDto:
+      required:
+      - authorizedToCharge
+      type: object
+      properties:
+        authorizedToCharge:
+          type: boolean
+          description: Set as `true` if your organization is authorized to charge the customer for invoices
+      description: Authorize your organization to charge the customer.
+      example:
+        authorizedToCharge: true
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    UpdateCustomerBankAccountRequestDto:
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: Customer bank account nickname
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Customer bank account owner type
+      description: Update a customer bank account
+      example:
+        nickname: Check Mailworth Business Checking
+        ownerType: BUSINESS
+    CountryCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BM
+      - BN
+      - BO
+      - BR
+      - BS
+      - BT
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CV
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IN
+      - IO
+      - IQ
+      - IS
+      - IT
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MG
+      - MH
+      - MK
+      - ML
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - ST
+      - SV
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - UM
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+    CustomerAccountTypeResponse:
+      type: string
+      description: CustomerAccountType.
+      enum:
+      - NONE
+      - BUSINESS
+      - PERSON
+      - UNDEFINED
+    ListCustomerBankAccountResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_CustomerBankAccountResponseDto_'
+    CustomerResponseDto:
+      required:
+      - email
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        archived:
+          type: boolean
+          description: Set as `true` if the customer is archived.
+        name:
+          type: string
+          description: Customer name
+        companyName:
+          type: string
+          description: Customer company name. This field is overridden when you connect with a customer in the BILL network.
+        contact:
+          allOf:
+          - $ref: '#/components/schemas/CustomerContact'
+          - description: Customer contact information
+        email:
+          type: string
+          description: Customer email address
+        phone:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer phone number. This field is overridden when you connect with a customer in the BILL network.
+        fax:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer fax number
+        description:
+          type: string
+          description: Customer description
+        invoiceCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Invoice currency. Three-letter abbreviation.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/CustomerAccountTypeResponse'
+          - description: Customer account type
+        paymentTermId:
+          type: string
+          description: BILL-generated ID of the payment term. Use payment terms to set the number of days the customer has to clear an invoice.
+        accountNumber:
+          type: string
+          description: Customer account number. The number appears in customer invoices.
+        billingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Customer billing address. This information is overridden when you connect with a customer in the BILL network.
+        shippingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressResponse'
+          - description: Customer shipping address. This information is overridden when you connect with a customer in the BILL network.
+        balance:
+          allOf:
+          - $ref: '#/components/schemas/CustomerBalance'
+          - description: Current balance to be paid by the customer
+        hasBankAccount:
+          type: boolean
+          description: Set as `true` if the customer bank account is added
+        authorizedToCharge:
+          type: boolean
+          description: Set as `true` if your organization is authorized to charge the customer for invoices
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Customers response.
+    CustomerContact:
+      type: object
+      properties:
+        firstName:
+          maxLength: 100
+          type: string
+          description: First name
+        lastName:
+          maxLength: 100
+          type: string
+          description: Last name
+      description: Customer contact.
+    BankAccountStatus:
+      type: string
+      description: Bank account status.
+      enum:
+      - NOT_VERIFIED
+      - VERIFIED
+      - PENDING
+      - BLOCKED
+      - EXPIRED
+      - INVALID
+      - UNDEFINED
+    AddressUpdate:
+      type: object
+      properties:
+        line1:
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+      description: The type Address Update dto.
+    BankAccountType:
+      type: string
+      description: BankAccountType Enum.
+      enum:
+      - CHECKING
+      - SAVINGS
+    CreateCustomerContactRequestDto:
+      required:
+      - email
+      - firstName
+      type: object
+      properties:
+        firstName:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Customer first name
+        lastName:
+          maxLength: 100
+          type: string
+          description: Customer last name
+        email:
+          minLength: 1
+          type: string
+          description: Customer email address. The value must be unique in the organization.
+          format: email
+        phone:
+          maxLength: 40
+          type: string
+          description: Customer phone number
+        altPhone:
+          maxLength: 40
+          type: string
+          description: Customer alternate phone number. Use this field to sync with your accounting system.
+        alternateEmail:
+          type: string
+          description: Customer alternate email address. The customer cannot use this email address to sign in to the BILL web app.
+          format: email
+      description: Create a customer contact
+      example:
+        firstName: Adam
+        lastName: Mailworth
+        email: admin@paperlessband.org
+        phone: '8889997654'
+    ListCustomerResponseDto:
+      type: object
+      description: Get list of customers response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_CustomerResponseDto_'
+    Address:
+      required:
+      - city
+      - country
+      - line1
+      - zipOrPostalCode
+      type: object
+      properties:
+        line1:
+          minLength: 1
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          minLength: 1
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          minLength: 1
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+      description: Address information.
+    BankAccountOwnerType:
+      type: string
+      description: BankAccountOwnerType Enum.
+      enum:
+      - BUSINESS
+      - PERSONAL
+    CustomerUpdateRequestDto:
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          type: string
+          description: Customer name
+        companyName:
+          maxLength: 250
+          type: string
+          description: Customer company name
+        contact:
+          allOf:
+          - $ref: '#/components/schemas/CustomerContact'
+          - description: Customer contact information
+        email:
+          type: string
+          description: Customer email address
+        phone:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer phone number
+        fax:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer fax number
+        description:
+          maxLength: 4000
+          type: string
+          description: Customer description
+        invoiceCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Invoice currency. Three-letter abbreviation.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/CustomerAccountTypeRequest'
+          - description: Customer account type
+        paymentTermId:
+          type: string
+          description: BILL-generated ID of the payment term. Use payment terms to set the number of days the customer has to clear an invoice.
+        accountNumber:
+          maxLength: 100
+          type: string
+          description: Customer account number. The number appears in customer invoices.
+        billingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressUpdate'
+          - description: Customer billing address
+        shippingAddress:
+          allOf:
+          - $ref: '#/components/schemas/AddressUpdate'
+          - description: Customer shipping address
+      description: Update a customer
+      example:
+        name: Paperless Band (Updated)
+        accountType: PERSON
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    CustomerBalance:
+      type: object
+      properties:
+        amount:
+          type: number
+      description: The type CustomerBalance dto.
+    ListResponseDto_CustomerResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerResponseDto'
+      description: Response from a list API request with paging references.
+    AddressResponse:
+      required:
+      - city
+      - country
+      - line1
+      - zipOrPostalCode
+      type: object
+      properties:
+        line1:
+          minLength: 1
+          pattern: ^.{0,1000}$
+          type: string
+          description: Address line 1
+        line2:
+          pattern: ^.{0,100}$
+          type: string
+          description: Address line 2
+        city:
+          minLength: 1
+          pattern: ^.{0,100}$
+          type: string
+          description: Address city
+        stateOrProvince:
+          pattern: ^.{0,100}$
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          minLength: 1
+          pattern: ^.{0,30}$
+          type: string
+          description: Zip or postal code
+        country:
+          allOf:
+          - $ref: '#/components/schemas/CountryCode'
+          - description: Country code (ISO2)
+        countryName:
+          type: string
+          description: Country name.
+      description: Address response.
+    CustomerCreateRequestDto:
+      required:
+      - email
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Customer name
+        companyName:
+          maxLength: 250
+          type: string
+          description: Customer company name
+        contact:
+          allOf:
+          - $ref: '#/components/schemas/CustomerContact'
+          - description: Customer contact information
+        email:
+          minLength: 1
+          type: string
+          description: Customer email address
+        phone:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer phone number
+        fax:
+          pattern: ^.{0,20}$
+          type: string
+          description: Customer fax number
+        description:
+          maxLength: 4000
+          type: string
+          description: Customer description
+        invoiceCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Invoice currency. Three-letter abbreviation.
+        accountType:
+          allOf:
+          - $ref: '#/components/schemas/CustomerAccountTypeRequest'
+          - description: Customer account type
+        paymentTermId:
+          type: string
+          description: BILL-generated ID of the payment term. Use payment terms to set the number of days the customer has to clear an invoice.
+        accountNumber:
+          maxLength: 100
+          type: string
+          description: Customer account number. The number appears in customer invoices.
+        billingAddress:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          - description: Customer billing address
+        shippingAddress:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          - description: Customer shipping address
+      description: Create a customer
+      example:
+        name: Paperless Band
+        companyName: Paperless Band LLC
+        contact:
+          firstName: Check
+          lastName: Mailworth
+        email: contact@paperlessband.org
+        accountType: BUSINESS
+        phone: '9998887654'
+        billingAddress:
+          line1: 987 Side Street
+          city: San Jose
+          stateOrProvince: CA
+          zipOrPostalCode: '95002'
+          country: US
+    UpdateCustomerContactRequestDto:
+      type: object
+      properties:
+        firstName:
+          maxLength: 100
+          type: string
+          description: Customer first name
+        lastName:
+          maxLength: 100
+          type: string
+          description: Customer last name
+        email:
+          type: string
+          description: Customer email address. The value must be unique in the organization.
+          format: email
+        phone:
+          maxLength: 40
+          type: string
+          description: Customer phone number
+        altPhone:
+          maxLength: 40
+          type: string
+          description: Customer alternate phone number. Use this field to sync with your accounting system.
+        alternateEmail:
+          type: string
+          description: Customer alternate email address. The customer cannot use this email address to sign in to the BILL web app.
+          format: email
+      description: Update a customer contact
+      example:
+        firstName: Janet
+        phone: '8889996543'
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    ListResponseDto_CustomerContactResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerContactResponseDto'
+      description: Response from a list API request with paging references.
+    ListCustomerContactResponseDto:
+      type: object
+      description: Response from a list customer contacts API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_CustomerContactResponseDto_'
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ChargeAuthorizationResponseDto:
+      type: object
+      properties:
+        authorizedToCharge:
+          type: boolean
+          description: Set as `true` if your organization is authorized to charge the customer for invoices
+      description: The type Charge customer response dto.
+    CustomerContactResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the customer contact. The value begins with `cpu`.
+        archived:
+          type: boolean
+          description: Set as `true` if the customer contact is archived.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        firstName:
+          type: string
+          description: Customer first name
+        lastName:
+          type: string
+          description: Customer last name
+        email:
+          type: string
+          description: Customer email address
+        phone:
+          type: string
+          description: Customer phone number
+        altPhone:
+          type: string
+          description: Customer alternate phone number
+        alternateEmail:
+          type: string
+          description: Customer alternate email address
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: CustomerContact response Dto.
+    CreateCustomerBankAccountRequestDto:
+      required:
+      - accountNumber
+      - nameOnAccount
+      - ownerType
+      - routingNumber
+      - type
+      type: object
+      properties:
+        nameOnAccount:
+          minLength: 1
+          type: string
+          description: Customer bank account name
+        nickname:
+          type: string
+          description: Customer bank account nickname
+        routingNumber:
+          minLength: 1
+          type: string
+          description: Customer bank routing number
+        accountNumber:
+          minLength: 1
+          type: string
+          description: Customer bank account number
+        type:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountType'
+          - description: Customer bank account type
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Customer bank account owner type
+      description: Create a customer bank account
+      example:
+        nameOnAccount: Check Mailworth
+        nickname: Check Mailworth Personal Checking
+        routingNumber: '021000021'
+        accountNumber: '333222111'
+        type: CHECKING
+        ownerType: PERSONAL
+    CustomerBankAccountResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the customer bank account. The value begins with `cba`.
+        nameOnAccount:
+          type: string
+          description: Customer bank account name
+        nickname:
+          type: string
+          description: Customer bank account nickname
+        routingNumber:
+          type: string
+          description: Customer bank routing number
+        accountNumber:
+          type: string
+          description: Customer bank account number
+        type:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountType'
+          - description: Customer bank account type.
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Customer bank account owner type.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountStatus'
+          - description: Customer bank account status.
+        archived:
+          type: boolean
+          description: Set as `true` if the customer bank account is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: CustomerBankAccount response Dto.
+    CurrencyCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BBD
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BND
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CUP
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GGP
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JEP
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MOP
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLE
+      - SLL
+      - SOS
+      - SPL
+      - SRD
+      - STN
+      - SVC
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TVD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XDR
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+    ListResponseDto_CustomerBankAccountResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerBankAccountResponseDto'
+      description: Response from a list API request with paging references.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

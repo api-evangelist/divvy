@@ -1,0 +1,2074 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Invoices API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Invoices
+paths:
+  /v3/invoices:
+    get:
+      tags:
+      - Invoices
+      summary: Get list of invoices
+      description: 'Get a list of invoice objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listInvoices
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{invoice_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of invoices response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListInvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Invoices
+      summary: Create an invoice
+      description: 'Create a new invoice.
+
+
+        See Invoices in the Guides section for more information, sample requests, and responses.'
+      operationId: createInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create an invoice response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/record-payment:
+    post:
+      tags:
+      - Invoices
+      summary: Record AR payment
+      description: 'Record an offline AR payment received from a customer.
+
+
+        An offline payment is a payment that you receive outside the BILL system. BILL simply applies the recorded payment amount to one or more invoices for the customer. Any recorded unapplied amount is an overpayment and is available as a customer credit in the BILL system.
+
+
+        See Recording an AR payment in the Guides section for more information, sample requests, and responses.'
+      operationId: recordInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordInvoiceRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Record AR payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordInvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/{invoiceId}:
+    get:
+      tags:
+      - Invoices
+      summary: Get invoice details
+      description: Get details about an existing invoice.
+      operationId: getInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      responses:
+        '200':
+          description: Get invoice details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Invoices
+      summary: Replace an invoice
+      description: 'Update the number of line items in an invoice. You can also update other invoice details.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in an invoice. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the invoice.
+
+        * When you omit an existing line item `id`, the line item is removed from the invoice.'
+      operationId: replaceInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceReplaceRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace an invoice response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Invoices
+      summary: Update an invoice
+      description: 'Update details about an invoice line item. You can also update other invoice details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount`, `quantity`, and `description`. The invoice line item `id` does not change with a PATCH operation.'
+      operationId: updateInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update an invoice response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/{invoiceId}/archive:
+    post:
+      tags:
+      - Invoices
+      summary: Archive an invoice
+      description: 'Archive an existing invoice. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived invoice with `POST /v3/invoices/{invoiceId}/restore`. There is no change when you archive an archived invoice.'
+      operationId: archiveInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      responses:
+        '200':
+          description: Archive an invoice response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/{invoiceId}/email:
+    post:
+      tags:
+      - Invoices
+      summary: Send an invoice
+      description: 'Send an invoice to a customer email address. You can send the invoice to multiple email addresses.
+
+
+        See Invoices in the Guides section for more information, sample requests, and responses.'
+      operationId: sendInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendInvoiceRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Send an invoice response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/{invoiceId}/payment-link:
+    post:
+      tags:
+      - Invoices
+      summary: Get invoice payment link
+      description: 'Get an invoice payment link. In the response, BILL sends you a payment link based on the provided invoice and customer information.
+
+
+        You can send the invoice payment link to your customer for getting paid by the customer. With this link, the customer can complete the invoice payment without the need to set up a BILL account.
+
+
+        When a customer payment is made with the invoice payment link, BILL sends a payment receipt to the provided email address.
+
+
+        **Note**: You get valid invoice payment links only for customers that are NOT connected with your organization in the BILL network.
+
+
+        See Invoices in the Guides section for more information, sample requests, and responses.'
+      operationId: getPaymentLink
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoicePaymentLinkRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Get an invoice payment link response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoicePaymentLinkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/invoices/{invoiceId}/restore:
+    post:
+      tags:
+      - Invoices
+      summary: Restore an archived invoice
+      description: 'Restore an archived invoice. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored invoices. There is no change when you restore a restored invoice.'
+      operationId: restoreInvoice
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+          example: '{{invoice_id}}'
+      responses:
+        '200':
+          description: Restore an archived invoice response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    ConvenienceFeeRequestDto:
+      type: object
+      properties:
+        percentage:
+          maximum: 3
+          minimum: 0
+          type: number
+          description: Convenience fee percentage
+      description: DTO for convenience fee in invoice requests.
+    InvoiceClassificationsDto:
+      type: object
+      properties:
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+      description: DTO for Invoice classifications.
+    InvoiceReplyTo:
+      required:
+      - userId
+      type: object
+      properties:
+        userId:
+          type: string
+          description: 'BILL-generated ID of the user sending the invoice. The value begins with `006`.
+
+
+            You can retrieve your user ID when you sign in with `/v3/login`.'
+      description: Invoice replyTo object.
+    RecordInvoiceRequestDto:
+      required:
+      - amount
+      - invoices
+      - paymentDate
+      - paymentType
+      type: object
+      properties:
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        paymentDate:
+          type: string
+          description: Invoice payment date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentType:
+          allOf:
+          - $ref: '#/components/schemas/InvoicePaymentTypeRequest'
+          - description: Payment type
+        amount:
+          type: number
+          description: Payment amount
+        description:
+          maxLength: 4000
+          type: string
+          description: Payment description
+        invoices:
+          type: array
+          description: List of invoice payments
+          items:
+            $ref: '#/components/schemas/RecordInvoiceItemRequestDto'
+      description: Record AR payment
+      example:
+        amount: '100'
+        customerId: '{{customer_id}}'
+        invoices:
+        - amount: '50'
+          id: '{{invoice_id}}'
+        paymentDate: '2026-12-20'
+        paymentType: CREDIT_CARD
+        description: Accepted credit card payment in store
+    InvoiceProcessingOptions:
+      type: object
+      properties:
+        sendEmail:
+          type: boolean
+          description: Set as `true` to send an email to the customer
+      description: User provided options for sending an email.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    InvoiceCreateRequestDto:
+      required:
+      - customer
+      - invoiceLineItems
+      type: object
+      properties:
+        invoiceNumber:
+          maxLength: 100
+          type: string
+          description: 'User-generated invoice number. This value can be your chosen number scheme.
+
+
+            If you do not set this field, `invoiceNumber` is auto-generated.'
+        invoiceDate:
+          type: string
+          description: 'Invoice creation date. This value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `invoiceDate` is set as the date when the invoice is created.'
+          format: date
+        dueDate:
+          type: string
+          description: 'Invoice due date. The value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `dueDate` is set as the date when the invoice is created.'
+          format: date
+        paymentTermId:
+          type: string
+        customer:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceCustomer'
+          - description: 'Customer contact information.
+
+              * Set the customer `id` for associating an existing customer to the invoice
+
+              * Set `name` and `email` for creating a new customer with the invoice.
+
+
+              In the response, a new BILL-generated customer `id` is available.'
+        invoiceLineItems:
+          type: array
+          description: Invoice line item information
+          items:
+            $ref: '#/components/schemas/InvoiceCreateLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceProcessingOptions'
+          - description: Invoice processing options
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the invoice
+        creditAmount:
+          minimum: 0
+          type: number
+          description: 'Credit amount applied to the invoice.
+
+
+            BILL applies the credit amount from the total of all the credit memos available for the customer.'
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        enableCardPayment:
+          type: boolean
+          description: Set as `true` if the card payment option is enabled for the invoice
+        convenienceFee:
+          allOf:
+          - $ref: '#/components/schemas/ConvenienceFeeRequestDto'
+          - description: Convenience fee information. The customer is charged the convenience fee when they pay the invoice using a card. To set the convenience fee, `enableCardPayment` must be set as `true`.
+      description: Create an invoice
+      example:
+        customer:
+          id: '{{customer_id}}'
+        invoiceLineItems:
+        - quantity: 2
+          description: Classic extreme drum sticks
+          price: 14.99
+        - quantity: 1
+          description: Metal guitar picks (5-pack)
+          price: 50
+        invoiceNumber: '202602'
+        dueDate: '2026-12-31'
+        processingOptions:
+          sendEmail: false
+    InvoicePayment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'BILL-generated ID of the invoice payment. The value begins with `0ip`.
+
+
+            This ID is generated when a payment is applied to the listed invoice.'
+        amount:
+          type: number
+          description: Invoice amount paid
+        status:
+          allOf:
+          - $ref: '#/components/schemas/InvoicePaymentStatus'
+          - description: Invoice payment status.
+        date:
+          type: string
+          description: Invoice payment date. The value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Invoice payments information.
+    InvoiceReplaceLineItem:
+      required:
+      - quantity
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the invoice line item. The value begins with `00f`.
+        description:
+          maxLength: 4000
+          type: string
+          description: Invoice line item description
+        price:
+          type: number
+          description: Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Invoice line item unit quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the invoice line item
+        taxable:
+          type: boolean
+          description: Set as true if the invoice line item is taxable
+      description: Invoice Replace Request Line Item.
+    ListResponseDto_InvoiceResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceResponseDto'
+      description: Response from a list API request with paging references.
+    InvoicePaymentTypeRequest:
+      type: string
+      description: Record AR payment type.
+      enum:
+      - CASH
+      - CHECK
+      - CREDIT_CARD
+      - ACH
+      - PAYPAL
+      - OTHER
+      - WALLET
+      - VIRTUAL_CARD
+    InvoiceStatus:
+      type: string
+      description: Invoice status enum.
+      enum:
+      - PAID_IN_FULL
+      - OPEN
+      - PARTIAL_PAYMENT
+      - SCHEDULED
+      - UNDEFINED
+    SendInvoiceRequestDto:
+      required:
+      - recipient
+      - replyTo
+      type: object
+      properties:
+        replyTo:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceReplyTo'
+          - description: Invoice sender information
+        recipient:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceRecipient'
+          - description: Invoice recipient information
+      description: Send an invoice to a customer
+      example:
+        recipient:
+          to:
+          - '{{customer_email}}'
+        replyTo:
+          userId: '{{login_user_id}}'
+    InvoiceResponseLineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the invoice line item. The value begins with `00f`.
+        description:
+          type: string
+          description: Invoice line item description
+        price:
+          type: number
+          description: Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Invoice line item unit quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the invoice line item
+        taxable:
+          type: boolean
+          description: Set as true if the invoice line item is taxable
+      description: Invoice Response Line Item.
+    InvoicePaymentLinkRequestDto:
+      required:
+      - customerId
+      - email
+      type: object
+      properties:
+        customerId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        email:
+          minLength: 1
+          type: string
+          description: 'Recipient email address.
+
+
+            When a customer payment is made with the invoice payment link, BILL sends a payment receipt to the provided email address.'
+        returnUrl:
+          type: string
+          description: Redirect URL after the customer payment is complete
+      description: Get invoice payment link
+      example:
+        customerId: '{{customer_id}}'
+        email: '{{customer_email}}'
+    InvoiceReplaceRequestDto:
+      required:
+      - customer
+      - invoiceLineItems
+      type: object
+      properties:
+        invoiceNumber:
+          maxLength: 100
+          type: string
+          description: 'User-generated invoice number. This value can be your chosen number scheme.
+
+
+            If you do not set this field, `invoiceNumber` is auto-generated.'
+        invoiceDate:
+          type: string
+          description: 'Invoice creation date. This value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `invoiceDate` is set as the date when the invoice is created.'
+          format: date
+        dueDate:
+          type: string
+          description: 'Invoice due date. The value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `dueDate` is set as the date when the invoice is created.'
+          format: date
+        paymentTermId:
+          type: string
+        customer:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceCustomer'
+          - description: 'Customer contact information.
+
+              * Set the customer `id` for associating an existing customer to the invoice.
+
+              * Set `name` and `email` for creating a new customer with the invoice.
+
+
+              In the response, a new BILL-generated customer `id` is available.'
+        invoiceLineItems:
+          type: array
+          description: Invoice line item information
+          items:
+            $ref: '#/components/schemas/InvoiceReplaceLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceProcessingOptions'
+          - description: Invoice processing options
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the invoice
+        creditAmount:
+          minimum: 0
+          type: number
+          description: 'Credit amount applied to the invoice.
+
+
+            BILL applies the credit amount from the total of all the credit memos available for the customer.'
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        enableCardPayment:
+          type: boolean
+          description: Set as `true` if the card payment option is enabled for the invoice
+        convenienceFee:
+          allOf:
+          - $ref: '#/components/schemas/ConvenienceFeeRequestDto'
+          - description: Convenience fee information. The customer is charged the convenience fee when they pay the invoice using a card. To set the convenience fee, `enableCardPayment` must be set as `true`.
+        invoicePdfId:
+          type: string
+          description: 'BILL-generated ID of the invoice PDF. The value begins with `att`.
+
+
+            The invoice PDF is sent as an email attachment when you send an invoice to a customer. The invoice PDF also appears when the customer clicks the invoice payment link to complete the invoice payment.
+
+
+            **Note**: You can get the list of invoice attachments with `GET /v3/attachments/invoices/{invoiceId}`. All the attachments in the list (including the invoice PDF) are sent as email attachments when you send the invoice to the customer.'
+      description: Replace an invoice (line item added)
+      example:
+        customer:
+          id: '{{customer_id}}'
+        invoiceLineItems:
+        - description: Premium drummer gloves
+          amount: 29.99
+          quantity: 1
+        - id: '{{invoice_line_item_id01}}'
+          description: Classic extreme drum sticks
+          price: 14.99
+          quantity: 2
+        - id: '{{invoice_line_item_id02}}'
+          description: Metal guitar picks (5-pack)
+          price: 50
+          quantity: 1
+    InvoiceRecipient:
+      required:
+      - to
+      type: object
+      properties:
+        to:
+          type: array
+          description: Recipient email addresses
+          items:
+            type: string
+      description: Invoice Recipient object.
+    InvoicePaymentLinkResponseDto:
+      type: object
+      properties:
+        paymentLink:
+          type: string
+          description: Invoice payment link
+      description: Invoice Payment Link Response Dto.
+    InvoicePaymentStatus:
+      type: string
+      description: Invoice payment status enum.
+      enum:
+      - PAID
+      - VOID
+      - SCHEDULED
+      - CANCELED
+      - INITIATED
+      - UNDEFINED
+    ListInvoiceResponseDto:
+      type: object
+      description: Get list of invoices response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_InvoiceResponseDto_'
+      - properties:
+          count:
+            type: integer
+            description: Total number of invoices matching the list request filters, across all pages of results.
+            format: int32
+          totalDueAmount:
+            type: number
+            description: Sum of the balance due of all invoices matching the list request filters, across all pages of results. This value is in the organization's base currency. For invoices issued in a foreign currency, the invoice's exchange rate is applied.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    ConvenienceFeeResponseDto:
+      type: object
+      properties:
+        percentage:
+          type: number
+          description: 'Convenience fee percentage
+
+            '
+      description: DTO for convenience fee in invoice responses.
+    InvoiceLineItemClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+      description: DTO for Bill Line Item classifications.
+    RecordInvoicePaymentStatus:
+      type: string
+      description: Record Invoice payment status enum.
+      enum:
+      - PAID
+      - VOID
+      - SCHEDULED
+      - CANCELED
+      - ESCHEATED
+      - UNDEFINED
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    InvoicePaymentTypeResponse:
+      type: string
+      description: Record AR payment type.
+      enum:
+      - CASH
+      - CHECK
+      - CREDIT_CARD
+      - ACH
+      - PAYPAL
+      - OTHER
+      - WALLET
+      - VIRTUAL_CARD
+      - UNDEFINED
+    RecordInvoiceItemRequestDto:
+      required:
+      - amount
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+        amount:
+          type: number
+          description: 'Payment amount. For a payment in an international currency (not USD), this value is in the local currency.
+
+
+            **Note**: You cannot overpay an invoice.'
+      description: Record invoice item dto.
+    RecordInvoiceItemResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+        payments:
+          type: array
+          description: Invoice payments
+          items:
+            $ref: '#/components/schemas/InvoicePayment'
+      description: Record invoice details response.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    InvoiceCreateLineItem:
+      required:
+      - quantity
+      type: object
+      properties:
+        description:
+          maxLength: 4000
+          type: string
+          description: Invoice line item description
+        price:
+          type: number
+          description: Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Invoice line item unit quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the invoice line item
+        taxable:
+          type: boolean
+          description: Set as true if the invoice line item is taxable
+      description: Invoice Create Request Line Item.
+    RecordInvoiceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the received payment. The value begins with `0rp`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        paymentType:
+          $ref: '#/components/schemas/InvoicePaymentTypeResponse'
+        paymentDate:
+          type: string
+          description: Invoice payment date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        amount:
+          type: number
+          description: Payment amount
+        unappliedAmount:
+          type: number
+          description: Unapplied payment amount
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecordInvoicePaymentStatus'
+          - description: Payment status.
+        description:
+          type: string
+          description: Payment description
+        invoices:
+          type: array
+          description: List of invoice payments
+          items:
+            $ref: '#/components/schemas/RecordInvoiceItemResponseDto'
+      description: Record AR payment response.
+    InvoiceRecordStatus:
+      type: string
+      description: Record status enum for invoices.
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - DRAFT
+      - UNDEFINED
+    InvoiceUpdateRequestDto:
+      type: object
+      properties:
+        invoiceNumber:
+          maxLength: 100
+          type: string
+          description: 'User-generated invoice number. This value can be your chosen number scheme.
+
+
+            If you do not set this field, `invoiceNumber` is auto-generated.'
+        invoiceDate:
+          type: string
+          description: 'Invoice creation date. This value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `invoiceDate` is set as the date when the invoice is created.'
+          format: date
+        dueDate:
+          type: string
+          description: 'Invoice due date. The value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `dueDate` is set as the date when the invoice is created.'
+          format: date
+        paymentTermId:
+          type: string
+        customer:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceCustomer'
+          - description: 'Customer contact information.
+
+
+              * Set the customer `id` for associating an existing customer to the invoice.
+
+
+              * Set `name` and `email` for creating a new customer with the invoice.
+
+
+              In the response, a new BILL-generated customer `id` is available.'
+        invoiceLineItems:
+          type: array
+          description: Invoice line item information
+          items:
+            $ref: '#/components/schemas/InvoiceUpdateLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceProcessingOptions'
+          - description: Invoice processing options
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the invoice
+        creditAmount:
+          minimum: 0
+          type: number
+          description: 'Credit amount applied to the invoice.
+
+
+            BILL applies the credit amount from the total of all the credit memos available for the customer.'
+        enableCardPayment:
+          type: boolean
+          description: Set as `true` if the card payment option is enabled for the invoice
+        convenienceFee:
+          allOf:
+          - $ref: '#/components/schemas/ConvenienceFeeRequestDto'
+          - description: Convenience fee information. The customer is charged the convenience fee when they pay the invoice using a card. To set the convenience fee, `enableCardPayment` must be set as `true`.
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        invoicePdfId:
+          type: string
+          description: 'BILL-generated ID of the invoice PDF. The value begins with `att`.
+
+
+            The invoice PDF is sent as an email attachment when you send an invoice to a customer. The invoice PDF also appears when the customer clicks the invoice payment link to complete the invoice payment.
+
+
+            **Note**: You can get the list of invoice attachments with `GET /v3/attachments/invoices/{invoiceId}`. All the attachments in the list (including the invoice PDF) are sent as email attachments when you send the invoice to the customer.'
+      description: Update an invoice
+      example:
+        invoiceLineItems:
+        - id: '{{invoice_line_item_id01}}'
+          quantity: 2
+          description: Classic extreme drum sticks (amount updated)
+          price: 19.99
+    CurrencyCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BBD
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BND
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CUP
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GGP
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JEP
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MOP
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLE
+      - SLL
+      - SOS
+      - SPL
+      - SRD
+      - STN
+      - SVC
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TVD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XDR
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+    InvoiceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the invoice. The value begins with `00e`.
+        archived:
+          type: boolean
+          description: Set as `true` if the invoice is archived
+        recordStatus:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceRecordStatus'
+          - description: 'Invoice record status.
+
+
+              When `recordStatus` is `ACTIVE`, `archived` is set as `false`. For any other `recordStatus` value, `archived` is set as `true`.'
+        invoiceNumber:
+          type: string
+          description: 'User-generated invoice number. This value can be your chosen number scheme.
+
+
+            If you do not set this field, `invoiceNumber` is auto-generated.'
+        invoiceDate:
+          type: string
+          description: 'Invoice creation date. This value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `invoiceDate` is set as the date when the invoice is created.'
+          format: date
+        dueDate:
+          type: string
+          description: 'Invoice due date. The value is in the `yyyy-MM-dd` format.
+
+
+            If you do not set this field, `dueDate` is set as the date when the invoice is created.'
+          format: date
+        paymentTermId:
+          type: string
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        customerName:
+          type: string
+          description: Name of the customer the invoice is issued to.
+        totalAmount:
+          type: number
+          description: Invoice total amount
+        dueAmount:
+          type: number
+          description: Invoice due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from `totalAmount`.
+        scheduledAmount:
+          type: number
+          description: Invoice scheduled amount. The value is set as the customer payment amount that is pending clearance.
+        creditAmount:
+          type: number
+          description: 'Credit amount applied to the invoice.
+
+
+            When a credit amount is applied to an invoice, the invoice `status` is set as `PARTIAL_PAYMENT` or `PAID_IN_FULL` depending on the invoice `totalAmount`.'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceStatus'
+          - description: Invoice status.
+        exchangeRate:
+          type: number
+          description: Invoice exchange rate
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the invoice. The value begins with `006`.
+        createdTime:
+          type: string
+          description: Invoice created time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Invoice updated time
+          format: date-time
+        invoiceLineItems:
+          type: array
+          description: Invoice line item information
+          items:
+            $ref: '#/components/schemas/InvoiceResponseLineItem'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the invoice payment. The value begins with `0ca`.
+        payments:
+          type: array
+          description: Invoice payments information
+          items:
+            $ref: '#/components/schemas/InvoicePayment'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the invoice
+        salesTaxItemId:
+          type: string
+          description: BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the invoice line items set as taxable.
+        salesTaxTotal:
+          type: number
+          description: Invoice sales tax amount. The value is set based on `salesTaxItemId`.
+        salesTaxPercentage:
+          type: number
+          description: Invoice sales tax percentage. The value is set based on `salesTaxItemId`.
+        enableCardPayment:
+          type: boolean
+          description: Set as `true` if the card payment option is enabled for the invoice
+        convenienceFee:
+          allOf:
+          - $ref: '#/components/schemas/ConvenienceFeeResponseDto'
+          - description: Convenience fee information
+        invoicePdfId:
+          type: string
+          description: 'BILL-generated ID of the invoice PDF. The value begins with `att`.
+
+
+            The invoice PDF is sent as an email attachment when you send an invoice to a customer. The invoice PDF also appears when the customer clicks the invoice payment link to complete the invoice payment.'
+      description: Invoices response.
+    InvoiceUpdateLineItem:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the invoice line item. The value begins with `00f`.
+        description:
+          maxLength: 4000
+          type: string
+          description: Invoice line item description
+        price:
+          type: number
+          description: Invoice line item unit price. For an invoice in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Invoice line item unit quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the invoice line item
+        taxable:
+          type: boolean
+          description: Set as true if the invoice line item is taxable
+      description: Invoice Update Request Line Item.
+    InvoiceCustomer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        name:
+          maxLength: 100
+          type: string
+          description: Customer name
+        email:
+          type: string
+          description: Customer email address
+        invoiceCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: 'Invoice currency. Three-letter abbreviation in the ISO 4217 format.
+
+
+              This value is required for an international customer. International customers pay invoices in this currency.'
+      description: Customer info for an invoice.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

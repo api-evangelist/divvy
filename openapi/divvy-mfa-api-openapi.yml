@@ -1,0 +1,963 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Mfa API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: MFA
+paths:
+  /v3/mfa/challenge:
+    post:
+      tags:
+      - MFA
+      summary: Generate MFA challenge
+      description: 'Generate an MFA challenge ID for creating an MFA-trusted API sign in session.
+
+
+        In the response, a `challengeId` is generated and a six-digit `token` is sent to the phone number that was registered with MFA setup.
+
+
+        After you generate a challenge ID (with `POST /v3/mfa/challenge`), complete your MFA sign in by validating the MFA challenge (with `POST /v3/mfa/challenge/validate`). At this point, your API session is MFA trusted.
+
+
+        There are two stages in the BILL MFA process.
+
+        1. **MFA setup**: Add a valid phone number for setting up MFA in the organization (with `POST /v3/mfa/setup`), and then complete the setup by validating the entered phone number (with `POST /v3/mfa/validate`). At this point, the phone number is registered for the MFA sign in operation.
+
+        2. **MFA sign in**: Generate an MFA challenge (with `POST /v3/mfa/challenge`), and then complete MFA sign in by validating the MFA challenge (with `POST /v3/mfa/challenge/validate`). At this point, your API session is MFA trusted.
+
+
+        **Note**: In the production environment, BILL requires an MFA-trusted API session for a set of API operations.
+
+        * Enable vendor `autoPay`
+
+        * Enable recurring bill `autoPayment`
+
+        * Create a payment or bulk payment
+
+        * Create a bank account in a BILL organization
+
+        * Reset MFA (Complete MFA setup and MFA sign-in again)'
+      operationId: generateChallenge
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaChallengeRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Generate MFA challenge response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaChallengeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/mfa/challenge/validate:
+    post:
+      tags:
+      - MFA
+      summary: Validate MFA challenge
+      description: 'Validate the MFA challenge for creating an MFA-trusted API sign in session. This validation requires the `challengeId` and `token` from `POST /v3/mfa/challenge`.
+
+
+        After the validation is complete, your API session is MFA trusted.
+
+
+        There are two stages in the BILL MFA process.
+
+        1. **MFA setup**: Add a valid phone number for setting up MFA in the organization (with `POST /v3/mfa/setup`), and then complete the setup by validating the entered phone number (with `POST /v3/mfa/validate`). At this point, the phone number is registered for the MFA sign in operation.
+
+        2. **MFA sign in**: Generate an MFA challenge (with `POST /v3/mfa/challenge`), and then complete MFA sign in by validating the MFA challenge (with `POST /v3/mfa/challenge/validate`). At this point, your API session is MFA trusted.
+
+
+        **Note**: In the production environment, BILL requires an MFA-trusted API session for a set of API operations.
+
+        * Enable vendor `autoPay`
+
+        * Enable recurring bill `autoPayment`
+
+        * Create a payment or bulk payment
+
+        * Create a bank account for a BILL organization
+
+        * Reset MFA (Complete MFA setup and MFA sign-in again)'
+      operationId: validateChallenge
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaChallengeValidateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Validate MFA challenge response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaChallengeValidateResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/mfa/phones:
+    get:
+      tags:
+      - MFA
+      summary: Get list of MFA phone numbers
+      description: Get a list of phone numbers that have been added for setting up MFA in the current organization.
+      operationId: listMfaPhones
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get list of MFA phone numbers response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListMfaPhoneResponseDto'
+  /v3/mfa/setup:
+    post:
+      tags:
+      - MFA
+      summary: Add phone for MFA setup
+      description: 'Add a valid phone number for setting up MFA in the current organization.
+
+
+        In the response, a `setupId` is generated and a six-digit `token` is sent to the phone number. After you add a phone number (with `POST /v3/mfa/setup`), complete the MFA setup by validating the entered phone number (with `POST /v3/mfa/validate`). At this point, the phone number is registered for the MFA sign in operation.
+
+
+        There are two stages in the BILL MFA process.
+
+        1. **MFA setup**: Add a valid phone number for setting up MFA in the organization (with `POST /v3/mfa/setup`), and then complete the setup by validating the entered phone number (with `POST /v3/mfa/validate`). At this point, the phone number is registered for the MFA sign in operation.
+
+        2. **MFA sign in**: Generate an MFA challenge (with `POST /v3/mfa/challenge`), and then complete MFA sign in by validating the MFA challenge (with `POST /v3/mfa/challenge/validate`). At this point, your API session is MFA trusted.
+
+
+        **Note**: In the production environment, BILL requires an MFA-trusted API session for a set of API operations.
+
+        * Enable vendor `autoPay`
+
+        * Enable recurring bill `autoPayment`
+
+        * Create a payment or bulk payment
+
+        * Create a bank account in a BILL organization
+
+        * Reset MFA (Complete MFA setup and MFA sign-in again)'
+      operationId: setup
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaSetupRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Add phone for MFA setup response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/mfa/setup/validate:
+    post:
+      tags:
+      - MFA
+      summary: Validate phone for MFA setup
+      description: 'Validate the phone number for setting up MFA in the current organization. This validation requires the `setupId` and `token` from `POST /v3/mfa/setup`.
+
+
+        After the validation is complete, the phone number is registered for the MFA sign in operation.
+
+
+        There are two stages in the BILL MFA process.
+
+        1. **MFA setup**: Add a valid phone number for setting up MFA in the organization (with `POST /v3/mfa/setup`), and then complete the setup by validating the entered phone number (with `POST /v3/mfa/validate`). At this point, the phone number is registered for the MFA sign in operation.
+
+        2. **MFA sign in**: Generate an MFA challenge (with `POST /v3/mfa/challenge`), and then complete MFA sign in by validating the MFA challenge (with `POST /v3/mfa/challenge/validate`). At this point, your API session is MFA trusted.
+
+
+        **Note**: In the production environment, BILL requires an MFA-trusted API session for a set of API operations.
+
+        * Enable vendor `autoPay`
+
+        * Enable recurring bill `autoPayment`
+
+        * Create a payment or bulk payment
+
+        * Create a bank account in a BILL organization
+
+        * Reset MFA (Complete MFA setup and MFA sign-in again)'
+      operationId: validate
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaSetupValidateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Validate phone for MFA setup response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/mfa/step-up:
+    post:
+      tags:
+      - MFA
+      summary: MFA step-up for API session
+      description: 'Set your current API session as MFA trusted.
+
+
+        Ideally, when you sign in with `POST /v3/login`, set `rememberMeId` and `device` in your request to generate an MFA-trusted API session.
+
+
+        In case you sign in without `rememberMeId` and `device` in your request, you can use this `POST /v3/mfa/step-up` endpoint to mark the current API session as MFA trusted.'
+      operationId: stepUpSession
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaStepUpRequestDto'
+        required: true
+      responses:
+        '200':
+          description: MFA step-up for API session response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStepUpResponseDto'
+components:
+  schemas:
+    MfaChallengeValidateResponseDto:
+      type: object
+      properties:
+        rememberMeId:
+          type: string
+          description: 'MFA ID. This value expires in 30 days.
+
+
+            When your API session is expiring, this value is required for generating a new MFA-trusted API session with `POST /v3/login`.'
+      description: Response for MFA challenge validation.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    MfaSetupResponseDto:
+      required:
+      - setupId
+      type: object
+      properties:
+        setupId:
+          type: string
+          description: MFA setup ID. This value is required for completing your MFA setup validation with `POST /v3/mfa/setup/validate`.
+      description: MFA Setup response.
+    ResponseStatus:
+      type: string
+      description: Status of the response.
+      enum:
+      - SUCCESS
+      - FAILURE
+    MfaSetupType:
+      type: string
+      description: Enum for different ways to do mfa setup.
+      enum:
+      - VOICE
+      - TEXT
+    ListMfaPhoneResponseDto:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MfaPhoneResponseDto'
+      description: List type for MFA Phones list.
+    MfaStepUpRequestDto:
+      type: object
+      properties:
+        rememberMeId:
+          type: string
+          description: 'MFA ID. Set this field for creating an MFA-trusted API session.
+
+
+            This MFA ID is generated when you set `rememberMe` as `true` in your `POST /v3/mfa/challenge/validate` request. This value expires in 30 days.
+
+
+            See [Validate MFA challenge](https://developer.bill.com/reference/validatechallenge) for more information.'
+        device:
+          type: string
+          description: Mobile device name. This is a nickname for your mobile device. Set this field when you set `rememberMeId`.
+      description: Step-up request for MFA
+      example:
+        rememberMeId: '{{mfa_remember_me_id}}'
+        device: '{{mfa_device_name}}'
+    MfaPhoneType:
+      type: string
+      description: Response for MFA Phone Type.
+      enum:
+      - MOBILE
+      - HOME
+      - WORK
+    MfaChallengeResponseDto:
+      type: object
+      properties:
+        challengeId:
+          type: string
+          description: MFA challenge ID. This value is required for validating the MFA challenge with `POST /v3/mfa/challenge/validate`.
+      description: Response for MFA challenge.
+    MfaPhoneResponseDto:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/MfaPhoneType'
+          - description: Phone type.
+        last4digits:
+          type: string
+          description: Phone number last four digits
+        primary:
+          type: boolean
+          description: Set as `true` to mark the phone number as the primary mobile device
+          deprecated: true
+      description: MFA Phone.
+    MfaSetupRequestDto:
+      required:
+      - phone
+      - type
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Phone number for MFA setup. The validation `token` is sent to this number.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/MfaSetupType'
+          - description: 'Phone type for MFA setup.
+
+              * `TEXT`: You receive the validation `token` as an SMS test message.
+
+              * `VOICE`: You receive the validation `token` by an automated phone call'
+        primary:
+          type: boolean
+          description: Set as `true` to mark the phone number as the primary mobile device. The default value is `true`.
+          deprecated: true
+      description: Add phone for MFA setup
+      example:
+        phone: '{{user_phone_no}}'
+        type: TEXT
+        primary: true
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    MfaChallengeRequestDto:
+      type: object
+      properties:
+        useBackup:
+          type: boolean
+          description: Set as `false` to generate the token with the primary device. The default value is `false`.
+          deprecated: true
+      description: Generate MFA challenge
+      example:
+        useBackup: 'false'
+    MfaStepUpResponseDto:
+      type: object
+      properties:
+        trusted:
+          type: boolean
+          description: This field is set as `true` if the current API session is MFA-trusted
+      description: Step-up response.
+    StatusDto:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResponseStatus'
+          - description: Request status
+      description: The type Delete response dto.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    MfaSetupValidateRequestDto:
+      required:
+      - setupId
+      - token
+      - type
+      type: object
+      properties:
+        setupId:
+          type: string
+          description: MFA `setupId` from the `POST /v3/mfa/setup` response
+        type:
+          allOf:
+          - $ref: '#/components/schemas/MfaSetupType'
+          - description: Phone type used for MFA setup
+        token:
+          type: string
+          description: Validation `token` sent to the registered phone number
+      description: Validate MFA setup
+      example:
+        setupId: '{{mfa_setup_id}}'
+        type: TEXT
+        token: '{{mfa_token}}'
+    MfaChallengeValidateRequestDto:
+      required:
+      - challengeId
+      - token
+      type: object
+      properties:
+        challengeId:
+          type: string
+          description: MFA `challengeId` from the `POST /v3/mfa/challenge` response
+        token:
+          type: string
+          description: Validation `token` sent to the registered phone number
+        device:
+          type: string
+          description: Mobile device name. This is a nickname for your mobile device. Set this field when `rememberMe` is set as `true`.
+        machineName:
+          type: string
+          description: Machine name. This is a nickname for the machine used to complete MFA sign in. Set this field when `rememberMe` is set as `true`.
+        rememberMe:
+          type: boolean
+          description: Set as `true` for the generated MFA ID to expire in 30 days
+      description: Validate MFA challenge
+      example:
+        challengeId: '{{mfa_challenge_id}}'
+        token: '{{mfa_token}}'
+        device: '{{mfa_device_name}}'
+        machineName: '{{mfa_machine_name}}'
+        rememberMe: true
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

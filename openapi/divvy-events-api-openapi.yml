@@ -1,0 +1,382 @@
+openapi: 3.2.0
+info:
+  title: Connect Events API
+  description: RESTful API for working with BILL webhooks
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect-events
+  description: sandbox
+tags:
+- name: Events
+paths:
+  /v3/events/catalog:
+    get:
+      tags:
+      - Events
+      summary: Get events catalog
+      description: 'Get the complete list of available events that you can subscribe to.
+
+
+        See Webhooks in the Guides section for more information, sample requests, and notification payloads for BILL events.'
+      operationId: getEventCatalog
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key sent to you by BILL when you create a developer account. Set `sessionId` and `devKey` for organization-level BILL v3 API webhook events.
+          example: '{{developer_key}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account. Set `sessionId` and `appKey` for partner-level BILL v3 API webhook events.
+          example: '{{app_key}}'
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication. Set `apiToken`  for Spend & Expense webhook events.
+          example: '{{api_token}}'
+      responses:
+        '200':
+          description: getEventCatalog 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventCatalogDto'
+  /v3/events/subscription/{subscriptionId}:
+    get:
+      tags:
+      - Events
+      summary: Get list of event notifications
+      description: 'Get a list of event notifications sent to you for a subscription. You can use this endpoint to address any issues with notification retries.
+
+
+        In the request, set `createdTimeFrom` and `createdTimeTo` to get event notifications for the specified time range. If you do not set `createdTimeTo`, the current date and time is used. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        **Note**: In this list operation, pagination is available only in one direction. The `nextPage` value is available in the response for you to retrieve the next page of results. However, you cannot retrieve the previous page of results.
+
+
+        See Webhooks in the Guides section for more information, sample requests, and notification payloads for BILL events.'
+      operationId: getEventsForSubscription
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key sent to you by BILL when you create a developer account. Set `sessionId` and `devKey` for organization-level BILL v3 API webhook events.
+          example: '{{developer_key}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account. Set `sessionId` and `appKey` for partner-level BILL v3 API webhook events.
+          example: '{{app_key}}'
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication. Set `apiToken`  for Spend & Expense webhook events.
+          example: '{{api_token}}'
+      - name: subscriptionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the subscription
+          example: '{{webhook_subscription_id}}'
+      - name: entityId
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: BILL-generated ID of the entity, such as bill or vendor. For example, to filter notifications by a specific bill, set this value as the ID of the bill.
+          example: '{{webhook_bill_id}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: createdTimeFrom
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Event notification created start date and time. The value is in the ISO 8601 DateTime (UTC) format. For example, `2026-12-30T00:00:00Z`.
+          example: '2026-03-15T00:00:00Z'
+      - name: createdTimeTo
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Event notification created end date and time. The value is in the ISO 8601 DateTime (UTC) format. For example, `2026-12-31T00:00:00Z`.
+
+
+            If you do not set `createdTimeTo`, the current date and time is used.'
+          example: '2026-03-20T00:00:00Z'
+      - name: ascending
+        in: query
+        schema:
+          type:
+          - boolean
+          - 'null'
+          description: 'Set as `true` to sort event notifications in the ascending order. By default, filtered notifications are sorted in the descending order.
+
+
+            **Note**: You must set `createdTimeFrom` for the notifications in the response to be sorted. If you do not set `createdTimeFrom`, the notifications in the response are not sorted.'
+          example: true
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` value in the response enables you to navigate to the next page of results. Set `page` as the `nextPage` value for navigation.'
+      responses:
+        '200':
+          description: getEventsForSubscription 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventWithRetriesDto'
+  /v3/events/subscription/{subscriptionId}/event/{eventId}:
+    post:
+      tags:
+      - Events
+      summary: Resend an event
+      description: 'Resend an existing event notification.
+
+
+        **Note**: When an event notification fails, BILL tries to send the notification again with exponential backoff.
+
+
+        See Webhooks in the Guides section for more information, sample requests, and notification payloads for BILL events.'
+      operationId: resendEvent
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key sent to you by BILL when you create a developer account. Set `sessionId` and `devKey` for organization-level BILL v3 API webhook events.
+          example: '{{developer_key}}'
+      - name: appKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Application key sent to you by BILL when you create a partner account. Set `sessionId` and `appKey` for partner-level BILL v3 API webhook events.
+          example: '{{app_key}}'
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication. Set `apiToken`  for Spend & Expense webhook events.
+          example: '{{api_token}}'
+      - name: subscriptionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the subscription
+          example: '{{webhook_subscription_id}}'
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the event
+          example: '{{webhook_event_id}}'
+      responses:
+        '200':
+          description: resendEvent 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+components:
+  schemas:
+    EventCatalogDto:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Event type
+        versions:
+          type: array
+          description: Available versions for the event type
+          items:
+            type: string
+      description: Event catalog information.
+    PaginationDto_EventWithRetriesDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventWithRetriesDto'
+      description: Pagination information.
+    EventWithRetriesDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the event
+        type:
+          type: string
+          description: Event type
+        version:
+          type: string
+          description: Event type version
+        subscriptionId:
+          type: string
+          description: BILL-generated ID of the subscription
+        payload:
+          type: string
+          description: Event payload. The payload is JSON escaped and presented as a string.
+        createdTime:
+          type: string
+          description: Event created date and time
+          format: date-time
+        statusCode:
+          type: integer
+          description: HTTP status code received from the notification URL
+          format: int32
+        retries:
+          type: array
+          description: Event retries information
+          items:
+            $ref: '#/components/schemas/EventRetryDto'
+      description: Event and retry attempts information.
+    EventDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the event
+        type:
+          type: string
+          description: Event type
+        version:
+          type: string
+          description: Event type version
+        subscriptionId:
+          type: string
+          description: BILL-generated ID of the subscription
+        payload:
+          type: string
+          description: Event payload. The payload is JSON escaped and presented as a string.
+        createdTime:
+          type: string
+          description: Event created date and time
+          format: date-time
+        statusCode:
+          type: integer
+          description: HTTP status code received from the notification URL
+          format: int32
+      description: Event information.
+    EventRetryDto:
+      type: object
+      properties:
+        attemptNumber:
+          type: integer
+          description: Event notification retry attempt number
+          format: int32
+        createdTime:
+          type: string
+          description: Event notification retry created date and time
+          format: date-time
+        statusCode:
+          type: integer
+          description: HTTP status code received from the notification URL
+          format: int32
+      description: Event notification retry attempts information.
+    ListEventWithRetriesDto:
+      type: object
+      description: The list of event with retries dto and next page.
+      allOf:
+      - $ref: '#/components/schemas/PaginationDto_EventWithRetriesDto_'
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/createnewsecuritykey.md
+  - https://developer.bill.com/reference/createsubscription.md
+  - https://developer.bill.com/reference/deletesubscription.md
+  - https://developer.bill.com/reference/getallsubscriptions.md
+  - https://developer.bill.com/reference/geteventcatalog.md
+  - https://developer.bill.com/reference/geteventsforsubscription.md
+  - https://developer.bill.com/reference/getsubscription.md
+  - https://developer.bill.com/reference/replacesubscription.md
+  - https://developer.bill.com/reference/resendevent.md
+  - https://developer.bill.com/reference/sendtestevent.md
+  - https://developer.bill.com/reference/updatesubscription.md
+  - https://developer.bill.com/reference/webhookgethealthcheck.md
+  merge:
+    pages: 12
+    deduped: 19
+    conflicts_kept_first: 0

@@ -1,0 +1,2525 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Payments API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Payments
+paths:
+  /v3/payments:
+    get:
+      tags:
+      - Payments
+      summary: Get list of payments
+      description: 'Get a list of payment objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listPayments
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{payment_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of payments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Payments
+      summary: Create a payment
+      description: 'Create a payment.
+
+
+        See Get list of vendor payment options to get details about vendor payment options and payment process dates.
+
+
+        **Note**: Creating a payment requires an MFA-trusted API session. See MFA setup for information about the BILL MFA process.
+
+
+        See Payments in the Guides section for more information, sample requests, and responses.'
+      operationId: createPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/bulk:
+    post:
+      tags:
+      - Payments
+      summary: Create a bulk payment
+      description: 'Create a request for paying multiple bills. You can pay up to 50 bills with one `POST /v3/payments/bulk` request.
+
+
+        Bulk payments at BILL follow a set of rules.
+
+        * **Successful response**: In your bulk payment request, all your bill payments must be successful for a successful response. If any bill payment is not successful, the entire request fails and none of the bills in the request are paid.
+
+        * **You can pay multiple vendors**: You can pay multiple vendors with one `POST /v3/payments/bulk` request. In this case, make sure that you do not set `vendorId` in your request.
+
+        * **You can only pay existing bills**: When you create a single payment with `POST /v3/payments`, you can set `createBill` as `true` in your request for creating a new bill for a vendor payment. In your bulk payment request, an existing `billId` is required for each bill to be paid.
+
+        * **Vendors with `"combinePayments": true`**: When you create a bulk payment for a vendor that has `"combinePayments": true`, BILL combines payments for up to 35 bills in one `payments` response object, and then combines payments for the remaining bills in a second `payments` response object.
+
+
+        See Get list of vendor payment options to get details about vendor payment options and payment process dates.
+
+
+        **Note**: Creating a bulk payment requires an MFA-trusted API session. See MFA setup for information about the BILL MFA process.
+
+
+        See Payments in the Guides section for more information, sample requests, and responses.'
+      operationId: createBulkPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkPaymentRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a bulk payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkPaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/exchange-rate:
+    get:
+      tags:
+      - Payments
+      summary: Get BILL exchange rate
+      description: 'Get the current BILL exchange rate and exchange rate batch ID for paying an international vendor. When the vendor bill currency is not `USD`, the exchange rate batch ID is required for creating a payment with `POST /v3/payments` or `POST /v3/payments/bulk`.
+
+
+        BILL maintains all `exchangeRate` values in a batch. When a batch expires, a new batch ID is generated and all `exchangeRate` values are updated in the new batch. Use this endpoint to get the current exchange rate and batch ID based on the payment amount and vendor bill currency.
+
+
+        In production, a BILL batch is valid for a maximum of 20 minutes. response provides the timestamp when the current batch will expire. For example, if a batch has been active for 17 minutes when you get the `exchangeRateBatchId`, `expirationTime` indicates that you have 3 minutes remaining (with `POST /v3/payments` or `POST /v3/payments/bulk`).
+
+
+        **Note**:
+
+        * International vendor payment information is required for you to get the BILL exchange rate with this endpoint.
+
+        * When the vendor bill currency is not `USD`, the payment `processDate` **must be** the next US business day.'
+      operationId: getExchangeRate
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the international vendor to be paid. The value begins with `009`.
+          example: '{{vendor_id}}'
+      - name: amount
+        in: query
+        required: true
+        schema:
+          type: number
+          description: Payment amount. The amount is in the vendor bill currency.
+          example: 1000
+      responses:
+        '200':
+          description: Get BILL exchange rate response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeRateResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Payments
+      summary: Get BILL exchange rates for multiple vendors
+      description: 'Get the current BILL exchange rate and exchange rate batch ID for multiple international vendors with one API request. When the vendor bill currency is not `USD`, the exchange rate batch ID is required for creating a payment with `POST /v3/payments` or `POST /v3/payments/bulk`.
+
+
+        BILL maintains all `exchangeRate` values in a batch. When a batch expires, a new batch ID is generated and all `exchangeRate` values are updated in the new batch. Use this endpoint to get the current exchange rate and batch ID based on the payment amount and vendor bill currency.
+
+
+        In production, a BILL batch is valid for a maximum of 20 minutes. response provides the timestamp when the current batch will expire. For example, if a batch has been active for 17 minutes when you get the `exchangeRateBatchId`, `expirationTime` indicates that you have 3 minutes remaining (with `POST /v3/payments` or `POST /v3/payments/bulk`).
+
+
+        **Note**:
+
+        * International vendor payment information is required for you to get BILL exchange rates with this endpoint.
+
+        * When the vendor bill currency is not `USD`, the payment `processDate` **must be** the next US business day.'
+      operationId: getExchangeRates
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/ExchangeRateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Get BILL exchange rates for multiple vendors response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeRatesResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/mass:
+    post:
+      tags:
+      - Payments
+      summary: Create a mass payment
+      description: 'Create a mass payment request for up to 2000 bills. BILL processes each payment in the mass payment request asynchronously.
+
+
+        In the response, a BILL-generated payment batch ID is available. You can track the current status of each payment in a mass payment batch with `GET /v3/payments/mass/{paymentBatchId}`.
+
+
+        **Note**: Creating a mass payment requires an MFA-trusted API session. See MFA setup for information about the BILL MFA process.'
+      operationId: createMassPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MassPaymentRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a mass payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MassPaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/mass/{paymentBatchId}:
+    get:
+      tags:
+      - Payments
+      summary: Get mass payment status
+      description: 'Get details about an existing mass payment batch.
+
+
+        In the response, you get the status of each payment in the mass payment batch. Each payment is either `scheduled`, `completed`, or `failed`. In addition, you get the `count` for the total number of payments in the mass payments batch.
+
+
+        **Note**: From the list of `completed` payments in the response, BILL begins processing payments based on the payment `processDate`.'
+      operationId: getMassPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: paymentBatchId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the mass payment batch. The value begins with `bbq`.
+          example: '{{mass_payment_batch_id}}'
+      responses:
+        '200':
+          description: Get mass payment status response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MassPaymentDetailsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/options:
+    get:
+      tags:
+      - Payments
+      summary: Get list of vendor payment options
+      description: 'Get a list of vendor payment options available based on the funding account options available in the signed-in user''s BILL organization and on the payment methods accepted by a vendor.
+
+
+        See Vendor payment options in the Guides section for more information, sample requests, and responses.'
+      operationId: listPaymentOptions
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the vendor to be paid. The value begins with `009`.
+          example: '{{vendor_id}}'
+      - name: amount
+        in: query
+        required: true
+        schema:
+          type: number
+          description: Vendor payment amount
+          example: 100
+      responses:
+        '200':
+          description: Get list of vendor payment options response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOptionsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/{paymentId}:
+    get:
+      tags:
+      - Payments
+      summary: Get payment details
+      description: Get details about an existing payment.
+      operationId: getPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+          example: '{{payment_id}}'
+      responses:
+        '200':
+          description: Get payment details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/{paymentId}/cancel:
+    post:
+      tags:
+      - Payments
+      summary: Cancel a payment
+      description: 'Cancel an existing payment.
+
+
+        You can cancel a payment only when the payment `singleStatus` is `SCHEDULED`. When BILL starts processing the payment, the payment `singleStatus` changes. At that point, you cannot cancel the payment. You can attempt to void the payment with `POST /v3/payments/{paymentId}/void`.'
+      operationId: cancelPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+          example: '{{payment_id}}'
+      responses:
+        '200':
+          description: Cancel a payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/{paymentId}/check-image:
+    get:
+      tags:
+      - Payments
+      summary: Get check image data
+      description: 'Get an image of an existing check sent to a vendor.
+
+
+        The check image is available when the vendor bank processes the check payment. BILL checks in with the bank every 30 minutes to get the check image. The image file format is determined by the vendor bank.
+
+
+        From the response, use `downloadLink` in a GET request to download the front and back images of the check.
+
+
+        ```
+
+        curl ''{downloadLink}'' --header ''sessionId: {session_id}'' --output {check_name}
+
+        ```'
+      operationId: getCheckImageData
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+          example: '{{payment_id}}'
+      responses:
+        '200':
+          description: Get check image data response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckImageDataResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/payments/{paymentId}/void:
+    post:
+      tags:
+      - Payments
+      summary: Void a payment
+      description: 'Void an existing payment.
+
+
+        Void a bill payment that has started processing and cannot be canceled (with `POST /v3/payments/{paymentId}/cancel`). You can attempt to void payments made both with BILL (online) and outside BILL (offline).
+
+
+        ### Void a payment made with BILL (online)
+
+
+        In your /`POST /v3/payments/{paymentId}/void` request:
+
+        * Set `paymentId` as the BILL-generated ID of the payment. The value begins with `stp`.
+
+        * Set `type` as the void payment request type
+
+        * Set `reason` as the reason for voiding the payment
+
+
+        See Can I cancel or void a Payables payment? in the BILL Help Center to learn about the BILL void payment process and timing in the production environment.'
+      operationId: voidPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+          example: '{{payment_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoidRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Void a payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    PaymentRequestDto:
+      required:
+      - amount
+      - fundingAccount
+      - processingOptions
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: 'BILL-generated ID of the vendor to be paid. The value begins with `009`.
+
+            * If `vendorId` is set, it must match your bill’s vendor ID.
+
+            * If `vendorId` is not set, the bill’s `vendorId` is automatically set.'
+        billId:
+          type: string
+          description: BILL-generated ID of the bill to be paid. The value begins with `00n`. If `createBill` is `true`, do not set `billId` in your payment request.
+        description:
+          maxLength: 70
+          type: string
+          description: Bill payment description. This value is included in the check memo or in the bank descriptor for electronic payments.
+        processDate:
+          type: string
+          description: 'Payment process date in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender''s funding account.
+
+
+            If the funding account `type` is set as `WALLET` or `AP_CARD`, `processDate` is required. For other funding account types, if `processDate` is not set, the date is automatically set as the next US business day.
+
+
+            **Note**: When you add a vendor bank account in the production environment, BILL requires 2 business days to complete a one-time verification of the bank account. To pay such a vendor, you must set a `processDate` that is 2 business days from the current date.'
+          format: date
+        exchangeRateBatchId:
+          type: integer
+          description: 'Exchange rate batch ID. This field is required for paying international vendors when the vendor bill currency is not `USD`.
+
+
+            Get the current BILL exchange rate and exchange rate batch ID with `GET /v3/payments/exchange-rate`.
+
+            '
+          format: int32
+        fundingAccount:
+          allOf:
+          - $ref: '#/components/schemas/FundingAccountRequest'
+          - description: Payment funding information (Bank account, card account, or wallet)
+        amount:
+          type: number
+          description: 'Payment amount. For a payment in an international currency (not USD), this value is in the local currency.
+
+
+            **Note**: You cannot overpay a bill.'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/ProcessingOptionsRequest'
+          - description: Payment processing options
+        paymentPurpose:
+          allOf:
+          - $ref: '#/components/schemas/PaymentPurposeRequest'
+          - description: 'Payment purpose information for compliance with international payment rules of the vendor country. This one-time configuration is required for enabling electronic payments to international vendors.
+
+
+              You can set `paymentPurpose` at the time of creating a vendor, updating vendor details, or creating a payment. To set `paymentPurpose` at the time of creating a payment, use the information from `GET /v3/vendors/{vendorId}/configuration`.
+
+
+              **Note**: Set `paymentPurpose` only when it is required. Vendor countries, like Japan, do not require any payment purpose information. For such countries, setting `paymentPurpose` in your request results in an error response.
+
+
+              See [Create an international vendor](https://developer.bill.com/docs/creating-an-international-vendor) for more information on how to set `paymentPurpose`.'
+        transactionNumber:
+          maxLength: 50
+          type: string
+          description: 'Payment transaction reference used as an external identifier.
+
+
+            You can set this field as a unique alphanumeric value for your system to track the payment transaction. The value must be 50 characters or fewer. If you do not set `transactionNumber`, BILL sets this field as a unique alphanumeric payment identification value.'
+        cardFundingPurpose:
+          type: string
+          description: 'Card funding purpose. This field is required for the `CARD_ACCOUNT` funding account `type` if BILL cannot identify the vendor industry.
+
+
+            See [Get card funding purpose](https://developer.bill.com/reference/listcardfundingpurposes) for more information.'
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill payment. To edit the vendor credit amount applied to the bill, set the same vendor credit `id` in your payment request. To apply an additional vendor credit to the bill, set the new vendor credit `id` in your payment request.
+          items:
+            $ref: '#/components/schemas/PaymentVendorCreditRequestDto'
+      description: Create a payment
+      example:
+        vendorId: '{{vendor_id}}'
+        billId: '{{bill_id}}'
+        processDate: '2026-12-31'
+        fundingAccount:
+          type: BANK_ACCOUNT
+          id: '{{org_bank_account_id}}'
+        amount: 228.99
+        processingOptions:
+          requestPayFaster: false
+          createBill: false
+    VoidRequestDto:
+      required:
+      - reason
+      - type
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/VoidTypeRequest'
+          - description: Void payment request type
+        reason:
+          maxLength: 4000
+          type: string
+          description: Void payment request reason
+      description: Request to Void a Payment.
+    PaymentPurposeResponse:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Payment purpose text
+        code:
+          allOf:
+          - $ref: '#/components/schemas/PaymentPurposeCodeResponse'
+          - description: Payment purpose code
+      description: Payment purpose response.
+    FundingAccountRequest:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/FundingAccountTypeRequest'
+          - description: 'Payment funding type.
+
+              * `BANK_ACCOUNT`: Bank account
+
+              * `CARD_ACCOUNT`: Credit card or debit card
+
+              * `WALLET`: BILL balance
+
+              * `AP_CARD`: AP Card
+
+
+              See the BILL Help FAQ sections for [BILL balance](https://help.bill.com/direct/s/article/4409933681677) and [AP Card](https://help.bill.com/direct/s/article/000003348) for more information.'
+        id:
+          type: string
+          description: BILL-generated ID of the selected payment funding type. For the `WALLET` type, the `id` is not required.
+      description: Funding account details in Payments API.
+    FundingAccountTypeRequest:
+      type: string
+      description: Funading account type for Payments API.
+      enum:
+      - BANK_ACCOUNT
+      - CARD_ACCOUNT
+      - WALLET
+      - AP_CARD
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    ExchangeRateRequestDto:
+      required:
+      - amount
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the international vendor to be paid. The value begins with `009`.
+          example: '{{vendor_id}}'
+        amount:
+          type: number
+          description: Payment amount. The amount is in the vendor bill currency.
+          example: 1000
+      description: DTO for exchange rate request.
+    CardFundingOption:
+      type: object
+      description: Card Funding option.
+      allOf:
+      - $ref: '#/components/schemas/FundingOption'
+      - properties:
+          id:
+            type: string
+            description: BILL-generated ID of the card account. The value begins with `cat`.
+          name:
+            type: string
+            description: Card account name
+          brand:
+            type: string
+            description: Card brand
+          feeInfo:
+            allOf:
+            - $ref: '#/components/schemas/CardFundingOptionFeeInfo'
+            - description: Estimated card account fees
+    VcardDisbursement:
+      type: object
+      properties:
+        arrivesByDate:
+          type: string
+          description: Virtual card payment arrives by date
+          format: date
+        validUntil:
+          type: string
+          description: Date until when the card is valid
+          format: date
+        last4CardNumber:
+          type: string
+          description: Masked number for virtual card
+      description: Virtual card disbursement dto when the disbursement type is virtual card.
+    ProcessingOptionsRequest:
+      type: object
+      properties:
+        requestPayFaster:
+          type: boolean
+          description: "Set as `true` to use BILL Pay Faster. This field is required if `requestCheckDeliveryType` is set.\n\n  See [Payments](https://developer.bill.com/docs/ap-payments)   in the Guides section for information about BILL Pay Faster payments."
+        createBill:
+          type: boolean
+          description: '* Set as `false` to create a vendor payment for an existing bill.
+
+            * Set as `true` to create a bill for a vendor payment. If `createBill` is `true`, do not set `billId` in your payment request.'
+        requestCheckDeliveryType:
+          allOf:
+          - $ref: '#/components/schemas/CheckDeliveryTypeRequest'
+          - description: BILL Pay Faster payment delivery type. The `RTP_DELIVERY` option is not available for vendor payments by check.
+      description: User provided options for processing the payments request.
+    BillPay:
+      required:
+      - amount
+      - billId
+      type: object
+      properties:
+        billId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill to be paid. The value begins with `00n`.
+        amount:
+          minimum: 0
+          type: number
+          description: Payment amount
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill payment
+          items:
+            $ref: '#/components/schemas/PaymentVendorCreditRequestDto'
+      description: Bill pays details in Payments API.
+    PaymentVendorCreditRequestDto:
+      required:
+      - amount
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`.
+        amount:
+          minimum: 0
+          type: number
+          description: Credit amount
+      description: Payment vendor credit request DTO.
+    DisbursementInfo:
+      type: object
+      properties:
+        isVoidable:
+          type: boolean
+          description: Set as `true` if the payment disbursement type can be voided
+        checkDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/CheckDisbursement'
+          - description: Check payment disbursement information
+        achDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/AchDisbursement'
+          - description: ACH payment disbursement information
+        rppsDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/RppsDisbursement'
+          - description: ACH payment to verified national vendor disbursement information
+        internationalDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/InternationalDisbursement'
+          - description: International ePayment disbursement information
+        vcardDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/VcardDisbursement'
+          - description: Virtual card payment disbursement information
+        walletDisbursement:
+          allOf:
+          - $ref: '#/components/schemas/WalletDisbursement'
+          - description: Instant Transfer (wallet) payment disbursement information
+      description: Disbursement info.
+    FundingAccountTypeResponse:
+      type: string
+      description: Funading account type for Payments API.
+      enum:
+      - BANK_ACCOUNT
+      - CARD_ACCOUNT
+      - WALLET
+      - AP_CARD
+      - UNDEFINED
+    CompletedPaymentDto:
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        paymentId:
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+      description: Completed payment DTO.
+    FailedPaymentDto:
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        errorCode:
+          type: string
+          description: Failed payment error code
+        errorMessage:
+          type: string
+          description: Failed payment error message
+      description: Failed payment DTO.
+    BulkProcessingOptions:
+      type: object
+      properties:
+        requestPayFaster:
+          type: boolean
+          description: "Set as `true` to use BILL Pay Faster. This field is required if `requestCheckDeliveryType` is set.\n\n  See [Payments](https://developer.bill.com/docs/ap-payments)   in the Guides section for information about BILL Pay Faster payments."
+        requestCheckDeliveryType:
+          allOf:
+          - $ref: '#/components/schemas/CheckDeliveryTypeRequest'
+          - description: BILL Pay Faster payment delivery type. The `RTP_DELIVERY` option is not available for vendor payments by check.
+      description: User provided options for processing the payments request.
+    PaymentOptionsResponseDto:
+      required:
+      - amount
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor to be paid. The value begins with `009`.
+        amount:
+          type: number
+          description: Vendor payment amount
+        fundingOptions:
+          allOf:
+          - $ref: '#/components/schemas/FundingOptions'
+          - description: Funding options
+      description: Payments options response dto.
+    ListResponseDto_PaymentResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentResponseDto'
+      description: Response from a list API request with paging references.
+    RppsDisbursement:
+      type: object
+      properties:
+        sentDate:
+          type: string
+          description: ACH payment to verified national vendor sent date
+          format: date
+        arrivesByDate:
+          type: string
+          description: ACH payment to verified national vendor arrives by date
+          format: date
+        traceNumber:
+          type: integer
+          description: Payment trace number. This value is used to uniquely identify a payment in a batch.
+          format: int32
+        batchNumber:
+          type: integer
+          description: Payment batch number
+          format: int32
+      description: Rpps disbursement dto when the disbursement type is ACH to verified national vendor.
+    MassPaymentRequestDto:
+      type: object
+      description: Create a mass payment
+      example:
+        processDate: '2026-12-16'
+        fundingAccount:
+          type: BANK_ACCOUNT
+          id: '{{org_bank_account_id}}'
+        payments:
+        - billId: '{{bill_id01}}'
+          amount: 228.99
+        - billId: '{{bill_id02}}'
+          amount: 142
+      allOf:
+      - $ref: '#/components/schemas/BulkPaymentRequestDto'
+    VoidTypeRequest:
+      type: string
+      description: Void type request enum.
+      enum:
+      - VOID_AND_CREDIT
+      - VOID_AND_REISSUE
+    DisbursementSubType:
+      type: string
+      description: PayBy.
+      enum:
+      - NONE
+      - WIRE
+      - IACH
+      - LOCAL
+      - MULTIPLE
+      - ACH
+      - UNDEFINED
+    PaymentResponseDto:
+      required:
+      - amount
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor to be paid. The value begins with `009`.
+        vendorName:
+          type: string
+          description: Vendor name
+        billId:
+          type: string
+          description: BILL-generated ID of the bill to be paid. The value begins with `00n`.
+        billPayments:
+          type: array
+          description: List of bill payments. When a payment is applied to a bill, the bill payment is identified by a bill payment `id`. The value begins with `blp`.
+          items:
+            $ref: '#/components/schemas/BillPayment'
+        description:
+          type: string
+          description: Bill payment description. This value is included in the check memo or in the bank descriptor for electronic payments.
+        processDate:
+          type: string
+          description: Payment process date in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender's funding account.
+          format: date
+        fundingAccount:
+          allOf:
+          - $ref: '#/components/schemas/FundingAccountResponse'
+          - description: Payment funding information
+        amount:
+          type: number
+          description: Payment amount. For a payment in an international currency (not USD), this value is in the local currency.
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/ProcessingOptionsResponse'
+          - description: Payment processing options
+        transactionNumber:
+          type: string
+          description: 'Payment transaction reference used as an external identifier.
+
+
+            You can set this field as a unique alphanumeric value for your system to track the payment transaction. The value must be 50 characters or fewer. If you do not set `transactionNumber`, BILL sets this field as a unique alphanumeric payment identification value.'
+        confirmationNumber:
+          type: string
+          description: BILL-generated bill payment confirmation value
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatus'
+          - description: Payment status.
+        exchangeRate:
+          type: number
+          description: Exchange rate for the payment in an international currency (not USD)
+        fundingAmount:
+          type: number
+          description: Payment amount in USD
+        onlinePayment:
+          type: boolean
+          description: 'Payment source.
+
+            * `true`: Payment is made with BILL (online)
+
+            * `false`: Payment is made outside BILL and then recorded in BILL (offline)'
+        disbursementType:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementType'
+          - description: Disbursement type. This value is set when you create a payment. See `disbursementInfo` for information about the disbursement method used when BILL processes your payment.
+        remittanceEmail:
+          type: string
+          description: Remittance email address set for the vendor
+        createdTime:
+          type: string
+          description: Payment created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Payment updated date and time
+          format: date-time
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the payment. The value begins with `006`.
+        voidInfo:
+          type: array
+          description: Void request information
+          items:
+            $ref: '#/components/schemas/VoidInfo'
+        disbursementStatus:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementStatus'
+          - description: Payment disbursement status
+        disbursementInfo:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementInfo'
+          - description: 'Payment disbursement information. This information is based on the disbursement method used when BILL processes your payment.
+
+
+              For example, when BILL processes an ACH payment, `disbursementInfo` includes the `sentDate` and `arrivesByDate` fields.'
+        paymentPurpose:
+          allOf:
+          - $ref: '#/components/schemas/PaymentPurposeResponse'
+          - description: Payment purpose information
+        cardFundingPurpose:
+          type: string
+          description: Card funding purpose
+        cancelRequestSubmitted:
+          type: boolean
+          description: 'This field is set as `true` if a cancel payment request is submitted.
+
+
+            **Note**: If the payment is cancelled, the payment `status` is set as `CANCELLED`.'
+        singleStatus:
+          allOf:
+          - $ref: '#/components/schemas/PaymentSingleStatus'
+          - description: 'Unified payment status. This field provides BILL payment lifecycle updates based on the `status` and `disbursementStatus` values in the response.
+
+
+              See [Single status payment values](https://developer.bill.com/docs/single-status-payment-values) in the Guides section for the list of available values.'
+      description: Payments response.
+    PaymentStatus:
+      type: string
+      description: The enum Payment status dto.
+      enum:
+      - APPROVING
+      - SCHEDULED
+      - PAID
+      - CANCELLED
+      - VOID
+      - ESCHEATED
+      - UNDEFINED
+    CheckDeliveryTypeResponse:
+      type: string
+      description: Enum for Check delivery type.
+      enum:
+      - STANDARD
+      - UPS_1DAY
+      - UPS_2DAY
+      - UPS_3DAY
+      - RTP_DELIVERY
+      - UNDEFINED
+    ProcessingOptionsResponse:
+      type: object
+      properties:
+        requestPayFaster:
+          type: boolean
+          description: "Set as `true` to use BILL Pay Faster. This field is required if `requestCheckDeliveryType` is set.\n\n  See [Payments](https://developer.bill.com/docs/ap-payments)   in the Guides section for information about BILL Pay Faster payments."
+        createBill:
+          type: boolean
+          description: '* Set as `false` to create a vendor payment for an existing bill.
+
+            * Set as `true` to create a bill for a vendor payment. If `createBill` is `true`, do not set `billId` in your payment request.'
+        requestCheckDeliveryType:
+          allOf:
+          - $ref: '#/components/schemas/CheckDeliveryTypeResponse'
+          - description: BILL Pay Faster payment delivery type. The `RTP_DELIVERY` option is not available for vendor payments by check.
+      description: User provided options for processing the payments request.
+    MassPaymentResponseDto:
+      type: object
+      properties:
+        paymentBatchId:
+          type: string
+          description: BILL-generated ID of the mass payment batch. The value begins with `bbq`.
+          example: '{{mass_payment_batch_id}}'
+      description: Mass payment response DTO.
+    MassPaymentDetailsResponseDto:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of payments in the mass payment batch
+          format: int32
+          example: 100
+        scheduled:
+          type: array
+          description: Scheduled payments. For each payment in the list, BILL has not started generating a payment `id` value and API response.
+          items:
+            $ref: '#/components/schemas/ScheduledPaymentDto'
+        completed:
+          type: array
+          description: 'Completed payments. For each payment in the list, BILL has successfully generated a payment `id` value and API response.
+
+
+            In the response, if the payment `id` is the same for multiple bills, the vendor has `combinePayments` set as `true`.
+
+
+            **Note**: From the list of `completed` payments, BILL begins processing payments based on the payment `processDate`.'
+          items:
+            $ref: '#/components/schemas/CompletedPaymentDto'
+        failed:
+          type: array
+          description: Failed payments. An error response is available for each failed payment.
+          items:
+            $ref: '#/components/schemas/FailedPaymentDto'
+      description: Mass payment details response DTO.
+    DisbursementType:
+      type: string
+      description: Enum for Disbursement type.
+      enum:
+      - CHECK
+      - ACH
+      - RPPS
+      - PAYPAL
+      - OFFLINE
+      - INTERNATIONAL_E_PAYMENT
+      - AMEX
+      - VIRTUAL_CARD
+      - WALLET
+      - CREDIT_CARD
+      - UNDEFINED
+    ExchangeRatesResponseDto:
+      type: object
+      properties:
+        exchangeRateBatchId:
+          type: integer
+          format: int32
+        exchangeRates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExchangeRateListResponseDto'
+      description: DTO for exchange rates response.
+    CheckImageDataResponseDto:
+      type: object
+      properties:
+        results:
+          type: array
+          description: URLs for the check image
+          items:
+            $ref: '#/components/schemas/DownloadLink'
+      description: Check image data response.
+    WalletDisbursement:
+      type: object
+      properties:
+        arrivesByDate:
+          type: string
+          description: Instant Transfer (wallet) payment arrives by date
+          format: date
+      description: Wallet disbursement dto when the disbursement type is wallet.
+    ExchangeRateResponseDto:
+      type: object
+      properties:
+        billCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Bill currency. This is the currency in which vendor bills are presented.
+        paymentCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Payment currency. This is the currency in which the vendor accepts payments.
+        baseCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Organization base currency.
+        exchangeRate:
+          type: number
+          description: 'Exchange rate. This rate compares the organization''s base currency and the vendor `paymentCurrency` value.
+
+
+            For example, if the organization''s base currency is USD and the vendor `paymentCurrency` is CAD, an `exchangeRate` of `1.372` tells us that `1 USD = 1.372 CAD`.
+
+            '
+        exchangeRateBatchId:
+          type: integer
+          description: 'Exchange rate batch ID. BILL maintains all `exchangeRate` values in a batch. When a batch expires, a new batch ID is generated and all `exchangeRate` values are updated in the new batch.
+
+            '
+          format: int32
+        vendorId:
+          type: string
+          description: 'BILL-generated ID of the international vendor
+
+            '
+        amountRange:
+          allOf:
+          - $ref: '#/components/schemas/ValidExchangeRateRangeDto'
+          - description: 'Payment amount range information for the exchange rate. The `exchangeRate` is valid for the amount range specified with the `from` and `to` values.
+
+
+              When you set `baseCurrency` as `false` in your request, this range is in the vendor `paymentCurrency` value.
+
+              '
+        expirationTime:
+          type: string
+          description: Exchange rate batch expiration date and time
+          format: date-time
+      description: Exchange Rate Response DTO.
+    PaymentPurposeCodeResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name
+        value:
+          type: string
+          description: Value
+      description: Payment purpose code response.
+    ValidExchangeRateRangeDto:
+      type: object
+      properties:
+        from:
+          type: number
+          description: Amount range start
+        to:
+          type: number
+          description: Amount range end
+      description: Valid exchange rate range information for the Exchange Rate Response DTO.
+    AchDisbursement:
+      type: object
+      properties:
+        sentDate:
+          type: string
+          description: ACH payment sent date
+          format: date
+        arrivesByDate:
+          type: string
+          description: ACH payment arrives by date
+          format: date
+      description: ACH disbursement dto when the disbursement type is ach.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    FundingOptions:
+      type: object
+      properties:
+        banks:
+          type: array
+          description: Bank account options
+          items:
+            $ref: '#/components/schemas/BankFundingOption'
+        cards:
+          type: array
+          description: Card account options
+          items:
+            $ref: '#/components/schemas/CardFundingOption'
+      description: Funding options.
+    InternationalDisbursement:
+      type: object
+      properties:
+        sentDate:
+          type: string
+          description: International ePayment sent date
+          format: date
+        arrivesByDate:
+          type: string
+          description: International ePayment arrives by date
+          format: date
+        amount:
+          type: number
+          description: Disbursement amount
+        disbursementSubType:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementSubType'
+          - description: Payment delivery method for making the International ePayment
+      description: International disbursement dto when the disbursement type is international.
+    FundingAccountResponse:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/FundingAccountTypeResponse'
+          - description: 'Payment funding type.
+
+              * `BANK_ACCOUNT`: Bank account
+
+              * `CARD_ACCOUNT`: Credit card or debit card
+
+              * `WALLET`: BILL balance
+
+              * `AP_CARD`: AP Card
+
+
+              See the BILL Help FAQ sections for [BILL balance](https://help.bill.com/direct/s/article/4409933681677) and [AP Card](https://help.bill.com/direct/s/article/000003348) for more information.'
+        id:
+          type: string
+          description: BILL-generated ID of the selected payment funding type. For the `WALLET` type, the `id` is not required.
+      description: Funding account details in Payments API.
+    CardFundingOptionFeeInfo:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Card fees amount
+        rate:
+          type: number
+          description: Card fees rate
+      description: Card funding option fee info.
+    FundingOption:
+      type: object
+      properties:
+        available:
+          type: boolean
+          description: This field is set as `true` if the funding account is available for vendor payments
+        deliveryDate:
+          type: string
+          description: Vendor payment delivery date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        processDate:
+          type: string
+          description: Vendor payment process date. The value is in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender's funding account.
+          format: date
+        reason:
+          type: string
+          description: Reason why the funding account is not available for vendor payments
+        conditions:
+          type: array
+          description: Additional information required for vendor payments with the funding account
+          items:
+            type: string
+      description: Funding option.
+    BulkPaymentResponseDto:
+      type: object
+      properties:
+        payments:
+          type: array
+          description: List of payments
+          items:
+            $ref: '#/components/schemas/PaymentResponseDto'
+      description: Bulk payments response.
+    PaymentSingleStatus:
+      type: string
+      enum:
+      - DISBURSEMENT_FAILED_ACTION_NEEDED
+      - DISBURSEMENT_FAILED_VENDOR_BANK_REJECTED
+      - FUNDING_FAILED_ACTION_NEEDED
+      - EXPIRING
+      - FUNDS_ESCHEATED
+      - CANCELED
+      - FUNDING_FAILED_VOIDED
+      - VOIDED
+      - CLEARED
+      - DELIVERED
+      - DISBURSEMENT_ON_HOLD
+      - VOID_PENDING
+      - SENT
+      - DISBURSEMENT_ON_HOLD_PAYER_IN_REVIEW
+      - PROCESSED
+      - FUNDING_STARTED
+      - FUNDING_ON_HOLD
+      - WAITING_ON_APPROVAL
+      - SCHEDULED
+      - READY_TO_FUND
+      - CANCELLATION_IN_PROGRESS
+      - UNDEFINED
+      - PARTIALLY_CLAIMED
+      - PAID_OFFLINE
+    CheckDeliveryTypeRequest:
+      type: string
+      description: Enum for Check delivery type.
+      enum:
+      - STANDARD
+      - UPS_1DAY
+      - UPS_2DAY
+      - UPS_3DAY
+      - RTP_DELIVERY
+    PaymentVendorCreditResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`.
+        amount:
+          type: number
+          description: Credit amount
+      description: Payment vendor credit response DTO.
+    DisbursementStatus:
+      type: string
+      description: The enum type for disbursement status.
+      enum:
+      - SCHEDULE
+      - DONE
+      - FAILED
+      - VOID
+      - HOLD
+      - FXHOLD
+      - ESCHEATED
+      - UNDEFINED
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    BulkPaymentRequestDto:
+      required:
+      - fundingAccount
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: 'BILL-generated ID of the vendor to be paid. The value begins with `009`.
+
+            * If `vendorId` is set, it must match each bill’s vendor ID.
+
+            * Do not set `vendorId` when you are paying multiple vendors with one request.'
+        description:
+          maxLength: 70
+          type: string
+          description: Bill payment description. This value is included in the check memo or in the bank descriptor for electronic payments.
+        processDate:
+          type: string
+          description: 'Payment process date in the `yyyy-MM-dd` format. On this date, BILL starts processing the payment and starts withdrawing funds from the sender''s funding account.
+
+
+            When the vendor bill currency is not `USD` (For example, `EUR`), the payment `processDate` for this vendor must be the next US business day.
+
+
+            If the funding account `type` is set as `WALLET` or `AP_CARD`, `processDate` is required. For other funding account types, if `processDate` is not set, the date is automatically set as the next US business day.
+
+
+            **Note**: When you add a vendor bank account in the production environment, BILL requires 2 business days to complete a one-time verification of the bank account. To pay such a vendor, you must set a `processDate` that is 2 business days from the current date.'
+          format: date
+        exchangeRateBatchId:
+          type: integer
+          description: 'Exchange rate batch ID. This field is required for paying international vendors when the vendor bill currency is not `USD`.
+
+
+            Get the current BILL exchange rate and exchange rate batch ID with `GET /v3/payments/exchange-rate` or `POST /v3/payments/exchange-rate` (for multiple international vendors).
+
+            '
+          format: int32
+        fundingAccount:
+          allOf:
+          - $ref: '#/components/schemas/FundingAccountRequest'
+          - description: Payment funding information
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillPay'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/BulkProcessingOptions'
+          - description: Payment processing options
+        transactionNumber:
+          maxLength: 50
+          type: string
+          description: 'Payment transaction reference used as an external identifier.
+
+
+            You can set this field as a unique alphanumeric value for your system to track the payment transaction. The value must be 50 characters or fewer. If you do not set `transactionNumber`, BILL sets this field as a unique alphanumeric payment identification value.'
+        cardFundingPurpose:
+          type: string
+          description: 'Card funding purpose. This field is required for the `CARD_ACCOUNT` funding account `type` if BILL cannot identify the vendor industry.
+
+
+            See [Get card funding purpose](https://developer.bill.com/reference/listcardfundingpurposes) for more information.'
+      description: Create a bulk payment
+      example:
+        processDate: '2026-12-16'
+        fundingAccount:
+          type: BANK_ACCOUNT
+          id: '{{org_bank_account_id}}'
+        payments:
+        - billId: '{{bill_id01}}'
+          amount: 228.99
+        - billId: '{{bill_id02}}'
+          amount: 142
+    ExchangeRateListResponseDto:
+      type: object
+      properties:
+        billCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Bill currency. This is the currency in which vendor bills are presented.
+        paymentCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Payment currency. This is the currency in which the vendor accepts payments.
+        baseCurrency:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyCode'
+          - description: Organization base currency.
+        exchangeRate:
+          type: number
+          description: 'Exchange rate. This rate compares the organization''s base currency and the vendor `paymentCurrency` value.
+
+
+            For example, if the organization''s base currency is USD and the vendor `paymentCurrency` is CAD, an `exchangeRate` of `1.372` tells us that `1 USD = 1.372 CAD`.
+
+            '
+        vendorId:
+          type: string
+          description: 'BILL-generated ID of the international vendor
+
+            '
+        amountRange:
+          allOf:
+          - $ref: '#/components/schemas/ValidExchangeRateRangeDto'
+          - description: 'Payment amount range information for the exchange rate. The `exchangeRate` is valid for the amount range specified with the `from` and `to` values.
+
+
+              When you set `baseCurrency` as `false` in your request, this range is in the vendor `paymentCurrency` value.
+
+              '
+        expirationTime:
+          type: string
+          description: Exchange rate batch expiration date and time
+          format: date-time
+      description: Exchange Rate Response DTO.
+    VoidType:
+      type: string
+      description: Void type enum.
+      enum:
+      - VOID_AND_CREDIT
+      - VOID_AND_REISSUE
+      - VOID_ONLY
+      - VOID_AND_REISSUE_VCARD
+    PaymentPurposeRequest:
+      type: object
+      properties:
+        text:
+          maxLength: 250
+          type: string
+          description: Payment purpose text. This can be any user-defined text. If you set `text`, do not set `code`.
+        code:
+          allOf:
+          - $ref: '#/components/schemas/PaymentPurposeCodeRequest'
+          - description: Payment purpose code. If you set the `code` object, do not set `text`.
+      description: Payment purpose request.
+    VoidStatus:
+      type: string
+      description: Void status enum.
+      enum:
+      - TO_BE_PROCESSED
+      - ACCEPTED
+      - REJECTED
+      - NO_OP
+      - ARCHIVED
+    BankFundingOption:
+      type: object
+      description: Bank Funding option.
+      allOf:
+      - $ref: '#/components/schemas/FundingOption'
+      - properties:
+          id:
+            type: string
+            description: BILL-generated ID of the bank account. The value begins with `bac`.
+          name:
+            type: string
+            description: Bank name
+          fee:
+            type: number
+            description: Estimated bank fees
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ScheduledPaymentDto:
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+      description: Scheduled payment DTO.
+    PaymentPurposeCodeRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name
+      description: Payment purpose code request.
+    VoidInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the void payment request. The value begins with `vrq`.
+        requestedBy:
+          type: string
+          description: BILL-generated ID of the user that requested a void payment. The value begins with `006`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/VoidType'
+          - description: Void payment request type.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VoidStatus'
+          - description: Void payment request status.
+        reason:
+          type: string
+          description: Void payment request reason
+        createdTime:
+          type: string
+          description: Void payment request created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Void payment request updated date and time
+          format: date-time
+      description: Void information for the Payments DTO.
+    BillPayment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill payment. The value begins with `blp`.
+        billId:
+          type: string
+          description: BILL-generated ID of the bill to be paid. The value begins with `00n`.
+        amount:
+          type: number
+          description: Payment amount. For a payment in an international currency (not USD), this value is in the local currency.
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill payment
+          items:
+            $ref: '#/components/schemas/PaymentVendorCreditResponseDto'
+      description: Details of bill payment.
+    CurrencyCode:
+      type: string
+      description: Enumeration based on the ISO2 country code specification.
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BBD
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BND
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CUP
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GGP
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JEP
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MOP
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLE
+      - SLL
+      - SOS
+      - SPL
+      - SRD
+      - STN
+      - SVC
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TVD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XDR
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+    DownloadLink:
+      type: object
+      properties:
+        downloadLink:
+          type: string
+          description: URL for downloading the check image. Use the URL in a GET request to download the check image.
+      description: Download link for CheckImageDataResponseDto.
+    CheckDisbursement:
+      type: object
+      properties:
+        sentDate:
+          type: string
+          description: Check payment sent date
+          format: date
+        arrivesByDate:
+          type: string
+          description: Check payment arrives by date
+          format: date
+        checkNumber:
+          type: integer
+          description: Check number
+          format: int64
+        trackingInformation:
+          type: string
+          description: UPS tracking number for the check. You get a tracking number only for a BILL Pay Faster check payment.
+      description: Check disbursement dto when the disbursement type is check.
+    ListPaymentResponseDto:
+      type: object
+      description: Get list of payments response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_PaymentResponseDto_'
+      - properties:
+          count:
+            type: integer
+            description: Total number of payments matching the list request, across all pages of results.
+            format: int32
+          totalAmount:
+            type: number
+            description: Sum of the amounts of all payments matching the list request, across all pages of results. This value is in the organization's base currency.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

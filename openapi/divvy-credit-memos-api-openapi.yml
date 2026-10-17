@@ -1,0 +1,1779 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Credit Memos API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: credit-memos
+paths:
+  /v3/credit-memos:
+    get:
+      tags:
+      - credit-memos
+      summary: Get list of credit memos
+      description: 'Get a list of credit memo objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listCreditMemos
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{credit_memo_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - credit-memos
+      summary: Create a credit memo
+      description: 'Create a new credit memo.
+
+
+        With a credit memo, you can adjust the invoice amount owed by a customer.
+
+
+        See Credit memos in the Guides section for more information, sample requests, and responses.'
+      operationId: createCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCreditMemoRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a credit memo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/bulk:
+    put:
+      tags:
+      - credit-memos
+      summary: Replace multiple credit memos
+      description: 'Update the number of line items in multiple credit memos with one API request. You can also update other details for each credit memo.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a credit memo. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the credit memo.
+
+        * When you omit an existing line item `id`, the line item is removed from the credit memo.'
+      operationId: bulkReplaceCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/ReplaceCreditMemoWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace multiple credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - credit-memos
+      summary: Create multiple credit memos
+      description: Create multiple credit memos with one API request. You can create up to 50 credit memos with one `POST /v3/credit-memos/bulk` request.
+      operationId: bulkCreateCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateCreditMemoRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - credit-memos
+      summary: Update multiple credit memos
+      description: 'Update details about line items in multiple credit memos with one API request. You can also update other credit memo details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount`, `quantity`, and `description`. The credit memo line item `id` does not change with a PATCH operation.'
+      operationId: bulkUpdateCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateCreditMemoWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/bulk/archive:
+    post:
+      tags:
+      - credit-memos
+      summary: Archive multiple credit memos
+      description: Archive multiple credit memos with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated IDs of the credit memos. Each value begin with `ccr`. Set the IDs as comma-separated values.
+          example: '{{credit_memo_id}}'
+      responses:
+        '200':
+          description: Archive multiple credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/bulk/restore:
+    post:
+      tags:
+      - credit-memos
+      summary: Restore multiple credit memos
+      description: Restore multiple credit memos with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated IDs of the credit memos. Each value begin with `ccr`. Set the IDs as comma-separated values.
+          example: '{{credit_memo_id}}'
+      responses:
+        '200':
+          description: Restore multiple credit memos response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/{creditMemoId}:
+    get:
+      tags:
+      - credit-memos
+      summary: Get credit memo details
+      description: Get details about an existing credit memo.
+      operationId: getCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: creditMemoId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+          example: '{{credit_memo_id}}'
+      responses:
+        '200':
+          description: Get credit memo details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoWithUsageResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - credit-memos
+      summary: Replace a credit memo
+      description: 'Update the number of line items in a credit memo. You can also update other credit memo details.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a credit memo. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the credit memo.
+
+        * When you omit an existing line item `id`, the line item is removed from the credit memo.'
+      operationId: replaceCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: creditMemoId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+          example: '{{credit_memo_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceCreditMemoRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace a credit memo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - credit-memos
+      summary: Update a credit memo
+      description: 'Update details about a credit memo line item. You can also update other credit memo line item details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount`, `quantity`, and `description`. The credit memo line item `id` does not change with a PATCH operation.'
+      operationId: updateCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: creditMemoId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+          example: '{{credit_memo_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCreditMemoRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a credit memo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/{creditMemoId}/archive:
+    post:
+      tags:
+      - credit-memos
+      summary: Archive a credit memo
+      description: 'Archive an existing credit memo. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived credit memo with
+
+        `POST /v3/credit-memos/{creditMemoId}/restore`. There is no change when you archive an archived credit memo.'
+      operationId: archiveCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: creditMemoId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+          example: '{{credit_memo_id}}'
+      responses:
+        '200':
+          description: Archive a credit memo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/credit-memos/{creditMemoId}/restore:
+    post:
+      tags:
+      - credit-memos
+      summary: Restore a credit memo
+      description: 'Restore an archived credit memo. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored credit memos. There is no change when you restore a restored credit memo.'
+      operationId: restoreCreditMemo
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: creditMemoId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+          example: '{{credit_memo_id}}'
+      responses:
+        '200':
+          description: Restore a credit memo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemoResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    CreditMemoResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        archived:
+          type: boolean
+          description: Set as `true` if the credit memo is archived
+        salesTaxItemId:
+          type: string
+          description: BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+        amount:
+          type: number
+          description: Credit memo amount
+        appliedAmount:
+          type: number
+          description: Credit memo amount applied to invoices
+        salesTaxTotal:
+          type: number
+          description: Credit memo sales tax amount. The value is set based on `salesTaxItemId`.
+        salesTaxPercentage:
+          type: number
+          description: Credit memo sales tax percentage. The value is set based on `salesTaxItemId`.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CreditStatusDto'
+          - description: Credit memo status.
+        createdTime:
+          type: string
+          description: Credit memo created time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Credit memo updated time
+          format: date-time
+        creditMemoLineItems:
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/CreditMemoLineItemResponseDto'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+      description: CreditMemo response Dto.
+    InvoiceClassificationsDto:
+      type: object
+      properties:
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+      description: DTO for Invoice classifications.
+    CreditMemoUsageDto:
+      type: object
+      properties:
+        invoiceId:
+          type: string
+          description: BILL-generated ID of the invoice to which the credit memo is applied
+        amount:
+          type: number
+          description: Credit memo amount applied to the invoice
+      description: CreditMemo usage Dto.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    ListCreditMemoResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_CreditMemoWithUsageResponseDto_'
+    CreateCreditMemoLineItemDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Credit memo line item description
+        price:
+          type: number
+          description: Credit memo line item unit price. For a credit memo in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Credit memo line item unit quantity
+        ratePercent:
+          minimum: -100
+          type: number
+          description: 'Credit memo line item rate percent. Use `ratePercent` to apply a discount or markup in your credit memo.
+
+
+            BILL applies the `ratePercent` to the sum of the `amount` values of all the line items above the `ratePercent` line item.
+
+
+            **Note**: Use a separate line item to set a `ratePercent` for the credit memo. Set the `ratePercent` line item as the final line item. Do not set `price` and `quantity` in the line item when you set `ratePercent`.
+
+
+            For example, let''s say you have two line items in a credit memo with an `amount` sum of `$150`. If you create a third line item with `ratePercent` set as `-10`, a 10% discount (`$15`) is applied to the `amount` sum of `$150`.'
+        taxable:
+          type: boolean
+          description: Set as `true` if the credit memo line item is taxable
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the credit memo line item
+      description: Credit Memo Create Request Line Item.
+    CreditMemoWithUsageResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        archived:
+          type: boolean
+          description: Set as `true` if the credit memo is archived
+        salesTaxItemId:
+          type: string
+          description: BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+        amount:
+          type: number
+          description: Credit memo amount
+        appliedAmount:
+          type: number
+          description: Credit memo amount applied to invoices
+        salesTaxTotal:
+          type: number
+          description: Credit memo sales tax amount. The value is set based on `salesTaxItemId`.
+        salesTaxPercentage:
+          type: number
+          description: Credit memo sales tax percentage. The value is set based on `salesTaxItemId`.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CreditStatusDto'
+          - description: Credit memo status.
+        createdTime:
+          type: string
+          description: Credit memo created time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Credit memo updated time
+          format: date-time
+        creditMemoLineItems:
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/CreditMemoLineItemResponseDto'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        usage:
+          type: array
+          description: Credit memo usage information
+          items:
+            $ref: '#/components/schemas/CreditMemoUsageDto'
+      description: CreditMemo response Dto.
+    ReplaceCreditMemoWithIdRequestDto:
+      required:
+      - creditDate
+      - creditMemoLineItems
+      - customerId
+      - id
+      - referenceNumber
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+        customerId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `payToChartOfAccountId` or `payToBankAccountId`.'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        creditMemoLineItems:
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/ReplaceCreditMemoLineItemDto'
+      description: Replace CreditMemo request Dto.
+    ListResponseDto_CreditMemoWithUsageResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditMemoWithUsageResponseDto'
+      description: Response from a list API request with paging references.
+    CreditMemoLineItemResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the credit memo line item. The value begins with `cci`.
+        description:
+          type: string
+          description: Credit memo line item description
+        price:
+          type: number
+          description: Credit memo line item unit price. For a credit memo in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Credit memo line item unit quantity
+        amount:
+          type: number
+          description: Credit memo line item amount
+        ratePercent:
+          type: number
+          description: Credit memo line item rate percent
+        taxable:
+          type: boolean
+          description: Set as `true` if the credit memo line item is taxable
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the credit memo line item
+      description: Credit Memo Create Request Line Item.
+    ReplaceCreditMemoRequestDto:
+      required:
+      - creditDate
+      - creditMemoLineItems
+      - customerId
+      - referenceNumber
+      type: object
+      properties:
+        customerId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `payToChartOfAccountId` or `payToBankAccountId`.'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        creditMemoLineItems:
+          minItems: 1
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/ReplaceCreditMemoLineItemDto'
+      description: Replace a credit memo
+      example:
+        customerId: '{{customer_id}}'
+        referenceNumber: 202602-creditmemo
+        creditDate: '2026-12-28'
+        description: Paperless Credit Memo (line item added)
+        creditMemoLineItems:
+        - description: Premium drummer gloves
+          price: 29.99
+          quantity: 1
+        - id: '{{credit_memo_line_item_id01}}'
+          description: Classic extreme drum sticks
+          price: 19.99
+          quantity: 2
+        - id: '{{credit_memo_line_item_id02}}'
+          description: Metal guitar picks (5-pack)
+          price: 50
+          quantity: 1
+        - id: '{{credit_memo_line_item_id03}}'
+          description: 10% discount
+          ratePercent: -10
+          taxable: false
+    CreditMemoBulkResponseDto:
+      type: object
+      properties:
+        creditMemos:
+          type: array
+          description: List of credit memos
+          items:
+            $ref: '#/components/schemas/CreditMemoResponseDto'
+      description: Response Dto for bulk credit memo.
+    CreditStatusDto:
+      type: string
+      description: Credit Status DTO.
+      enum:
+      - FULLY_APPLIED
+      - NOT_APPLIED
+      - PARTIALLY_APPLIED
+      - IN_PROCESS
+      - UNDEFINED
+    ReplaceCreditMemoLineItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the credit memo line item. The value begins with `cci`.
+        description:
+          type: string
+          description: Credit memo line item description
+        price:
+          type: number
+          description: Credit memo line item unit price. For a credit memo in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Credit memo line item unit quantity
+        ratePercent:
+          minimum: -100
+          type: number
+          description: 'Credit memo line item rate percent. Use `ratePercent` to apply a discount or markup in your credit memo.
+
+
+            BILL applies the discount to the sum of the `amount` values of all the line items above the `ratePercent` line item.
+
+
+            **Note**: Use a separate line item to set a `ratePercent` for the credit memo. Set the `ratePercent` line item as the final line item. Do not set `price` and `quantity` in the line item when you set `ratePercent`.
+
+
+            For example, let''s say you have two line items in a credit memo with an `amount` sum of `$150`. If you create a third line item with `ratePercent` set as `-10`, a 10% discount (`$15`) is applied to the `amount` sum of `$150`.'
+        taxable:
+          type: boolean
+          description: Set as `true` if the credit memo line item is taxable
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the credit memo line item
+      description: Credit Memo Replace Request Line Item.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    InvoiceLineItemClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+      description: DTO for Bill Line Item classifications.
+    CreateCreditMemoRequestDto:
+      required:
+      - creditDate
+      - creditMemoLineItems
+      - customerId
+      - referenceNumber
+      type: object
+      properties:
+        customerId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `payToChartOfAccountId` or `payToBankAccountId`.'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        creditMemoLineItems:
+          minItems: 1
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/CreateCreditMemoLineItemDto'
+      description: Create a credit memo
+      example:
+        customerId: '{{customer_id}}'
+        referenceNumber: 202602-creditmemo
+        creditDate: '2026-12-28'
+        creditMemoLineItems:
+        - description: Classic extreme drum sticks
+          price: 14.99
+          quantity: 2
+        - description: Metal guitar picks (5-pack)
+          price: 50
+          quantity: 1
+        - description: 10% discount
+          ratePercent: -10
+        description: Paperless Credit Memo
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    UpdateCreditMemoLineItemDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo line item. The value begins with `cci`.
+        description:
+          type: string
+          description: Credit memo line item description
+        price:
+          type: number
+          description: Credit Memo line item unit price. For a Credit memo in an international currency (not USD), this value is in the local currency.
+        quantity:
+          type: number
+          description: Credit memo line item unit quantity
+        ratePercent:
+          minimum: -100
+          type: number
+          description: 'Credit memo line item rate percent. Use `ratePercent` to apply a discount or markup in your credit memo.
+
+
+            BILL applies the discount to the sum of the `amount` values of all the line items above the `ratePercent` line item.
+
+
+            **Note**: Use a separate line item to set a `ratePercent` for the credit memo. Set the `ratePercent` line item as the final line item. Do not set `price` and `quantity` in the line item when you set `ratePercent`.
+
+
+            For example, let''s say you have two line items in a credit memo with an `amount` sum of `$150`. If you create a third line item with `ratePercent` set as `-10`, a 10% discount (`$15`) is applied to the `amount` sum of `$150`.'
+        taxable:
+          type: boolean
+          description: Set as `true` if the credit memo line item is taxable
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceLineItemClassificationsDto'
+          - description: General ledger classifications information for the credit memo line item
+      description: Credit Memo Create Request Line Item.
+    UpdateCreditMemoWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the credit memo. The value begins with `ccr`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          maxLength: 100
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `payToChartOfAccountId` or `payToBankAccountId`.'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        creditMemoLineItems:
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/UpdateCreditMemoLineItemDto'
+      description: Update CreditMemo with id request Dto.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    UpdateCreditMemoRequestDto:
+      type: object
+      properties:
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+        referenceNumber:
+          maxLength: 100
+          type: string
+          description: User-generated credit memo number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Credit memo issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Credit memo description
+        salesTaxItemId:
+          type: string
+          description: 'BILL-generated ID of the `SALES_TAX` item. The value begins with `0ii`. The tax rate is applied to all the credit memo line items set as taxable.
+
+
+            You can set up a `SALES_TAX` percentage item with `POST /v3/classifications/items`.'
+        payToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the credit memo is applied to an invoice payment. The value begins with `0ca`.
+        payToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the credit memo is applied to an invoice payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `payToChartOfAccountId` or `payToBankAccountId`.'
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceClassificationsDto'
+          - description: General ledger classifications information for the credit memo
+        creditMemoLineItems:
+          type: array
+          description: Credit memo line item information
+          items:
+            $ref: '#/components/schemas/UpdateCreditMemoLineItemDto'
+      description: Update a credit memo
+      example:
+        description: Paperless Credit Memo (Updated)
+        creditMemoLineItems:
+        - id: '{{credit_memo_line_item_id01}}'
+          description: Classic extreme drum sticks
+          price: 19.99
+          quantity: 2
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

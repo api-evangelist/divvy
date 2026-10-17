@@ -1,0 +1,1173 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Custom Fields API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Custom Fields
+paths:
+  /v3/spend/custom-fields:
+    get:
+      tags:
+      - Custom Fields
+      summary: Get list of custom fields
+      description: Get a list of custom field objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+      operationId: listCustomFields
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: "Field name and sort order. You can set only one sort field.\n\nThe format is `sort={field}:{sort_order}`.\n\nThe sortable fields are:\n - `name`\n - `createdTime`"
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: "Field name, operator, and value. You can set multiple filters.\n\nThe format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.\n\nExample: `filters=name:sw:Ad,retired:eq:false`\n\nThe filterable fields are:\n - `name` - String. Operators: `eq`, `sw`.\n - `retired` - `true` or `false`. Operators: `eq`."
+          example: retired:eq:false
+      responses:
+        '200':
+          description: Get list of custom fields response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomFieldResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Custom Fields
+      summary: Create a custom field
+      description: 'Create a new custom field.
+
+
+        See Transactions in the Guides section for more information, sample requests, and responses.'
+      operationId: createCustomField
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomFieldRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Create a custom field response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/custom-fields/{customFieldId}:
+    get:
+      tags:
+      - Custom Fields
+      summary: Get custom field details
+      description: Get details about an existing custom field.
+      operationId: getCustomField
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      responses:
+        '200':
+          description: Get custom field details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Custom Fields
+      summary: Delete a custom field
+      description: Delete an existing custom field. A deleted custom field cannot be restored. The deleted custom field is not available in the list of custom fields.
+      operationId: deleteCustomField
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      responses:
+        '200':
+          description: Delete a custom field response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Custom Fields
+      summary: Update a custom field
+      description: Update details about an existing custom field.
+      operationId: updateCustomField
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomFieldRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a custom field response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/custom-fields/{customFieldId}/values:
+    get:
+      tags:
+      - Custom Fields
+      summary: Get list of custom field values
+      description: Get a list of custom field value objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+      operationId: listCustomFieldValues
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: "Field name, operator, and value. You can set multiple filters.\n\nThe format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.\n\nExample: `filters=name:sw:Ad`\n\nThe filterable fields are:\n - `name` - String. Operators: `eq`, `sw`.\n - `retired` - `true` or `false`. Operators: `eq`. The default value is `false`."
+          example: retired:eq:false
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      responses:
+        '200':
+          description: Get list of custom field values response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomFieldValuesResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Custom Fields
+      summary: Create a custom field value
+      description: Create a new value for an existing custom field.
+      operationId: createCustomFieldValues
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomFieldValueRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Create a custom field value response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomFieldValueResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Custom Fields
+      summary: Delete a custom field value
+      description: 'Delete an existing custom field value.
+
+
+        A deleted value cannot be restored. The deleted value is not available in the list of custom field values. In addition, the deleted value cannot be assigned to current or future transactions. The deleted value will continue to be assigned to past transactions.'
+      operationId: deleteCustomFieldValue
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteCustomFieldValuesRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Delete a custom field value response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/custom-fields/{customFieldId}/values/{customFieldValueId}:
+    get:
+      tags:
+      - Custom Fields
+      summary: Get custom field value details
+      description: Get details about an existing custom field value.
+      operationId: getCustomFieldValues
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      - name: customFieldValueId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field value
+          example: '{{se_custom_field_value_uuid01}}'
+      responses:
+        '200':
+          description: Get custom field value details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldValueResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    PaginationResponseDto_CustomFieldValueResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/CustomFieldValueResponseDto'
+      description: Response from a list API request with paging references.
+    DeleteCustomFieldValuesRequestDto:
+      required:
+      - customFieldValueIds
+      type: object
+      properties:
+        customFieldValueIds:
+          minItems: 1
+          type: array
+          description: List of custom field value IDs or UUIDs
+          items:
+            type: string
+      description: Delete custom field values request
+      example:
+        customFieldValueIds:
+        - '{{se_custom_field_value_uuid01}}'
+    UpdateCustomFieldRequestDto:
+      type: object
+      properties:
+        minimumAmountForRequirement:
+          type:
+          - number
+          - 'null'
+          description: Minimum transaction amount where the custom field is required
+        name:
+          type:
+          - string
+          - 'null'
+          description: Custom field name
+        description:
+          type:
+          - string
+          - 'null'
+          description: Custom field description
+        allowCustomValues:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` if the custom field can have custom values
+        required:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` if the custom field is required for all budgets. The default value is `false`.
+        global:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` if the custom field applies to all budgets. The default value is `false`.
+        selectedBudgetIds:
+          type: array
+          description: List of budgets where the custom field is available. Set the budget ID or UUID values.
+          items:
+            type: string
+        requiredBudgetIds:
+          type: array
+          description: List of budgets where the custom field is required. Set the budget ID or UUID values.
+          items:
+            type: string
+      description: Update a custom field (Description added)
+      example:
+        description: Engineering team offsite 2026
+    PaginationResponseDto_CustomFieldResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/CustomFieldResponseDto'
+      description: Response from a list API request with paging references.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    CreateCustomFieldRequestDto:
+      required:
+      - allowCustomValues
+      - global
+      - name
+      - required
+      type: object
+      properties:
+        name:
+          type: string
+          description: Custom field name
+        description:
+          type: string
+          description: Custom field description
+        multiSelect:
+          type: boolean
+          description: Set as `true` if the custom field can have multiple selected values
+        allowCustomValues:
+          type: boolean
+          description: Set as `true` if the custom field can have custom values
+        minimumAmountForRequirement:
+          type: number
+          description: Minimum transaction amount where the custom field is required
+        required:
+          type: boolean
+          description: Set as `true` if the custom field is required for all budgets. The default value is `false`.
+        global:
+          type: boolean
+          description: Set as `true` if the custom field applies to all budgets. The default value is `false`.
+        values:
+          type: array
+          description: List of custom field values
+          items:
+            type: string
+        selectedBudgetIds:
+          type: array
+          description: List of budgets where the custom field is available. Set the budget ID or UUID values.
+          items:
+            type: string
+        requiredBudgetIds:
+          type: array
+          description: List of budgets where the custom field is required. Set the budget ID or UUID values.
+          items:
+            type: string
+      description: Create a custom field
+      example:
+        name: Team offsite
+        allowCustomValues: false
+        global: true
+        values:
+        - Travel
+        - Food
+    CustomFieldType:
+      type: string
+      description: Enum representing the custom field kind in the Spend API.
+      enum:
+      - CUSTOM_SELECTOR
+      - NOTE
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    CustomFieldResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the custom field
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the custom field
+        name:
+          type: string
+          description: Custom field name
+        description:
+          type: string
+          description: Custom field description
+        type:
+          allOf:
+          - $ref: '#/components/schemas/CustomFieldType'
+          - description: 'Custom field type.
+
+              n* `CUSTOM_SELECTOR`: Select one value from the list (or multiple values when `multiSelect` is true)
+
+              * `NOTE`: Write a per-transaction custom note.
+
+
+              **Note**: Currently, BILL does not support creating additional custom fields with `type` set as `NOTE`.'
+        multiSelect:
+          type: boolean
+          description: Set as `true` if the custom field can have multiple selected values
+        allowCustomValues:
+          type: boolean
+          description: Set as `true` if the custom field can have custom values
+        minimumAmountForRequirement:
+          type: number
+          description: Minimum transaction amount where the custom field is required
+        required:
+          type: boolean
+          description: Set as `true` if the custom field is required for all budgets. The default value is `false`.
+        global:
+          type: boolean
+          description: Set as `true` if the custom field applies to all budgets. The default value is `false`.
+        retired:
+          type: boolean
+          description: Set as `true` if the custom field is retired
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        selectedBudgetIds:
+          type: array
+          description: List of BILL-generated ID values of budgets where the custom field is available
+          deprecated: true
+          items:
+            type: string
+        selectedBudgetUuids:
+          type: array
+          description: List of BILL-generated UUID values of budgets where the custom field is available
+          items:
+            type: string
+        requiredBudgetIds:
+          type: array
+          description: List of BILL-generated ID values of budgets where the custom field is required
+          deprecated: true
+          items:
+            type: string
+        requiredBudgetUuids:
+          type: array
+          description: List of BILL-generated UUID values of budgets where the custom field is required
+          items:
+            type: string
+      description: DTO representing a custom field response.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    CreateCustomFieldValueRequestDto:
+      required:
+      - values
+      type: object
+      properties:
+        values:
+          minItems: 1
+          type: array
+          description: List of custom field values
+          items:
+            type: string
+      description: Create a custom field value (value added to existing list)
+      example:
+        values:
+        - Travel
+        - Food
+        - Entertainment
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    PaginatedCustomFieldValuesResponseDto:
+      type: object
+      description: List of custom fields with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_CustomFieldValueResponseDto_'
+    CustomFieldValueResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the custom field value
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the custom field value
+        value:
+          type: string
+          description: Custom field value
+        deleted:
+          type: boolean
+          description: Set as `true` if the custom field value is retired
+      description: DTO representing a custom field value response.
+    PaginatedCustomFieldResponseDto:
+      type: object
+      description: List of custom fields with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_CustomFieldResponseDto_'
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

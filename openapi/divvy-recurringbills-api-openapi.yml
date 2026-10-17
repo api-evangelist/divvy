@@ -1,0 +1,1309 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Recurringbills API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: recurringbills
+paths:
+  /v3/recurringbills:
+    get:
+      tags:
+      - recurringbills
+      summary: Get list of recurring bills
+      description: 'Get a list of recurring bill objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listRecurringBills
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: archived
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{recurring_bill_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of recurring bills response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - recurringbills
+      summary: Create a recurring bill
+      description: 'Create a recurring bill.
+
+
+        See Recurring bills in the Guides section for more information, sample requests, and responses.'
+      operationId: createRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringBillCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a recurring bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/recurringbills/{recurringBillId}:
+    get:
+      tags:
+      - recurringbills
+      summary: Get recurring bill details
+      description: Get details about an existing recurring bill.
+      operationId: getRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: recurringBillId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+          example: '{{recurring_bill_id}}'
+      responses:
+        '200':
+          description: Get recurring bill details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillReadResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - recurringbills
+      summary: Replace a recurring bill
+      description: 'Update the number of line items in a recurring bill. You can also update other recurring bill details.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a recurring bill. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the bill.
+
+        * When you omit an existing line item `id`, the line item is removed from the bill.
+
+
+        When a recurring bill is modified, all future bills are automatically changed.'
+      operationId: replaceRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: recurringBillId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+          example: '{{recurring_bill_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringBillReplaceRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace a recurring bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - recurringbills
+      summary: Update a recurring bill
+      description: 'Update details about a recurring bill line item. You can also update other recurring bill details.
+
+
+        You can use the PATCH operation to modify line item details, such as amount and description. The recurring bill line item `id` does not change with a PATCH operation.
+
+
+        When a recurring bill is modified, all future bills are automatically changed.'
+      operationId: updateRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: recurringBillId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+          example: '{{recurring_bill_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringBillUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a recurring bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/recurringbills/{recurringBillId}/archive:
+    post:
+      tags:
+      - recurringbills
+      summary: Archive a recurring bill
+      description: 'Archive a recurring bill. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived recurring bill with `POST /v3/recurringbills/{recurringbillId}/restore`. There is no change when you archive an archived recurring bill.
+
+
+        When a recurring bill is modified, all future bills are automatically changed.'
+      operationId: archiveRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: recurringBillId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+          example: '{{recurring_bill_id}}'
+      responses:
+        '200':
+          description: Archive a recurring bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/recurringbills/{recurringBillId}/restore:
+    post:
+      tags:
+      - recurringbills
+      summary: Restore an archived recurring bill
+      description: 'Restore an archived recurring bill. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored recurring bills. There is no change when you restore a restored recurring bill.
+
+
+        When a recurring bill is modified, all future bills are automatically changed.'
+      operationId: restoreRecurringBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: recurringBillId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+          example: '{{recurring_bill_id}}'
+      responses:
+        '200':
+          description: Restore an archived recurring bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    RecurringBillReplaceRequestDto:
+      required:
+      - recurringBillLineItems
+      - schedule
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: User-generated invoice number. This value can be your chosen number scheme or bill due date.
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/ScheduleRequest'
+          - description: Recurring bill scheduling information
+        recurringBillLineItems:
+          type: array
+          description: Recurring bill line item information
+          items:
+            $ref: '#/components/schemas/RecurringBillReplaceLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillProcessingOptions'
+          - description: 'Payment processing options.
+
+
+              **Note**: Enabling recurring bill `autoPayment` requires an MFA-trusted API session. See [MFA setup](https://developer.bill.com/reference/setup) for information about the BILL MFA process.'
+        paymentInformation:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillPaymentInformation'
+          - description: Payment information
+      description: Replace a recurring bill (line item added)
+      example:
+        vendorId: '{{vendor_id}}'
+        schedule:
+          period: MONTHLY
+          frequency: 1
+          nextDueDate: '2026-12-31'
+          endDate: '2027-11-01'
+          daysInAdvance: 5
+        recurringBillLineItems:
+        - amount: 19.99
+          description: Monthly subscription
+        - amount: 4.99
+          description: Decaf black tea (10 bags)
+        paymentInformation:
+          bankAccountId: '{{org_bank_account_id}}'
+    RecurringBillResponseDto:
+      required:
+      - archived
+      - billsCount
+      - expired
+      - id
+      - recurringBillLineItems
+      - schedule
+      - vendorId
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the recurring bill. The value begins with `btp`.
+        archived:
+          type: boolean
+          description: Set as `true` if the recurring bill is archived
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          type: string
+          description: Recurring bill description
+        billsCount:
+          type: integer
+          description: Number of bills generated from this recurring bill
+          format: int32
+        amount:
+          type: number
+          description: Recurring bill total amount
+        expired:
+          type: boolean
+          description: Set as `true` if the recurring bill is expired
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/ScheduleResponse'
+          - description: Recurring bill scheduling information
+        recurringBillLineItems:
+          type: array
+          description: Recurring bill line item information
+          items:
+            $ref: '#/components/schemas/RecurringBillResponseLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillProcessingOptions'
+          - description: Payment processing options
+        paymentInformation:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillPaymentInformation'
+          - description: Payment information
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Recurring bills response.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    PeriodResponse:
+      type: string
+      description: Period for scheduling a recurring bill.
+      enum:
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - YEARLY
+      - NONE
+      - UNDEFINED
+    RecurringBillReadResponseDto:
+      type: object
+      description: Recurring bills read response.
+      allOf:
+      - $ref: '#/components/schemas/RecurringBillResponseDto'
+      - properties:
+          vendorName:
+            type: string
+            description: Vendor name
+    ScheduleRequest:
+      type: object
+      properties:
+        period:
+          allOf:
+          - $ref: '#/components/schemas/PeriodRequest'
+          - description: Time period for setting up recurring bills
+        frequency:
+          type: integer
+          description: 'Bill frequency per time `period`.
+
+
+            For example, if the time `period` is `MONTHLY` and `frequency` is `3`, a bill is generated once every 3 months.'
+          format: int32
+        nextDueDate:
+          type: string
+          description: Due date for the next bill. This value is in the `yyyy-MM-dd` format.
+          format: date
+        endDate:
+          type: string
+          description: End date for the recurring bills schedule. Recurring bills stop on the `endDate`. This value is in the `yyyy-MM-dd` format.
+          format: date
+        daysInAdvance:
+          type: integer
+          description: Number of days before `nextDueDate` when the next bill is generated. If the date has occurred in the past for one or more bills, all those bills are generated.
+          format: int32
+      description: Schedule properties for a recurring bill.
+    ListResponseDto_RecurringBillReadResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecurringBillReadResponseDto'
+      description: Response from a list API request with paging references.
+    ScheduleResponse:
+      type: object
+      properties:
+        period:
+          allOf:
+          - $ref: '#/components/schemas/PeriodResponse'
+          - description: Time period for setting up recurring bills
+        frequency:
+          type: integer
+          description: 'Bill frequency per time `period`.
+
+
+            For example, if the time `period` is `MONTHLY` and `frequency` is `3`, a bill is generated once every 3 months.'
+          format: int32
+        nextDueDate:
+          type: string
+          description: Due date for the next bill. This value is in the `yyyy-MM-dd` format.
+          format: date
+        endDate:
+          type: string
+          description: End date for the recurring bills schedule. Recurring bills stop on the `endDate`. This value is in the `yyyy-MM-dd` format.
+          format: date
+        daysInAdvance:
+          type: integer
+          description: Number of days before `nextDueDate` when the next bill is generated. If the date has occurred in the past for one or more bills, all those bills are generated.
+          format: int32
+      description: Schedule properties for a recurring bill.
+    RecurringBillReplaceLineItem:
+      required:
+      - amount
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the recurring bill line item. The value begins with `tli`.
+        amount:
+          type: number
+          description: Recurring bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Recurring bill line item description
+        price:
+          type: number
+          description: Recurring bill line item price
+        quantity:
+          type: number
+          description: Recurring bill line item quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillLineItemClassificationsDto'
+          - description: General ledger classifications information for the recurring bill line item
+      description: Line items that define a bill's overall amount.
+    RecurringBillPaymentInformation:
+      type: object
+      properties:
+        bankAccountId:
+          type: string
+          description: BILL-generated ID of the bank account used to pay each bill. The value begins with `bac`.
+        cardAccountId:
+          type: string
+          description: BILL-generated ID of the card account used to pay each bill. The value begins with `cat`.
+      description: Payment info for a recurring bill.
+    RecurringBillUpdateRequestDto:
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: User-generated invoice number. This value can be your chosen number scheme or bill due date.
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/ScheduleRequest'
+          - description: Recurring bill scheduling information
+        recurringBillLineItems:
+          type: array
+          description: Recurring bill line item information
+          items:
+            $ref: '#/components/schemas/RecurringBillUpdateLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillProcessingOptions'
+          - description: 'Payment processing options.
+
+
+              **Note**: Enabling recurring bill `autoPayment` requires an MFA-trusted API session. See [MFA setup](https://developer.bill.com/reference/setup) for information about the BILL MFA process.'
+        paymentInformation:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillPaymentInformation'
+          - description: Payment information
+      description: Update a recurring bill
+      example:
+        recurringBillLineItems:
+        - id: '{{recurring_bill_line_item_id01}}'
+          amount: 22.99
+          description: Monthly subscription (amount updated)
+          quantity: 1
+    ListRecurringBillResponseDto:
+      type: object
+      description: Get list of recurring bills response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_RecurringBillReadResponseDto_'
+      - properties:
+          count:
+            type: integer
+            description: Total number of recurring bills matching the list request, across all pages of results.
+            format: int32
+          totalAmount:
+            type: number
+            description: Sum of the amounts of all recurring bills matching the list request, across all pages of results.
+    RecurringBillCreateLineItem:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Recurring bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Recurring bill line item description
+        price:
+          type: number
+          description: Recurring bill line item price
+        quantity:
+          type: number
+          description: Recurring bill line item quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillLineItemClassificationsDto'
+          - description: General ledger classifications information for the recurring bill line item
+      description: Line items that define a bill's overall amount.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    RecurringBillUpdateLineItem:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the recurring bill line item. The value begins with `tli`.
+        amount:
+          type: number
+          description: Recurring bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Recurring bill line item description
+        price:
+          type: number
+          description: Recurring bill line item unit price
+        quantity:
+          type: number
+          description: Recurring bill line item quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillLineItemClassificationsDto'
+          - description: General ledger classifications information for the recurring bill line item
+      description: Line items that define a bill's overall amount.
+    RecurringBillLineItemClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        employeeId:
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+      description: DTO for Bill Line Item classifications.
+    RecurringBillCreateRequestDto:
+      required:
+      - recurringBillLineItems
+      - schedule
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: User-generated invoice number. This value can be your chosen number scheme or bill due date.
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/ScheduleRequest'
+          - description: Recurring bill scheduling information
+        recurringBillLineItems:
+          type: array
+          description: Recurring bill line item information
+          items:
+            $ref: '#/components/schemas/RecurringBillCreateLineItem'
+        processingOptions:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillProcessingOptions'
+          - description: 'Payment processing options.
+
+
+              **Note**: Enabling recurring bill `autoPayment` requires an MFA-trusted API session. See [MFA setup](https://developer.bill.com/reference/setup) for information about the BILL MFA process.'
+        paymentInformation:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillPaymentInformation'
+          - description: Payment information
+      description: Create a recurring bill
+      example:
+        vendorId: '{{vendor_id}}'
+        schedule:
+          period: MONTHLY
+          frequency: 1
+          nextDueDate: '2026-12-31'
+          endDate: '2027-11-01'
+          daysInAdvance: 5
+        recurringBillLineItems:
+        - amount: 19.99
+          description: Monthly subscription
+        processingOptions:
+          autoPayment: true
+        paymentInformation:
+          bankAccountId: '{{org_bank_account_id}}'
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    RecurringBillProcessingOptions:
+      type: object
+      properties:
+        autoPayment:
+          type: boolean
+          description: Set as `true` to enable auto-payment for each bill
+      description: User provided options for processing the recurring payment.
+    PeriodRequest:
+      type: string
+      description: Period for scheduling a recurring bill.
+      enum:
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - YEARLY
+      - NONE
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    RecurringBillResponseLineItem:
+      required:
+      - amount
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the recurring bill line item. The value begins with `tli`.
+        amount:
+          type: number
+          description: Recurring bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          type: string
+          description: Recurring bill line item description
+        price:
+          type: number
+          description: Recurring bill line item price
+        quantity:
+          type: number
+          description: Recurring bill line item quantity
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/RecurringBillLineItemClassificationsDto'
+          - description: General ledger classifications information for the recurring bill line item
+      description: Line items that define a bill's overall amount.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

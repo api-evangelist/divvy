@@ -1,0 +1,5627 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Classifications API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Classifications
+paths:
+  /v3/classifications/accounting-classes:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of accounting classes
+      description: 'Get a list of accounting class objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationAccountingClasses
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{accounting_class_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of accounting classes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create an accounting class
+      description: Create a new accounting class.
+      operationId: createClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationAccountingClassRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create an accounting class response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple accounting classes
+      description: Create multiple accounting classes with one API request. You can create up to 50 accounting classes with one `POST /v3/classifications/accounting-classes/bulk` request.
+      operationId: bulkCreateClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationAccountingClassRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple accounting classes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple accounting classes
+      description: Update details about multiple accounting classes with one API request.
+      operationId: bulkUpdateClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationAccountingClassWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple accounting classes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple accounting classes
+      description: Archive multiple accounting classes with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of accounting classes. Each value begins with `cls`. Set the IDs as comma-separated values.
+          example: '{{accounting_class_id}}'
+      responses:
+        '200':
+          description: Archive multiple accounting classes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple accounting classes
+      description: Restore multiple accounting classes with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of accounting classes. Each value begins with `cls`. Set the IDs as comma-separated values.
+          example: '{{accounting_class_id}}'
+      responses:
+        '200':
+          description: Restore multiple accounting classes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get accounting class details
+      description: Get details about an existing accounting class.
+      operationId: getClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+          example: '{{accounting_class_id}}'
+      responses:
+        '200':
+          description: Get accounting class details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update an accounting class
+      description: Update details about an existing accounting class.
+      operationId: updateClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+          example: '{{accounting_class_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationAccountingClassRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update an accounting class response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive an accounting class
+      description: Archive an existing accounting class. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+          example: '{{accounting_class_id}}'
+      responses:
+        '200':
+          description: Archive an accounting class response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/accounting-classes/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived accounting class
+      description: Restore an archived accounting class. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationAccountingClass
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+          example: '{{accounting_class_id}}'
+      responses:
+        '200':
+          description: Restore an accounting class response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of chart of accounts
+      description: 'Get a list of chart of accounts objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{chart_of_accounts_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create a chart of accounts
+      description: Create a new chart of accounts.
+      operationId: createClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationChartOfAccountsRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple chart of accounts
+      description: Create multiple chart of accounts with one API request. You can create up to 50 chart of accounts with one `POST /v3/classifications/chart-of-accounts/bulk` request.
+      operationId: bulkCreateClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationChartOfAccountsRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple chart of accounts
+      description: Update details about multiple chart of accounts with one API request.
+      operationId: bulkUpdateClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationChartOfAccountsWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple chart of accounts
+      description: Archive multiple chart of accounts with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated IDs of the chart of accounts. Values begin with `0ca`. Set the IDs as comma-separated values.
+          example: '{{chart_of_accounts_id}}'
+      responses:
+        '200':
+          description: Archive multiple chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple chart of accounts
+      description: Restore multiple chart of accounts with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated IDs of the chart of accounts. Values begin with `0ca`. Set the IDs as comma-separated values.
+          example: '{{chart_of_accounts_id}}'
+      responses:
+        '200':
+          description: Restore multiple chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get chart of accounts details
+      description: Get details about an existing chart of accounts.
+      operationId: getClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+          example: '{{chart_of_accounts_id}}'
+      responses:
+        '200':
+          description: Get chart of accounts details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update a chart of accounts
+      description: Update details about an existing chart of accounts.
+      operationId: updateClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+          example: '{{chart_of_accounts_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationChartOfAccountsRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive a chart of accounts
+      description: Archive an existing chart of accounts. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+          example: '{{chart_of_accounts_id}}'
+      responses:
+        '200':
+          description: Archive a chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/chart-of-accounts/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived chart of accounts
+      description: Restore an archived chart of accounts. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationChartOfAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+          example: '{{chart_of_accounts_id}}'
+      responses:
+        '200':
+          description: Restore a chart of accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of departments
+      description: 'Get a list of department objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationDepartments
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{department_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of classification departments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create a department
+      description: Create a new department.
+      operationId: createClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationDepartmentRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a department response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple departments
+      description: Create multiple departments with one API request. You can create up to 50 departments with one `POST /v3/classifications/departments/bulk` request.
+      operationId: bulkCreateClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationDepartmentRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple departments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple departments
+      description: Update multiple departments with one API request.
+      operationId: bulkUpdateClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationDepartmentWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple departments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple departments
+      description: Archive multiple departments with one API request. In the response, the `archived` field is set as `true`.
+      operationId: bulkArchiveClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of departments. Each value begins with `0de`. Set the IDs as comma-separated values.
+          example: '{{department_id}}'
+      responses:
+        '200':
+          description: Archive multiple departments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple departments
+      description: Restore multiple departments with one API request. In the response, the `archived` field is set as `false`.
+      operationId: bulkRestoreClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of departments. Each value begins with `0de`. Set the IDs as comma-separated values.
+          example: '{{department_id}}'
+      responses:
+        '200':
+          description: Restore multiple departments response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get department details
+      description: Get details about an existing department.
+      operationId: getClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+          example: '{{department_id}}'
+      responses:
+        '200':
+          description: Get department details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update a department
+      description: Update details about an existing department.
+      operationId: updateClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+          example: '{{department_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationDepartmentRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a department response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive a department
+      description: Archive an existing department. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+          example: '{{department_id}}'
+      responses:
+        '200':
+          description: Archive a department response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/departments/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived department
+      description: Restore an archived department. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationDepartment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+          example: '{{department_id}}'
+      responses:
+        '200':
+          description: Restore a department response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of employees
+      description: 'Get a list of employee objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationEmployees
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{employee_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of employees response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create an employee
+      description: Create a new employee.
+      operationId: createClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationEmployeeRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create an employee response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple employees
+      description: Create multiple employees with one API request. You can create up to 50 employees with one `POST /v3/classifications/employees/bulk` request.
+      operationId: bulkCreateClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationEmployeeRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple employees response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple employees
+      description: Update details about multiple employees with one API request.
+      operationId: bulkUpdateClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationEmployeeWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple employees response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple employees
+      description: Archive multiple employees with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of employees. Each value begins with `emp`. Set the IDs as comma-separated values.
+          example: '{{employee_id}}'
+      responses:
+        '200':
+          description: Archive multiple employees response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple employees
+      description: Restore multiple employees with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of employees. Each value begins with `emp`. Set the IDs as comma-separated values.
+          example: '{{employee_id}}'
+      responses:
+        '200':
+          description: Restore multiple employees response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get employee details
+      description: Get details about an existing employee.
+      operationId: getClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+          example: '{{employee_id}}'
+      responses:
+        '200':
+          description: Get employee details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update an employee
+      description: Update details about an existing employee.
+      operationId: updateClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+          example: '{{employee_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationEmployeeRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update an employee response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive an employee
+      description: Archive an existing employee. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+          example: '{{employee_id}}'
+      responses:
+        '200':
+          description: Archive an employee response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/employees/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived employee
+      description: Restore an archived employee. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationEmployee
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+          example: '{{employee_id}}'
+      responses:
+        '200':
+          description: Restore an archived employee response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of items
+      description: 'Get a list of item objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationItems
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{item_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of items response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create an item
+      description: Create a new item.
+      operationId: createClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationItemRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create an item response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple items
+      description: Create multiple items with one API request. You can create up to 50 items with one `POST /v3/classifications/items/bulk` request.
+      operationId: bulkCreateClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationItemRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple items response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple items
+      description: Update details about multiple items with one API request.
+      operationId: bulkUpdateClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationItemWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple items response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple items
+      description: Archive multiple items with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of items. Each value begins with `0ii`. Set the IDs as comma-separated values.
+          example: '{{item_id}}'
+      responses:
+        '200':
+          description: Archive multiple items response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple items
+      description: Restore multiple items with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of items. Each value begins with `0ii`. Set the IDs as comma-separated values.
+          example: '{{item_id}}'
+      responses:
+        '200':
+          description: Restore multiple items response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get item details
+      description: Get details about an existing item.
+      operationId: getClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+          example: '{{item_id}}'
+      responses:
+        '200':
+          description: Get item details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update an item
+      description: Update details about an existing item.
+      operationId: updateClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+          example: '{{item_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationItemRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update an item response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive an item
+      description: Archive an existing item. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+          example: '{{item_id}}'
+      responses:
+        '200':
+          description: Archive an item response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/items/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived item
+      description: Restore an archived item. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationItem
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+          example: '{{item_id}}'
+      responses:
+        '200':
+          description: Restore classification item response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationItemResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of jobs
+      description: 'Get a list of job objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationJobs
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{job_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of jobs response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create a job
+      description: Create a new job.
+      operationId: createClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationJobRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a job response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple jobs
+      description: Create multiple jobs with one API request. You can create up to 50 jobs with one `POST /v3/classifications/jobs/bulk` request.
+      operationId: bulkCreateClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationJobRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple jobs response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple jobs
+      description: Update details about multiple jobs with one API request.
+      operationId: bulkUpdateClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationJobWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple jobs response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple jobs
+      description: Archive multiple jobs with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of jobs. Each value begins with `job`. Set the IDs as comma-separated values.
+          example: '{{job_id}}'
+      responses:
+        '200':
+          description: Archive multiple jobs response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple jobs
+      description: Restore multiple jobs with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of jobs. Each value begins with `job`. Set the IDs as comma-separated values.
+          example: '{{job_id}}'
+      responses:
+        '200':
+          description: Restore multiple jobs response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get job details
+      description: Get details about an existing job.
+      operationId: getClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+          example: '{{job_id}}'
+      responses:
+        '200':
+          description: Get job details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update a job
+      description: Update details about an existing job.
+      operationId: updateClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+          example: '{{job_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationJobRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a job response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive a job
+      description: Archive an existing job. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+          example: '{{job_id}}'
+      responses:
+        '200':
+          description: Archive a job response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/jobs/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived job
+      description: Restore an archived job. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationJob
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+          example: '{{job_id}}'
+      responses:
+        '200':
+          description: Restore an archived job response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationJobResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations:
+    get:
+      tags:
+      - Classifications
+      summary: Get list of locations
+      description: 'Get a list of location objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listClassificationLocations
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{location_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of locations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Classifications
+      summary: Create a location
+      description: Create a new location.
+      operationId: createClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationLocationRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a location response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/bulk:
+    post:
+      tags:
+      - Classifications
+      summary: Create multiple locations
+      description: Create multiple locations with one API request. You can create up to 50 locations with one `POST /v3/classifications/locations/bulk` request.
+      operationId: bulkCreateClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClassificationLocationRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple locations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update multiple locations
+      description: Update details about multiple locations with one API request.
+      operationId: bulkUpdateClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClassificationLocationWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple locations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/bulk/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive multiple locations
+      description: Archive multiple locations with one API request. In the response, the `archived` field for each object is set as `true`.
+      operationId: bulkArchiveClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of locations. Each value begins with `loc`. Set the IDs as comma-separated values.
+          example: '{{location_id}}'
+      responses:
+        '200':
+          description: Archive multiple locations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/bulk/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore multiple locations
+      description: Restore multiple locations with one API request. In the response, the `archived` field for each object is set as `false`.
+      operationId: bulkRestoreClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: List of BILL-generated IDs of locations. Each value begins with `loc`. Set the IDs as comma-separated values.
+          example: '{{location_id}}'
+      responses:
+        '200':
+          description: Restore multiple locations response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/{id}:
+    get:
+      tags:
+      - Classifications
+      summary: Get location details
+      description: Get details about an existing location.
+      operationId: getClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+          example: '{{location_id}}'
+      responses:
+        '200':
+          description: Get location details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Classifications
+      summary: Update a location
+      description: Update details about an existing location.
+      operationId: updateClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+          example: '{{location_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationLocationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a location response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/{id}/archive:
+    post:
+      tags:
+      - Classifications
+      summary: Archive a location
+      description: Archive an existing location. In the response, the `archived` field is set as `true`.
+      operationId: archiveClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+          example: '{{location_id}}'
+      responses:
+        '200':
+          description: Archive a location response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/classifications/locations/{id}/restore:
+    post:
+      tags:
+      - Classifications
+      summary: Restore an archived location
+      description: Restore an archived location. In the response, the `archived` field is set as `false`.
+      operationId: restoreClassificationLocation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: id
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+          example: '{{location_id}}'
+      responses:
+        '200':
+          description: Restore an archived location response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationLocationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    ClassificationEmployeeResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        shortName:
+          type: string
+          description: Employee short name
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent employee. You can set this field if this employee is a child object.
+        archived:
+          type: boolean
+          description: Set as `true` if the employee is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationEmployee response Dto.
+    ListResponseDto_ClassificationEmployeeResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+      description: Response from a list API request with paging references.
+    ListClassificationChartOfAccountsResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationChartOfAccountsResponseDto_'
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    ClassificationAccountingClassResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        name:
+          type: string
+          description: Accounting class name
+        shortName:
+          type: string
+          description: Accounting class short name
+        description:
+          type: string
+          description: Accounting class description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent accounting class. You can set this field if this accounting class is a child object.
+        archived:
+          type: boolean
+          description: Set as `true` if the accounting class is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationAccountingClass response Dto.
+    ClassificationEmployeeBulkResponseDto:
+      type: object
+      properties:
+        employees:
+          type: array
+          description: List of employees
+          items:
+            $ref: '#/components/schemas/ClassificationEmployeeResponseDto'
+      description: Response Dto for bulk classification employee.
+    CreateClassificationAccountingClassRequestDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Accounting class name
+        shortName:
+          type: string
+          description: Accounting class short name
+        description:
+          type: string
+          description: Accounting class description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent accounting class. You can set this field if this accounting class is a child object.
+      description: Create an accounting class
+      example:
+        name: Prepaid Subscriptions
+        description: Prepaid Subscriptions class (Prepaid Expenses account)
+    UpdateClassificationAccountingClassWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        name:
+          type: string
+          description: Accounting class name
+        shortName:
+          type: string
+          description: Accounting class short name
+        description:
+          type: string
+          description: Accounting class description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent accounting class. You can set this field if this accounting class is a child object.
+      description: Update ClassificationAccountingClass request Dto.
+    CreateClassificationChartOfAccountsRequestDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Chart of accounts name
+        description:
+          type: string
+          description: Chart of accounts description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent chart of accounts. You can set this field if this chart of accounts is a child object.
+        account:
+          allOf:
+          - $ref: '#/components/schemas/CreateAccountRequest'
+          - description: Chart of accounts details
+      description: Create a chart of accounts
+      example:
+        name: Prepaid Expenses
+        description: Prepaid expenses for the upcoming quarter
+        account:
+          type: EXPENSE
+          number: 1-020
+    UpdateClassificationJobRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Job name
+        shortName:
+          type: string
+          description: Job short name
+        description:
+          type: string
+          description: Job description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent job. You can set this field if this job is a child object.
+      description: Update a job (description updated)
+      example:
+        name: Kitchen Remodel
+        description: New cabinets & countertop ($10,000 budget)
+    ClassificationAccountingClassBulkResponseDto:
+      type: object
+      properties:
+        accountingClasses:
+          type: array
+          description: List of accounting classes
+          items:
+            $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+      description: Response Dto for bulk classification accounting class.
+    ListClassificationAccountingClassResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationAccountingClassResponseDto_'
+    ClassificationJobBulkResponseDto:
+      type: object
+      properties:
+        jobs:
+          type: array
+          description: List of jobs
+          items:
+            $ref: '#/components/schemas/ClassificationJobResponseDto'
+      description: Response Dto for bulk classification job.
+    ClassificationItemResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeResponse'
+          - description: Item type
+        shortName:
+          type: string
+          description: Item short name
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+        archived:
+          type: boolean
+          description: Set as `true` if the item is archived
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent item. You can set this field if this item is a child object.
+        price:
+          type: number
+          description: Item price
+        expenseChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item when it is used for bills or purchases in your accounting system. The value begins with `0ca`.
+        purchaseDescription:
+          type: string
+          description: Item description when it is used for bills or purchases in your accounting system
+        purchaseCost:
+          type: number
+          description: Item purchase cost set in your accounting system
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item. The value begins with `0ca`.
+        taxable:
+          type: boolean
+          description: Set as `true` if the item is taxable
+        percentage:
+          type: number
+          description: Item tax percentage
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: CategoryItem response Dto.
+    ListClassificationEmployeeResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationEmployeeResponseDto_'
+    ListClassificationItemResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationItemResponseDto_'
+    UpdateClassificationChartOfAccountsRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Chart of accounts name
+        description:
+          type: string
+          description: Chart of accounts description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent chart of accounts. You can set this field if this chart of accounts is a child object.
+        account:
+          allOf:
+          - $ref: '#/components/schemas/UpdateAccountRequest'
+          - description: Chart of accounts details
+      description: Update a chart of accounts (description updated)
+      example:
+        name: Prepaid Expenses
+        description: Prepaid expenses for Q4 2026
+        account:
+          type: EXPENSE
+          number: 1-020
+    ListResponseDto_ClassificationItemResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationItemResponseDto'
+      description: Response from a list API request with paging references.
+    UpdateClassificationLocationWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        name:
+          type: string
+          description: Location name
+        shortName:
+          type: string
+          description: Location short name
+        description:
+          type: string
+          description: Location description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent location. You can set this field if this location is a child object.
+      description: Update ClassificationLocation request Dto.
+    ChartOfAccountsTypeResponse:
+      type: string
+      description: Chart of accounts type response.
+      enum:
+      - UNSPECIFIED
+      - ACCOUNTS_PAYABLE
+      - ACCOUNTS_RECEIVABLE
+      - BANK
+      - COST_OF_GOODS_SOLD
+      - CREDIT_CARD
+      - EQUITY
+      - EXPENSE
+      - FIXED_ASSET
+      - INCOME
+      - LONG_TERM_LIABILITY
+      - OTHER_ASSET
+      - OTHER_CURRENT_ASSET
+      - OTHER_CURRENT_LIABILITY
+      - OTHER_EXPENSE
+      - OTHER_INCOME
+      - NON_POSTING
+      - UNDEFINED
+    ItemTypeRequest:
+      type: string
+      description: ItemType.
+      enum:
+      - UNKNOWN
+      - SERVICE
+      - INVENTORY
+      - NON_INVENTORY
+      - PAYMENT
+      - DISCOUNT
+      - SALES_TAX
+      - SUBTOTAL
+      - OTHER_CHARGE
+      - INVENTORY_ASSEMBLY
+      - GROUP
+      - SALES_TAX_GROUP
+      - FIXED_ASSET
+      - CATEGORY
+      - EXPENSE
+    CreateClassificationItemRequestDto:
+      required:
+      - name
+      - type
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeRequest'
+          - description: Item type
+        shortName:
+          type: string
+          description: Item short name
+        name:
+          minLength: 1
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent item. You can set this field if this item is a child object.
+        price:
+          type: number
+          description: Item price
+        expenseChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item when it is used for bills or purchases in your accounting system. The value begins with `0ca`.
+        purchaseDescription:
+          type: string
+          description: Item description when it is used for bills or purchases in your accounting system
+        purchaseCost:
+          type: number
+          description: Item purchase cost set in your accounting system
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item. The value begins with `0ca`.
+        taxable:
+          type: boolean
+          description: Set as `true` if the item is taxable
+        percentage:
+          type: number
+          description: 'Item tax percentage. You can set this field for a set of item `type` values.
+
+            * `DISCOUNT`
+
+            * `SALES_TAX`
+
+            * `OTHER_CHARGE`
+
+            '
+      description: Create an item
+      example:
+        type: SALES_TAX
+        percentage: 3
+        name: State Sales Tax
+    ClassificationDepartmentBulkResponseDto:
+      type: object
+      properties:
+        departments:
+          type: array
+          description: List of departments
+          items:
+            $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+      description: Response Dto for bulk classification department.
+    UpdateClassificationAccountingClassRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Accounting class name
+        shortName:
+          type: string
+          description: Accounting class short name
+        description:
+          type: string
+          description: Accounting class description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent accounting class. You can set this field if this accounting class is a child object.
+      description: Update an accounting class (description updated)
+      example:
+        name: Prepaid Subscriptions
+        description: Prepaid Expenses account
+    UpdateClassificationDepartmentWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `dep`.
+        name:
+          type: string
+          description: Department name
+        shortName:
+          type: string
+          description: Department short name
+        description:
+          type: string
+          description: Department description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent department. You can set this field if this department is a child object.
+      description: Update ClassificationDepartment with id request Dto.
+    CreateClassificationEmployeeRequestDto:
+      required:
+      - firstName
+      - lastName
+      type: object
+      properties:
+        firstName:
+          minLength: 1
+          type: string
+          description: Employee first name
+        lastName:
+          minLength: 1
+          type: string
+          description: Employee last name
+        shortName:
+          type: string
+          description: Employee short name
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent employee. You can set this field if this employee is a child object.
+      description: Create an employee
+      example:
+        firstName: James
+        lastName: Milner
+    UpdateClassificationJobWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        name:
+          type: string
+          description: Job name
+        shortName:
+          type: string
+          description: Job short name
+        description:
+          type: string
+          description: Job description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent job. You can set this field if this job is a child object.
+      description: Update ClassificationJob with id request Dto.
+    ClassificationItemBulkResponseDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: List of items
+          items:
+            $ref: '#/components/schemas/ClassificationItemResponseDto'
+      description: Response Dto for bulk classification item.
+    UpdateAccountRequest:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChartOfAccountsTypeRequest'
+          - description: Type
+        number:
+          type: string
+          description: Number
+      description: Update account request Dto.
+    AccountResponse:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChartOfAccountsTypeResponse'
+          - description: Type
+        number:
+          type: string
+          description: Number
+      description: Account response Dto.
+    ListResponseDto_ClassificationAccountingClassResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationAccountingClassResponseDto'
+      description: Response from a list API request with paging references.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    CreateClassificationLocationRequestDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Location name
+        shortName:
+          type: string
+          description: Location short name
+        description:
+          type: string
+          description: Location description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent location. You can set this field if this location is a child object.
+      description: Create a location
+      example: "{\n  \"name\": \"123 Main St Retail Store\",\n  \"\"description\": \"Retail store prepaid subscription expenses\"\n}"
+    ClassificationLocationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        name:
+          type: string
+          description: Location name
+        shortName:
+          type: string
+          description: Location short name
+        description:
+          type: string
+          description: Location description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent location. You can set this field if this location is a child object.
+        archived:
+          type: boolean
+          description: Set as `true` if the location is archived
+        createdTime:
+          type: string
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationLocation response Dto.
+    UpdateClassificationDepartmentRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Department name
+        shortName:
+          type: string
+          description: Department short name
+        description:
+          type: string
+          description: Department description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent department. You can set this field if this department is a child object.
+      description: Update a department (description updated)
+      example: "{\n  \"name\": \"Sales Department\",\n  \"description\": \"Prepaid Expenses account\",\n}"
+    CreateClassificationJobRequestDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Job name
+        shortName:
+          type: string
+          description: Job short name
+        description:
+          type: string
+          description: Job description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent job. You can set this field if this job is a child object.
+      description: Create a job
+      example:
+        name: Kitchen Remodel
+        description: New cabinets & countertop
+    ListResponseDto_ClassificationChartOfAccountsResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+      description: Response from a list API request with paging references.
+    UpdateClassificationEmployeeWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        shortName:
+          type: string
+          description: Employee short name
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent employee. You can set this field if this employee is a child object.
+      description: Update ClassificationEmployee with id request Dto.
+    UpdateClassificationItemRequestDto:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeRequest'
+          - description: Item type
+        shortName:
+          type: string
+          description: Item short name
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent item. You can set this field if this item is a child object.
+        price:
+          type: number
+          description: Item price
+        expenseChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item when it is used for bills or purchases in your accounting system. The value begins with `0ca`.
+        purchaseDescription:
+          type: string
+          description: Item description when it is used for bills or purchases in your accounting system
+        purchaseCost:
+          type: number
+          description: Item purchase cost set in your accounting system
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item. The value begins with `0ca`.
+        taxable:
+          type: boolean
+          description: Set as `true` if the item is taxable
+        percentage:
+          type: number
+          description: 'Item tax percentage. You can set this field for a set of item `type` values.
+
+            * `DISCOUNT`
+
+            * `SALES_TAX`
+
+            * `OTHER_CHARGE`
+
+            '
+      description: Update an item (percentage updated)
+      example:
+        type: SALES_TAX
+        percentage: 3.25
+        name: State Sales Tax
+    ItemTypeResponse:
+      type: string
+      description: Item type response.
+      enum:
+      - UNDEFINED
+      - UNKNOWN
+      - SERVICE
+      - INVENTORY
+      - NON_INVENTORY
+      - PAYMENT
+      - DISCOUNT
+      - SALES_TAX
+      - SUBTOTAL
+      - OTHER_CHARGE
+      - INVENTORY_ASSEMBLY
+      - GROUP
+      - SALES_TAX_GROUP
+      - FIXED_ASSET
+      - CATEGORY
+      - EXPENSE
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    ClassificationChartOfAccountsBulkResponseDto:
+      type: object
+      properties:
+        chartOfAccounts:
+          type: array
+          description: List of chart of accounts
+          items:
+            $ref: '#/components/schemas/ClassificationChartOfAccountsResponseDto'
+      description: Response Dto for bulk classification chart of accounts.
+    ChartOfAccountsTypeRequest:
+      type: string
+      description: Chart of accounts type.
+      enum:
+      - UNSPECIFIED
+      - ACCOUNTS_PAYABLE
+      - ACCOUNTS_RECEIVABLE
+      - BANK
+      - COST_OF_GOODS_SOLD
+      - CREDIT_CARD
+      - EQUITY
+      - EXPENSE
+      - FIXED_ASSET
+      - INCOME
+      - LONG_TERM_LIABILITY
+      - OTHER_ASSET
+      - OTHER_CURRENT_ASSET
+      - OTHER_CURRENT_LIABILITY
+      - OTHER_EXPENSE
+      - OTHER_INCOME
+      - NON_POSTING
+    ListClassificationLocationResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationLocationResponseDto_'
+    ListClassificationDepartmentResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationDepartmentResponseDto_'
+    ListResponseDto_ClassificationDepartmentResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationDepartmentResponseDto'
+      description: Response from a list API request with paging references.
+    ClassificationLocationBulkResponseDto:
+      type: object
+      properties:
+        locations:
+          type: array
+          description: List of locations
+          items:
+            $ref: '#/components/schemas/ClassificationLocationResponseDto'
+      description: Response Dto for bulk classification location.
+    ListResponseDto_ClassificationLocationResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationLocationResponseDto'
+      description: Response from a list API request with paging references.
+    CreateAccountRequest:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ChartOfAccountsTypeRequest'
+          - description: Type
+        number:
+          type: string
+          description: Number
+      description: Account request Dto.
+    ClassificationDepartmentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        name:
+          type: string
+          description: Department name
+        shortName:
+          type: string
+          description: Department short name
+        description:
+          type: string
+          description: Department description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent department. You can set this field if this department is a child object.
+        archived:
+          type: boolean
+          description: Set as `true` if the department is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationDepartment response Dto.
+    UpdateClassificationLocationRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Location name
+        shortName:
+          type: string
+          description: Location short name
+        description:
+          type: string
+          description: Location description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent location. You can set this field if this location is a child object.
+      description: Update a location (name updated)
+      example:
+        name: 234 Main St Retail Store
+        description: Retail store prepaid subscription expenses
+    UpdateClassificationEmployeeRequestDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        shortName:
+          type: string
+          description: Employee short name
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent employee. You can set this field if this employee is a child object.
+      description: Update an employee (lastName updated)
+      example:
+        firstName: James
+        lastName: Tarkowski
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ListClassificationJobResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_ClassificationJobResponseDto_'
+    UpdateClassificationChartOfAccountsWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        name:
+          type: string
+          description: Chart of accounts name
+        description:
+          type: string
+          description: Chart of accounts description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent chart of accounts. You can set this field if this chart of accounts is a child object.
+        account:
+          allOf:
+          - $ref: '#/components/schemas/UpdateAccountRequest'
+          - description: Chart of accounts details
+      description: Update ClassificationChartOfAccounts with id request Dto.
+    UpdateClassificationItemWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeRequest'
+          - description: Item type
+        shortName:
+          type: string
+          description: Item short name
+        name:
+          type: string
+          description: Item name
+        description:
+          type: string
+          description: Item description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent item. You can set this field if this item is a child object.
+        price:
+          type: number
+          description: Item price
+        expenseChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item when it is used for bills or purchases in your accounting system. The value begins with `0ca`.
+        purchaseDescription:
+          type: string
+          description: Item description when it is used for bills or purchases in your accounting system
+        purchaseCost:
+          type: number
+          description: Item purchase cost set in your accounting system
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the item. The value begins with `0ca`.
+        taxable:
+          type: boolean
+          description: Set as `true` if the item is taxable
+        percentage:
+          type: number
+          description: 'Item tax percentage. You can set this field for a set of item `type` values.
+
+            * `DISCOUNT`
+
+            * `SALES_TAX`
+
+            * `OTHER_CHARGE`
+
+            '
+      description: Update ClassificationItem request Dto.
+    ClassificationJobResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        name:
+          type: string
+          description: Job name
+        shortName:
+          type: string
+          description: Job short name
+        description:
+          type: string
+          description: Job description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent job. You can set this field if this job is a child object.
+        archived:
+          type: boolean
+          description: Set as `true` if the job is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationJob response Dto.
+    ListResponseDto_ClassificationJobResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationJobResponseDto'
+      description: Response from a list API request with paging references.
+    CreateClassificationDepartmentRequestDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Department name
+        shortName:
+          type: string
+          description: Department short name
+        description:
+          type: string
+          description: Department description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent department. You can set this field if this department is a child object.
+      description: Create a department
+      example: "{\n  \"name\": \"Sales Department\",\n  \"description\": \"Sales department (Prepaid Expenses account)\",\n}"
+    ClassificationChartOfAccountsResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        archived:
+          type: boolean
+          description: Set as `true` if the chart of accounts is archived
+        name:
+          type: string
+          description: Chart of accounts name
+        description:
+          type: string
+          description: Chart of accounts description
+        parentId:
+          type: string
+          description: BILL-generated ID of the parent chart of accounts. You can set this field if this chart of accounts is a child object.
+        account:
+          allOf:
+          - $ref: '#/components/schemas/AccountResponse'
+          - description: Chart of accounts details
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: ClassificationChartOfAccounts response Dto.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

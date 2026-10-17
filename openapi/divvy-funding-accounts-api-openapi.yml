@@ -1,0 +1,2037 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Funding Accounts API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: funding-accounts
+paths:
+  /v3/funding-accounts/ap-cards:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get list of AP Cards
+      description: 'Get a list of AP Card objects.
+
+
+        With the AP Card, you can earn rewards simply by paying your bills. The AP Card is a payment method that enables you to send fast payments with no transaction fees or annual fees. You can use the AP Card with any vendor who accepts virtual card payments.
+
+
+        See AP Card Frequently Asked Questions (FAQs) in the BILL Help to learn more about AP Card.'
+      operationId: listPayableAPCards
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get list of AP Cards response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/APCardResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get list of bank accounts
+      description: 'Get a list of bank account objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listBankAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: bankAccountId:eq:{{org_bank_account_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of bank accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - funding-accounts
+      summary: Create a bank account
+      description: 'Create a new bank account. The currently signed-in user must have the `ADMINISTRATOR` user role in the BILL organization to perform this operation. BILL sends an email notification for informing you about changes to your funding accounts.
+
+
+        When you create a bank account, BILL sends a test ACH payment to confirm whether the account details are accurate.
+
+
+        In the response, three fields are set to their default values.
+
+        * The bank account `status` is set as `PENDING`. You can verify the bank account with `POST /v3/funding-accounts/banks/{bankAccountId}/verify`.
+
+        * The `payables` and `receivables` values are set as `false`. To update these values, update the bank account with `PATCH /v3/funding-accounts/banks/{bankAccountId}`.
+
+
+        **Note**: Creating a bank account requires an MFA-trusted API session. See MFA setup for information about the BILL MFA process.
+
+
+        See Bank account setup (v3 API) in the Guides section for more information, sample requests, and responses.'
+      operationId: createBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationBankAccountCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/users:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get list of bank account users
+      description: 'Get a list of bank account user objects. In the response, if the bank account user `verificationStatus` is set as `NOMINATED`, user verification must be completed before the user can pay with the specified bank account.
+
+
+        By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.'
+      operationId: listBankAccountUsers
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: archived
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{org_bank_account_user_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      - name: currentUser
+        in: query
+        schema:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` to get results for the currently signed-in user. The default value is `false`.
+      responses:
+        '200':
+          description: Get list of bank account users response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationBankAccountUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/users/nominate:
+    post:
+      tags:
+      - funding-accounts
+      summary: Nominate a bank account user
+      description: 'Nominate a bank account user.
+
+
+        When you nominate a user, BILL performs a set of operations.
+
+        * The bank account user `verificationStatus` is set as `NOMINATED`.
+
+        * BILL sends the user an email asking them to sign in to the BILL web app and complete identity verification. See Verify your identity in the Guides section for test verification information you can enter in the sandbox environment.
+
+
+        After user identity verification is successful, the bank account user `verificationStatus` is set as `VERIFIED` and the user can pay with the specified bank account.
+
+
+        **Note**: The bank account `status` must be set as `VERIFIED` before you can nominate bank account users.'
+      operationId: nominateBankAccountUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NominateBankAccountUserRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Nominate a bank account user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/users/{bankAccountUserId}/archive:
+    post:
+      tags:
+      - funding-accounts
+      summary: Archive a bank account user
+      description: Archive an existing bank account user. In the response, the `archived` field is set as `true` and the bank account user `verificationStatus` is set as `UNVERIFIED`.
+      operationId: archiveBankAccountUser
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: bankAccountUserId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bank account user. The value begins with `bau`.
+          example: '{{org_bank_account_user_id}}'
+      responses:
+        '200':
+          description: Archive a bank account user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationBankAccountUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/{bankAccountId}:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get bank account details
+      description: Get details about an existing bank account.
+      operationId: getBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+          example: '{{org_bank_account_id}}'
+      responses:
+        '200':
+          description: Get bank account details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - funding-accounts
+      summary: Update a bank account
+      description: 'Update details about an existing bank account.
+
+
+        This operation follows a set of rules.
+
+        * **Bank account `status` requirement**: The bank account `status` must be set as `VERIFIED` before you can update any details about the bank account. You can verify the bank account with `POST /v3/funding-accounts/banks/{bankAccountId}/verify`.
+
+        * **Update field restrictions**: You cannot update the `routingNumber`, `accountNumber`, and account `type` values for a bank account. If you want to update any of these values, create a new bank account with `POST /v3/funding-accounts/banks`.'
+      operationId: updateBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+          example: '{{org_bank_account_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationBankAccountUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/{bankAccountId}/archive:
+    post:
+      tags:
+      - funding-accounts
+      summary: Archive a bank account
+      description: 'Archive an existing bank account. In the response, the `archived` field is set as `true`.
+
+
+        Archiving a bank account at BILL has a set of requirements.
+
+        * **Bank account status**: The bank account `status` must be set as `VERIFIED`. You can verify the bank account with `POST /v3/funding-accounts/banks/{bankAccountId}/verify`.
+
+        * **Bank account user status**: The bank account user `verificationStatus` must be set as `VERIFIED`. To begin the verification process, nominate a bank account user with `POST /v3/funding-accounts/banks/users`.'
+      operationId: archiveBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+          example: '{{org_bank_account_id}}'
+      responses:
+        '200':
+          description: Archive a bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationBankAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/banks/{bankAccountId}/verify:
+    post:
+      tags:
+      - funding-accounts
+      summary: Verify a bank account
+      description: 'Verify an existing bank account.
+
+
+        When you create a bank account, BILL sends a test ACH payment to the bank account to confirm whether the account details are accurate. Enter the test amount as the `depositAmount` value in your `POST /v3/funding-accounts/banks/{bankAccountId}/verify` request.
+
+
+        **Note**: Bank account verification is required in the production environment before the account can be used for other BILL operations. In the sandbox environment, set `depositAmount` as `0.50` to complete bank account verification.
+
+
+        The bank account `status` is set as `VERIFIED` when BILL is able to verify the `depositAmount` value. BILL sends an email notification for confirming a test transaction. When BILL cannot verify the bank account after three attempts, you cannot use the bank account. At this point, use another bank account or create a bank account with `POST /v3/funding-accounts/banks`.
+
+
+        After your bank account verification is complete, ensure that the current bank account user `verificationStatus` is set as `VERIFIED` before you can use the bank account. To begin the verification process, nominate a bank account user with `POST /v3/funding-accounts/banks/users/nominate`.
+
+
+        See Bank account setup (v3 API) in the Guides section for more information, sample requests, and responses.'
+      operationId: verifyBankAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: bankAccountId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+          example: '{{org_bank_account_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankAccountVerifyRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Verify a bank account response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountVerifyResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/cards:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get list of card accounts
+      description: Get a list of card account objects.
+      operationId: listPayableCardAccounts
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: cardUserStatus
+        in: query
+        required: true
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/CardUserStatus'
+          - description: Card user status
+      responses:
+        '200':
+          description: Get list of card accounts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayableCardAccountsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/cards/funding-purposes:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get card funding purpose
+      description: 'Get a list of card funding purpose values based on the vendor and card brand.
+
+
+        When you create a payment (`POST /v3/payments` or `POST /v3/payments/bulk`) with a `CARD_ACCOUNT` funding account `type`, BILL requires a vendor industry value for compliance. When BILL cannot identify the vendor industry, the `cardFundingPurpose` field must be set in your payment request.
+
+
+        Use this endpoint to get the list of card funding purpose values you can set. If you get an empty 200 response, BILL has information about the vendor industry and setting the `cardFundingPurpose` field is not required in your payment request.'
+      operationId: listCardFundingPurposes
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated ID of the vendor to be paid. The value begins with `009`.
+          example: '{{vendor_id}}'
+      - name: brand
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Card brand
+          example: visa
+      responses:
+        '200':
+          description: Get card funding purpose response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCardFundingPurposesResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/cards/users:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get list of card account users
+      description: 'Get a list of card account user objects. In the response, if the card account user `verificationStatus` is set as `NOMINATED`, user verification must be completed before the user can pay with the specified card account.
+
+
+        By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.'
+      operationId: listCardAccountUsers
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: archived
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{org_card_account_user_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      - name: currentUser
+        in: query
+        schema:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` to get results for the currently signed-in user. The default value is `false`.
+      responses:
+        '200':
+          description: Get list of card account users response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationCardAccountUserResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/cards/{cardAccountId}:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get card account details
+      description: Get details about an existing card account.
+      operationId: getCardAccount
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: cardAccountId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the card account. The value begins with `cat`.
+          example: '{{org_card_account_id}}'
+      responses:
+        '200':
+          description: Get card account details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardAccountResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/funding-accounts/permissions:
+    get:
+      tags:
+      - funding-accounts
+      summary: Get funding account permissions
+      description: Get the funding account permissions available for the current organization and current organization user.
+      operationId: getFundingAccountPermission
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      responses:
+        '200':
+          description: Get funding account permissions response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingAccountPermissionResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    OrganizationBankAccountUpdateRequestDto:
+      type: object
+      properties:
+        nameOnAccount:
+          type: string
+          description: Full name on bank account
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Bank account owner type
+        bankName:
+          maxLength: 100
+          type: string
+          description: Bank name. Set this field as a nickname for your bank account.
+        accessToAdmins:
+          type: boolean
+          description: Set as `true` to enable access to all users with the `ADMINISTRATOR` user role
+        default:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationBankAccountDefault'
+          - description: Bank account default values for BILL AP and AR operations
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the organization bank account. The value begins with `0ca`.
+      description: Update a bank account
+      example:
+        ownerType: PERSONAL
+    ListPayableCardAccountsRateActivePromotion:
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Promotion start date
+          format: date-time
+        endDate:
+          type: string
+          description: Promotion end date
+          format: date-time
+        creditCardRate:
+          type: number
+          description: Credit card rate
+        debitCardRate:
+          type: number
+          description: Debit card rate
+      description: List Payable Card Accounts Rate Active Promotion.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    OrganizationCardAccountUserStatus:
+      type: string
+      description: Card account user verification status.
+      enum:
+      - UNVERIFIED
+      - NOMINATED
+      - VERIFIED
+      - UNDEFINED
+    ListResponseDto_OrganizationBankAccountResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationBankAccountResponseDto'
+      description: Response from a list API request with paging references.
+    ResponseStatus:
+      type: string
+      description: Status of the response.
+      enum:
+      - SUCCESS
+      - FAILURE
+    ListPayableCardAccountsResponseDto:
+      type: object
+      properties:
+        rates:
+          allOf:
+          - $ref: '#/components/schemas/ListPayableCardAccountsRate'
+          - description: Applicable card rates
+        cards:
+          type: array
+          description: List of card accounts
+          items:
+            $ref: '#/components/schemas/CardAccountResponseDto'
+      description: List Card Accounts response DTO.
+    CardAccountType:
+      type: string
+      description: Card Account response type.
+      enum:
+      - UNDEFINED
+      - CREDIT_CARD
+      - DEBIT_CARD
+      - PREPAID_CARD
+      - UNKNOWN
+    ListCardFundingPurposesResponseDto:
+      type: object
+      properties:
+        lastUsedPurpose:
+          type: string
+          description: 'Last used purpose. This value was last used as the `cardFundingPurpose` value in a payment request.
+
+
+            **Note**: This field is available only for the AMEX, VISA, and MASTERCARD card brands.'
+        results:
+          type: array
+          description: List of card funding purpose values based on the vendor and card brand. Use a `subCategories` value for an AMEX, VISA, or MASTERCARD card brand. Use a `category` value for all other card brands.
+          items:
+            $ref: '#/components/schemas/FundingPurpose'
+      description: Card funding purposes dto.
+    ListResponseDto_OrganizationCardAccountUserResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationCardAccountUserResponseDto'
+      description: Response from a list API request with paging references.
+    OrganizationCardAccountUserResponseDto:
+      type: object
+      properties:
+        cardAccountId:
+          type: string
+          description: BILL-generated ID of the card account. The value begins with `cat`.
+        userId:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        archived:
+          type: boolean
+          description: Set as `true` if the card account is archived
+        verificationStatus:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationCardAccountUserStatus'
+          - description: Card account user verification status.
+      description: Card account user response.
+    BankAccountVerifyRequestDto:
+      required:
+      - depositAmount
+      type: object
+      properties:
+        depositAmount:
+          maximum: 0.99
+          minimum: 0.01
+          type: number
+          description: 'Verify deposit amount.
+
+
+            Enter an amount between `0.01` and `0.99`. In the sandbox environment, set this field as `0.50` to complete bank account verification.'
+      description: Verify a bank account
+      example:
+        depositAmount: 0.5
+    OrganizationBankAccountCreateRequestDto:
+      required:
+      - bankName
+      - nameOnAccount
+      - ownerType
+      - type
+      type: object
+      properties:
+        nameOnAccount:
+          minLength: 1
+          type: string
+          description: Full name on bank account
+        routingNumber:
+          type: string
+          description: Bank routing number. This field is required.
+        accountNumber:
+          type: string
+          description: Bank account number. This field is required.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountType'
+          - description: Bank account type
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Bank account owner type
+        bankName:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Bank name. Set this field as a nickname for your bank account.
+        accessToAdmins:
+          type: boolean
+          description: Set as `true` to enable access to all users with the `ADMINISTRATOR` user role
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bank account. The value begins with `0ca`.
+      description: Create a bank account
+      example:
+        nameOnAccount: Agatha Ffringe
+        routingNumber: '074000010'
+        accountNumber: '111222333'
+        type: CHECKING
+        ownerType: BUSINESS
+        bankName: Chase
+    CardAccountResponseDto:
+      required:
+      - archived
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the card account. The value begins with `cat`.
+        archived:
+          type: boolean
+          description: Set as `true` if the card account is archived
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the card account. The value begins with `006`.
+        issuingBankName:
+          type: string
+          description: Card issuing bank name
+        nameOnAccount:
+          type: string
+          description: Full name on card account
+        brand:
+          type: string
+          description: Card brand
+        type:
+          allOf:
+          - $ref: '#/components/schemas/CardAccountType'
+          - description: Card type.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CardAccountStatus'
+          - description: Card account status.
+        last4:
+          type: string
+          description: Card last four digits
+        expiration:
+          allOf:
+          - $ref: '#/components/schemas/CardAccountExpiration'
+          - description: Card expiration information
+        default:
+          allOf:
+          - $ref: '#/components/schemas/CardAccountDefault'
+          - description: Card payment defaults for BILL operations
+      description: Card Account response DTO.
+    CardPermission:
+      type: object
+      properties:
+        payByCard:
+          type: boolean
+          description: This field is set as `true` if you can pay by card
+        fundingEnabled:
+          type: boolean
+          description: This field is set as `true` if you can add a card account as a payment method
+        amexAllowed:
+          type: boolean
+          description: This field is set as `true` if you can pay with an AMEX credit card
+      description: Funding Account Card Permission response.
+    ListPayableCardAccountsRate:
+      type: object
+      properties:
+        defaultCardAccountId:
+          type: string
+          description: ID of the default card account
+        funding:
+          allOf:
+          - $ref: '#/components/schemas/ListPayableCardAccountsFundingRate'
+          - description: Card funding rates
+        activePromotion:
+          allOf:
+          - $ref: '#/components/schemas/ListPayableCardAccountsRateActivePromotion'
+          - description: Active promotions on the card
+      description: List Payable Card Accounts Rate.
+    BankAccountStatus:
+      type: string
+      description: Bank account status.
+      enum:
+      - NOT_VERIFIED
+      - VERIFIED
+      - PENDING
+      - BLOCKED
+      - EXPIRED
+      - INVALID
+      - UNDEFINED
+    APCardStatus:
+      type: string
+      description: AP Card response status.
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - DELETED
+      - PENDING
+      - DRAFT
+      - DRAFT_DELETED
+      - FROZEN
+      - UNDEFINED
+    UserPermission:
+      type: object
+      properties:
+        payOnline:
+          type: boolean
+          description: This field is set as `true` if you can make online payments
+      description: User level permission response DTO.
+    BankAccountType:
+      type: string
+      description: BankAccountType Enum.
+      enum:
+      - CHECKING
+      - SAVINGS
+    CardAccountStatus:
+      type: string
+      description: Card Account response status.
+      enum:
+      - NOT_VERIFIED
+      - VERIFIED
+      - PENDING
+      - BLOCKED
+      - EXPIRED
+      - INVALID
+      - UNDEFINED
+    BankAccountVerifyResponseDto:
+      type: object
+      properties:
+        verified:
+          type: boolean
+          description: Set as `true` if the bank account is verified
+      description: Verify a bank account response.
+    OrganizationBankAccountResponseDto:
+      required:
+      - archived
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+        archived:
+          type: boolean
+          description: Set as `true` if the bank account is archived
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountStatus'
+          - description: Bank account status.
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the bank account. The value begins with `006`.
+        routingNumber:
+          type: string
+          description: Bank routing number
+        accountNumber:
+          type: string
+          description: Bank account number
+        nameOnAccount:
+          type: string
+          description: Full name on bank account
+        type:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountType'
+          - description: Bank account type
+        ownerType:
+          allOf:
+          - $ref: '#/components/schemas/BankAccountOwnerType'
+          - description: Bank account owner type
+        bankName:
+          type: string
+          description: Bank name
+        accessToAdmins:
+          type: boolean
+          description: Set as `true` to enable access to all users with the `ADMINISTRATOR` user role
+        default:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationBankAccountDefault'
+          - description: Bank account default values for BILL AP and AR operations
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bank account. The value begins with `0ca`.
+      description: Bank account response.
+    ListPayableCardAccountsFundingRate:
+      type: object
+      properties:
+        creditCardRate:
+          type: number
+          description: Credit card funding rate
+        debitCardRate:
+          type: number
+          description: Debit card funding rate
+      description: List Payable Card Accounts Funding Rate.
+    ListResponseDto_OrganizationBankAccountUserResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationBankAccountUserResponseDto'
+      description: Response from a list API request with paging references.
+    BankAccountOwnerType:
+      type: string
+      description: BankAccountOwnerType Enum.
+      enum:
+      - BUSINESS
+      - PERSONAL
+    WalletPermission:
+      type: object
+      properties:
+        fundingEnabled:
+          type: boolean
+          description: This field is set as `true` if you have access to Wallet (BILL balance) as a payment method
+      description: Funding account wallet permission response.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    CardUserStatus:
+      type: string
+      description: Card user status
+      enum:
+      - VERIFIED
+      - NOMINATED
+    OrganizationPermission:
+      type: object
+      properties:
+        card:
+          allOf:
+          - $ref: '#/components/schemas/CardPermission'
+          - description: Card funding account permissions
+        wallet:
+          allOf:
+          - $ref: '#/components/schemas/WalletPermission'
+          - description: Wallet (BILL balance) funding account permissions
+      description: Organization level permission response DTO.
+    NominateBankAccountUserRequestDto:
+      required:
+      - bankAccountId
+      - userId
+      type: object
+      properties:
+        userId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        bankAccountId:
+          minLength: 1
+          type: string
+          description: 'BILL-generated ID of the bank account. The value begins with `bac`.
+
+
+            **Note**: The bank account `status` must be set as `VERIFIED`.
+
+            '
+      description: Nominate a bank account user
+      example:
+        bankAccountId: '{{org_bank_account_id}}'
+        userId: '{{org_user_id}}'
+    CardAccountDefault:
+      type: object
+      properties:
+        payables:
+          type: boolean
+          description: Set as `true` if the card account is set as default for Accounts Payable operations
+        receivables:
+          type: boolean
+          description: Set as `true` if the card account is set as default for Accounts Receivable operations
+        funding:
+          type: boolean
+          description: Set as `true` if the card account is set as default for funding
+        disbursement:
+          type: boolean
+          description: Set as `true` if the card account is set as default for disbursement
+      description: Card Account Response Default.
+    OrganizationBankAccountUserStatus:
+      type: string
+      description: Bank account user verification status.
+      enum:
+      - UNVERIFIED
+      - NOMINATED
+      - VERIFIED
+      - UNDEFINED
+    ListOrganizationBankAccountUserResponseDto:
+      type: object
+      description: Get list of bank account users response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_OrganizationBankAccountUserResponseDto_'
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    ListOrganizationBankAccountResponseDto:
+      type: object
+      description: Get list of bank accounts response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_OrganizationBankAccountResponseDto_'
+    FundingPurpose:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Purpose category
+        subCategories:
+          type: array
+          description: Purpose sub-category
+          items:
+            type: string
+      description: Funding purpose.
+    CardAccountExpiration:
+      type: object
+      properties:
+        year:
+          type: string
+          description: Card expiration year
+        month:
+          type: string
+          description: Card expiration month
+      description: Card Account response Expiration.
+    StatusDto:
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ResponseStatus'
+          - description: Request status
+      description: The type Delete response dto.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    ListOrganizationCardAccountUserResponseDto:
+      type: object
+      description: Get list of card account users response.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_OrganizationCardAccountUserResponseDto_'
+    FundingAccountPermissionResponseDto:
+      type: object
+      properties:
+        organization:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationPermission'
+          - description: Funding account permissions available for the current organization
+        user:
+          allOf:
+          - $ref: '#/components/schemas/UserPermission'
+          - description: Funding account permissions available for the current user
+      description: Funding Account Permission response DTO.
+    OrganizationBankAccountDefault:
+      type: object
+      properties:
+        payables:
+          type: boolean
+          description: Set as `true` if the bank account is set as default for Accounts Payable operations
+        receivables:
+          type: boolean
+          description: Set as `true` if the bank account is set as default for Accounts Receivable operations
+      description: Bank account defaults.
+    APCardResponseDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the AP Card. The value begins with `dva`.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/APCardStatus'
+          - description: AP Card status.
+        nameOnAccount:
+          type: string
+          description: Full name on the AP Card
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        balance:
+          type: number
+          description: AP Card available balance
+        limit:
+          type: number
+          description: AP Card spending limit
+      description: AP Card response DTO.
+    OrganizationBankAccountUserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bank account user. The value begins with `bau`.
+        bankAccountId:
+          type: string
+          description: BILL-generated ID of the bank account. The value begins with `bac`.
+        userId:
+          type: string
+          description: BILL-generated ID of the user. The value begins with `006`.
+        archived:
+          type: boolean
+          description: Set as `true` if the bank account user is archived
+        verificationStatus:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationBankAccountUserStatus'
+          - description: Bank account user verification status.
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+      description: Bank account user response.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

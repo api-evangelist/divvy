@@ -1,0 +1,1703 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Transactions API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Transactions
+paths:
+  /v3/spend/transactions:
+    get:
+      tags:
+      - Transactions
+      summary: Get list of transactions
+      description: 'Get a list of transaction objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 50 results on one page.
+
+
+        In the response, you get information about transactions, reversals, and refunds.
+
+        * **Transaction**: For a standard transaction, the `transactionType` is set as `AUTHORIZATION` or `DECLINE`. The status is updated to `CLEAR` once BILL moves the money from the funding account. The `CLEAR` transactions receive a new ID and reference to the original `AUTHORIZATION` transaction via the `originalAuthTransactionUuid` field.
+
+        * **Reversal**: For a reversal (a cancellation before funds are settled), the `transactionType` remains `AUTHORIZATION`, but the `amount` is typically a negative value.
+
+        * **Refund**: For a refund (a cancellation after funds are settled), the `transactionType` is set to `CLEAR` and the `amount` is a negative value.
+
+
+        **Note**: Only parent transactions are available in the response.'
+      operationId: listTransactions
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 50
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. You can set only one sort field.
+
+
+            The format is `sort={field}:{sort_order}`.
+
+
+            The sortable fields are:
+
+            - `amount`
+
+            - `merchantName`
+
+            - `occurredTime`'
+          example: occurredTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: "Field name, operator, and value. You can set multiple filters.\n\nThe format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.\n\nExample: `filters=cardId:eq:MyCardID,userId:in:\"123,456\"`\n\nThe filterable fields are:\n - `cardId` - List of string IDs or UUIDs. Operators: `eq`, `in`.\n - `merchantName` - String. Operators: `eq`.\n - `userId` - List of string IDs or UUIDs. Operators: `eq`, `in`.\n - `budgetId` - List of string IDs or UUIDs. Operators: `eq`, `in`.\n - `fees` - Number with 2 decimal places. Operators: `lte`, `gte`.\n - `transactionIds` - List of string IDs or UUIDs. Operators: `eq`, `in`.\n - `customFieldIds` - List of string IDs or UUIDs. Operators: `eq`, `in`.\n - `customFieldValueIds` - List of string IDs or UUIDs. Operators: `eq`, `in`. **Note**: Use `customFieldIds` and `customFieldValueIds` to filter transactions based on custom fields. Use the `showCustomFieldIds` query parameter to control which custom fields are shown for each transaction.\n - `receiptStatus` - `VALIDATED`, `NOT_VALIDATED`, `ATTACHED`, `MISSING`, `NOT_REQUIRED`, `NOT_ATTACHED`. Operators: `eq`, `ne`, `in`, `nin`.\n - `type` - `CLEAR`, `DECLINE`, `AUTHORIZATION`, `OTHER`. Operators: `eq`, `ne`, `in`, `nin`. **Deprecated**: use `transactionType`.\n - `transactionType` - `CLEAR`, `DECLINE`, `AUTHORIZATION`, `OTHER`. Operators: `eq`, `ne`, `in`, `nin`.\n - `occurredTime` - DateTime. Operators: `lte`, `gte`.\n - `authorizedTime` - DateTime. Operators: `lte`, `gte`.\n - `updatedTime` - DateTime. Operators: `lte`, `gte`.\n - `isLocked` - `true` or `false`. Operators: `eq`.\n - `complete` - `true` or `false`. Operators: `eq`.\n - `amount` - Number with 2 decimal places. Operators: `lte`, `gte`.\n - `isReviewed` - `true` or `false`. Operators: `eq`.\n - `syncStatus` - `PENDING`, `SYNCED`, `ERROR`, `MANUAL_SYNCED`, `NOT_SYNCED`. Operators: `eq`, `ne`, `in`, `nin`."
+          example: amount:gte:100.00
+      - name: showCustomFieldIds
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'List of BILL-generated IDs of custom fields to be displayed for each transaction. Set the IDs as comma-separated values. By default, all the custom fields are displayed for all transactions.
+
+
+            **NOTE**: Use `customFieldIds` and `customFieldValueIds` to filter transactions based on custom fields.'
+      - name: includeReceipts
+        in: query
+        schema:
+          type:
+          - boolean
+          - 'null'
+          description: Set as `true` to include transaction receipts in the response. By default, receipts are not included in the response.
+          example: true
+      responses:
+        '200':
+          description: Get list of transactions response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/receipt-upload-url:
+    post:
+      tags:
+      - Transactions
+      summary: Create a transaction upload URL
+      description: 'Create a transaction image upload URL.
+
+
+        From the response, use the upload `url` to upload a receipt image for the transaction. For example, to upload a JPEG image, use the following `curl` command. To upload a PNG image, set the content type as `image/png`.
+
+
+        ```
+
+        curl ''{upload_url}''
+
+        -H ''Content-Type: image/jpeg''
+
+        --upload-file {file_name_with_extension}
+
+        ```
+
+
+        **Note**: BILL supports JPG and PNG file formats for transaction images.
+
+
+        See Transactions in the Guides section for more information, sample requests, and responses.'
+      operationId: createReceiptUploadUrl
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      responses:
+        '200':
+          description: Create a transaction upload URL response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReimbursementImageUploadUrlResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{acsTransactionId}/3ds-challenge:
+    post:
+      tags:
+      - Transactions
+      summary: Accept or reject a transaction
+      description: 'Accept or reject a transaction 3D Secure (3DS) challenge.
+
+
+        When a transaction is created, a 3DS challenge may trigger to verify the identity of the cardholder. Use this endpoint to approve or deny the transaction. The Spend & Expense user must have the `ADMIN` user role to perform this operation.
+
+
+        Subscribe to the `spend.three-ds-challenge.created` event to get a webhook notification when a 3DS challenge is triggered for a transaction. See Spend & Expense 3DS challenge notification payload for more information.
+
+
+        See 3-D Secure - BILL Spend & Expense in the BILL Help Center to learn more about 3D Secure at BILL.'
+      operationId: threeDsChallenge
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: acsTransactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction. You receive this transaction ID in the `spend.three-ds-challenge.created` webhook notification.
+          example: '{{se_transaction_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreeDsRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Accept or reject a transaction response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreeDsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{transactionId}:
+    get:
+      tags:
+      - Transactions
+      summary: Get transaction details
+      description: 'Get details about an existing transaction.
+
+
+        In the response, you get information about transactions, reversals, and refunds.
+
+        * **Transaction**: For a standard transaction, the `transactionType` is set as `AUTHORIZATION` or `DECLINE`. The status is updated to `CLEAR` once BILL moves the money from the funding account. The `CLEAR` transactions receive a new ID and reference to the original `AUTHORIZATION` transaction via the `originalAuthTransactionUuid` field.
+
+        * **Reversal**: For a reversal (a cancellation before funds are settled), the `transactionType` remains `AUTHORIZATION`, but the `amount` is typically a negative value.
+
+        * **Refund**: For a refund (a cancellation after funds are settled), the `transactionType` is set to `CLEAR` and the `amount` is a negative value.'
+      operationId: getTransaction
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      - name: showCustomFieldIds
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: List of BILL-generated IDs or UUIDs of custom fields. Set the IDs or UUIDs as comma-separated values.
+          example: '{{se_custom_field_uuid}}'
+      responses:
+        '200':
+          description: Get transaction details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Transactions
+      summary: Update a transaction
+      description: Update the budget for an existing transaction.
+      operationId: updateTransaction
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTxRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a transaction response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{transactionId}/custom-fields:
+    get:
+      tags:
+      - Transactions
+      summary: Get list of transaction custom fields
+      description: Get a list of custom field objects applied to an existing transaction.
+      operationId: listTransactionCustomFields
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: "Field name, operator, and value. You can set multiple filters.\n\nThe format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.\n\nExample: `filters=customFieldIds:in:\"abc,def\"`\n\nThe filterable fields are:\n - `customFieldIds` - List of string IDs or UUIDs. Operators: `eq`, `in`."
+          example: customFieldIds:eq:{{se_custom_field_uuid}}
+      responses:
+        '200':
+          description: Get list of transaction custom fields response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTransactionCustomFieldResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Transactions
+      summary: Update transaction custom fields
+      description: 'Update details about custom fields and their values applied to an existing transaction.
+
+
+        You cannot update custom fields in a locked transaction. When a transaction is locked, `isLocked` is set as `true`. You can get information about your transactions with `GET /v3/spend/transactions` or `GET /v3/spend/transactions/{transactionId}.
+
+
+        See Lock or unlock custom fields for a transaction in the BILL Help Center for more information.'
+      operationId: updateTransactionCustomFields
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUpdateTxCustomFieldRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update transaction custom fields response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpendStatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{transactionId}/custom-fields/{customFieldId}/values:
+    get:
+      tags:
+      - Transactions
+      summary: Get list of transaction custom field values
+      description: Get a list of custom field value objects applied to an existing transaction. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+      operationId: listTransactionCustomFieldValues
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      - name: customFieldId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+          example: '{{se_custom_field_uuid}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      responses:
+        '200':
+          description: Get list of transaction custom field value response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTxCFValueResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{transactionId}/receipts:
+    post:
+      tags:
+      - Transactions
+      summary: Add a transaction receipt
+      description: 'Add a receipt to an existing transaction.
+
+
+        In the request, use the same upload `url` that you used to upload the receipt image. See Create a transaction upload URL to learn about creating a transaction image upload URL.'
+      operationId: addTransactionReceipt
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionReceiptRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Add a transaction receipt response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReceiptImage'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/transactions/{transactionId}/receipts/{receiptId}:
+    delete:
+      tags:
+      - Transactions
+      summary: Delete a transaction receipt
+      description: Delete a receipt from an existing transaction. A deleted receipt cannot be restored. The deleted receipt is not available in the transaction details.
+      operationId: deleteTransactionReceipt
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the transaction
+          example: '{{se_transaction_uuid}}'
+      - name: receiptId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated UUID of the transaction receipt
+          example: '{{se_transaction_receipt_uuid}}'
+      responses:
+        '200':
+          description: Delete a transaction receipt response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    UpdateCustomFieldDto:
+      required:
+      - customFieldId
+      type: object
+      properties:
+        customFieldId:
+          type: string
+          description: BILL-generated ID or UUID of the custom field
+        selectedValues:
+          type: array
+          description: 'List of selected custom field values. Set the custom field value ID or UUID values.
+
+
+            **Note**: Clear the `selectedValues` array to clear all the custom field selected values.'
+          items:
+            type: string
+        note:
+          type: string
+          description: 'Updated custom field note.
+
+
+            **Note**: This field is available only for custom fields with `type` set as `NOTE`.'
+      description: Set custom fields in transactions \& reimbursements.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    UpdateTxRequestDto:
+      required:
+      - budgetId
+      type: object
+      properties:
+        budgetId:
+          type: string
+          description: BILL-generated ID or UUID of the budget linked with the transaction
+      description: Update a transaction
+      example:
+        budgetId: '{{se_budget_uuid}}'
+    CurrencyData:
+      type: object
+      properties:
+        exchangeRate:
+          type: number
+          description: Exchange rate for currency conversion
+        exponent:
+          type: integer
+          description: Number of decimal places in the currency format
+          format: int64
+        originalCurrencyAmount:
+          type: string
+          description: Transaction amount in the original currency before conversion
+        originalCurrencyCode:
+          type: string
+          description: Three-letter ISO currency code of the original currency
+        symbol:
+          type: string
+          description: Currency symbol for display purposes (e.g. $, €, £)
+      description: CurrencyData class for Spend \& Expense Transactions.
+    DisputeStatusType:
+      type: string
+      description: Dispute status enum for Spend \& Expense Transactions.
+      enum:
+      - SUBMITTED
+      - IN_PROGRESS
+      - CLOSED_WON
+      - CLOSED_LOST
+    PaginationResponseDto_TransactionResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/TransactionResponseDto'
+      description: Response from a list API request with paging references.
+    ThreeDsResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the 3D Secure response
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ThreeDsChallengeStatus'
+          - description: 3D Secure challenge status
+      description: Response dto for three ds response.
+    ThreeDsChallengeStatus:
+      type: string
+      description: Enum representing the status of a 3D Secure (3DS) challenge.
+      enum:
+      - SKIPPED
+      - PENDING
+      - SENT
+      - ACCEPTED
+      - REJECTED
+      - CANCELLED
+      - TIMED_OUT
+      - FAILED
+      - UNDEFINED
+    TransactionType:
+      type: string
+      description: TransactionType.
+      enum:
+      - CLEAR
+      - DECLINE
+      - AUTHORIZATION
+      - OTHER
+    CustomFieldValueDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the custom field value
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the custom field value
+        value:
+          type: string
+          description: Custom field value
+      description: Custom field value DTO object representing the custom field value return on Custom fields for transactions and reimbursements.
+    PaginatedTransactionsResponseDto:
+      type: object
+      description: List of transactions with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_TransactionResponseDto_'
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    ReimbursementImageUploadUrlResponseDto:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Pre-signed URL for uploading a receipt
+      description: API response for creating a reimbursement image upload URL.
+    PaginatedTxCFValueResponseDto:
+      type: object
+      description: List of transaction custom field values with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_CustomFieldValueDto_'
+    TxMerchantLocationDto:
+      type: object
+      properties:
+        city:
+          type: string
+          description: Merchant city
+        state:
+          type: string
+          description: Merchant state or region
+        postalCode:
+          type: string
+          description: Merchant zip or postal code
+        country:
+          type: string
+          description: Merchant country
+      description: Transaction merchant address info.
+    ReceiptImage:
+      required:
+      - filename
+      - url
+      - uuid
+      type: object
+      properties:
+        url:
+          minLength: 1
+          type: string
+          description: Uploaded receipt URL
+        filename:
+          minLength: 1
+          type: string
+          description: Receipt file name
+        uuid:
+          minLength: 1
+          type: string
+          description: BILL-generated UUID for the receipt image
+      description: DTO representing an image from the Spend API.
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    ApproverType:
+      type: string
+      description: Spend \& Expense transactions approver type.
+      enum:
+      - ADMIN
+      - MANAGER
+      - NEXT_MANAGER
+      - BUDGET_OWNER
+      - BOOKKEEPER
+      - SPECIFIC_PERSON
+    ListTransactionCustomFieldResponseDto:
+      type: object
+      properties:
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/CustomFieldDto'
+      description: Transaction custom field response list.
+    ThreeDsActionType:
+      type: string
+      description: Enum representing the action type for 3D Secure (3DS) transactions.
+      enum:
+      - ACCEPT
+      - REJECT
+    Reviewer:
+      type: object
+      properties:
+        approverType:
+          allOf:
+          - $ref: '#/components/schemas/ApproverType'
+          - description: Approver type.
+        reviewedTime:
+          type: string
+          description: Transaction review date and time
+          format: date-time
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TransactionReviewerStatusType'
+          - description: Review status.
+        userId:
+          type: string
+          description: BILL-generated ID of the user assigned to review the transaction
+          deprecated: true
+        userUuid:
+          type: string
+          description: BILL-generated UUID of the user assigned to review the transaction
+        userName:
+          type: string
+          description: Display name of the user assigned to review the transaction
+      description: Spend \& Expense transactions reviewer information.
+    TransactionReviewerStatusType:
+      type: string
+      description: Spend \& Expense transactions reviewer status type.
+      enum:
+      - WAITING
+      - APPROVED
+      - DENIED
+    ReceiptSyncStatusType:
+      type: string
+      description: ReceiptSyncStatusType enum for Spend \& Expense Transactions.
+      enum:
+      - NOT_SYNCED
+      - SYNCED
+      - SYNC_ERROR
+      - NO_ATTACHMENTS
+    CardType:
+      type: string
+      description: CardType.
+      enum:
+      - PHYSICAL
+      - VIRTUAL_MEMBER
+      - VIRTUAL_VENDOR
+      - VIRTUAL
+    CustomFieldDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the custom field
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the custom field
+        name:
+          type: string
+          description: Custom field name
+        note:
+          type: string
+          description: Custom field note
+        isRequired:
+          type: boolean
+          description: Set as `true` if the custom field is required
+        selectedValues:
+          type: array
+          description: 'List of selected values for this custom field.
+
+
+            **NOTE**: In the response, you get up to 20 selected values for a custom field. Use `GET /v3/spend/custom-fields/{customFieldId}/values` to get the complete list of selected values.'
+          items:
+            $ref: '#/components/schemas/CustomFieldValueDto'
+      description: Transaction custom field response.
+    TransactionReceiptRequestDto:
+      required:
+      - url
+      type: object
+      properties:
+        url:
+          minLength: 1
+          type: string
+          description: Uploaded receipt URL
+      description: Add a transaction receipt
+      example:
+        url: '{{se_transaction_url}}'
+    SpendStatusDto:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the request, e.g. "SUCCESS"
+      description: Simple DTO to respond to requests with a status of "success".
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    BulkUpdateTxCustomFieldRequestDto:
+      required:
+      - customFields
+      type: object
+      properties:
+        customFields:
+          minItems: 1
+          type: array
+          description: List of custom field and value updates
+          items:
+            $ref: '#/components/schemas/UpdateCustomFieldDto'
+      description: Transaction Custom Fields update request dto.
+    ThreeDsRequestDto:
+      required:
+      - action
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ThreeDsActionType'
+          - description: 3D Secure action. Set this field as `ACCEPT` or `REJECT`.
+            example: ACCEPT
+      description: ThreeDsRequestDto represents a request for 3D Secure actions.
+    PaginationResponseDto_CustomFieldValueDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/CustomFieldValueDto'
+      description: Response from a list API request with paging references.
+    AccountingIntegrationTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the transaction in your accounting system
+        billable:
+          type: boolean
+          description: Set as `true` if the transaction can be billed to a client or customer
+        integrationTxId:
+          type: string
+          description: Unique transaction ID in your accounting system
+        syncStatus:
+          type: string
+          description: Current sync status of the transaction with your accounting system
+        syncMessage:
+          type: string
+          description: Message describing the result of the previous sync attempt
+        integrationType:
+          type: string
+          description: Accounting system integration type
+        integrationId:
+          type: string
+          description: BILL-generated ID of the accounting system integration
+        syncRequestId:
+          type: string
+          description: Unique ID of the sync request that processed the transaction
+      description: Spend \& Expense accounting integration transaction information.
+    ProgramNetworkType:
+      type: string
+      description: ProgramNetworkType enum for Spend \& Expense Transactions.
+      enum:
+      - VISA
+      - MASTERCARD
+    TransactionStatusTagType:
+      type: string
+      description: StatusTag enum for Spend \& Expense Transactions.
+      enum:
+      - APPROVED
+      - COMPLETE
+      - DECLINED
+      - DENIED
+      - DISPUTE_LOST
+      - DISPUTE_UPDATE
+      - DISPUTE_WON
+      - DISPUTED
+      - DO_NOT_SYNC
+      - INCOMPLETE
+      - NONE
+      - PENDING
+      - PTR_INCOMPLETE
+      - PTR_NEEDS_YOUR_APPROVAL
+      - PTR_PENDING_APPROVAL
+      - PTR_UPCOMING_APPROVAL
+      - REVIEWED
+    TransactionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the transaction
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the transaction
+        childTransactionIds:
+          type: array
+          description: BILL-generated IDs of child transactions associated with the current transaction
+          deprecated: true
+          items:
+            type: string
+        childTransactionUuids:
+          type: array
+          description: BILL-generated IDs of child transactions associated with the current transaction
+          items:
+            type: string
+        isLocked:
+          type: boolean
+          description: Set as `true` if the transaction is locked
+        isReconciled:
+          type: boolean
+          description: Set as `true` if the transaction is reconciled
+        transactionType:
+          allOf:
+          - $ref: '#/components/schemas/TransactionType'
+          - description: Transaction type.
+        parentTransactionId:
+          type: string
+          description: BILL-generated ID of the parent transaction. This field is set on child transactions when a parent transaction is split.
+          deprecated: true
+        userId:
+          type: string
+          description: BILL-generated ID of the user who created the transaction
+          deprecated: true
+        userUuid:
+          type: string
+          description: BILL-generated UUID of the user who created the transaction
+        userName:
+          type: string
+          description: Display name of the user who created the transaction
+        rawMerchantName:
+          type: string
+          description: Raw merchant name for the transaction
+        merchantName:
+          type: string
+          description: Readable (cleaned) merchant name for the transaction
+        budgetId:
+          type: string
+          description: BILL-generated ID of the budget linked with the transaction
+          deprecated: true
+        budgetUuid:
+          type: string
+          description: BILL-generated UUID of the budget linked with the transaction
+        budgetName:
+          type: string
+          description: Name of the budget linked with the transaction
+        parentBudgetUuid:
+          type: string
+          description: BILL-generated UUID of the parent budget linked with the transaction
+        originalAuthTransactionId:
+          type: string
+          description: BILL-generated ID of the originating authorization transaction
+          deprecated: true
+        originalAuthTransactionUuid:
+          type: string
+          description: 'BILL-generated UUID of the originating authorization transaction.
+
+
+            After a transaction is authorized, it is set as cleared when it is complete. The `originalAuthTransactionUuid` ties the cleared transaction to the authorized transaction. The value is `null` when the transaction is not authorized.'
+        isCredit:
+          type: boolean
+          description: Set as `true` if the transaction is a credit
+        currencyData:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyData'
+          - description: Transaction currency information
+        receiptRequired:
+          type: boolean
+          description: Set as `true` if a receipt is required to complete the transaction
+        reviewRequired:
+          type: boolean
+          description: Set as `true` if a review is required to complete the transaction
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TransactionStatusTagType'
+          - description: Transaction status
+        occurredTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        authorizedTime:
+          type: string
+          description: Transaction authorized date and time
+          format: date-time
+        complete:
+          type: boolean
+          description: Set as `true` if the transaction has all the required fields completed
+        pointsAwarded:
+          type: integer
+          description: 'Points awarded for the transaction. This value is `0` until the transaction is cleared.
+
+
+            **Note**: Only `ADMIN` users can view any awarded points.'
+          format: int64
+        customFields:
+          type: array
+          description: Transaction custom fields information
+          items:
+            $ref: '#/components/schemas/CustomFieldDto'
+        receipts:
+          type: array
+          description: List of receipts attached to the transaction
+          items:
+            $ref: '#/components/schemas/ReceiptImage'
+        network:
+          allOf:
+          - $ref: '#/components/schemas/ProgramNetworkType'
+          - description: Transaction network type.
+        isParent:
+          type: boolean
+          description: Set as `true` if the transaction is the parent of another transaction
+        reviews:
+          type: array
+          description: Transaction review information
+          items:
+            $ref: '#/components/schemas/Review'
+        amount:
+          type: number
+          description: 'Transaction amount including fees.
+
+
+            When `amount` is negative, the transaction is a reversal or refund.
+
+            * **Reversal**: For a reversal (cancel before funds are settled), `transactionType` is set as `AUTHORIZATION` and `amount` is a negative value.
+
+            * **Refund**: For a refund (cancel after funds are settled), `transactionType` is set as `CLEAR` and `amount` is a negative value.'
+        transactedAmount:
+          type: number
+          description: Transaction amount not including fees
+        fees:
+          type: number
+          description: Sum of transaction fees (including `foreignExchangeFee`)
+        foreignExchangeFee:
+          type: number
+          description: Foreign exchange fee for the transaction (if any)
+        receiptStatus:
+          allOf:
+          - $ref: '#/components/schemas/ReceiptStatusType'
+          - description: Receipt status.
+        matchedClearTransactionId:
+          type: string
+          description: BILL-generated ID of the cleared transaction. Use this ID to identify the transaction after it is cleared.
+          deprecated: true
+        matchedClearTransactionUuid:
+          type: string
+          description: BILL-generated UUID of the cleared transaction. Use this ID to identify the transaction after it is cleared.
+        accountingIntegrationTransactions:
+          type: array
+          description: Accounting system integration information
+          items:
+            $ref: '#/components/schemas/AccountingIntegrationTransaction'
+        reviewers:
+          type: array
+          description: Transaction reviewers information
+          items:
+            $ref: '#/components/schemas/Reviewer'
+        cardId:
+          type: string
+          description: BILL-generated ID of the card used to make the transaction
+          deprecated: true
+        cardUuid:
+          type: string
+          description: BILL-generated UUID of the card used to make the transaction
+        cardLastFour:
+          type: string
+          description: Last four digits of the card number used to make the transaction
+        cardType:
+          allOf:
+          - $ref: '#/components/schemas/CardType'
+          - description: Type of the card used to make the transaction
+        receiptSyncStatus:
+          allOf:
+          - $ref: '#/components/schemas/ReceiptSyncStatusType'
+          - description: Transaction receipt sync status.
+        merchantCategoryCode:
+          type: string
+          description: Merchant category code
+        declineReason:
+          type: string
+          description: Human-readable transaction decline reason. This field is available when `transactionType` is set as `DECLINE`.
+        declineInternalReasonCode:
+          type: string
+          description: Transaction decline reason code. This field is available when `transactionType` is set as `DECLINE`.
+        cardPresent:
+          type: boolean
+          description: Set as `true` if a physical card was present for the transaction
+        merchantLocation:
+          allOf:
+          - $ref: '#/components/schemas/TxMerchantLocationDto'
+          - description: Merchant location information for the transaction. This information is available when `cardPresent` is set as `true`.
+        disputeStatus:
+          allOf:
+          - $ref: '#/components/schemas/DisputeStatusType'
+          - description: Dispute status for the transaction. This information is available when the transaction has been disputed.
+      description: Transactions response.
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the review
+        isApproved:
+          type: boolean
+          description: Set as `true` if the transaction was approved
+        note:
+          type: string
+          description: Review note
+        createdTime:
+          type: string
+          description: Review created date and time
+          format: date-time
+        deletedTime:
+          type: string
+          description: Review deleted date and time (if available)
+          format: date-time
+        reviewerId:
+          type: string
+          description: BILL-generated ID of the user who reviewed the transaction
+          deprecated: true
+        reviewerUuid:
+          type: string
+          description: BILL-generated UUID of the user who reviewed the transaction
+      description: Review class for Spend \& Expense Transactions.
+    ReceiptStatusType:
+      type: string
+      description: ReceiptStatusType enum for Spend \& Expense Transactions.
+      enum:
+      - VALIDATED
+      - NOT_VALIDATED
+      - ATTACHED
+      - MISSING
+      - NOT_REQUIRED
+      - NOT_ATTACHED
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

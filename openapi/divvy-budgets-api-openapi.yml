@@ -1,0 +1,1576 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Budgets API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Budgets
+paths:
+  /v3/spend/budgets:
+    get:
+      tags:
+      - Budgets
+      summary: Get list of budgets
+      description: Get a list of budget objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+      operationId: listBudgets
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. You can set only one sort field.
+
+
+            The format is `sort={field}:{sort_order}`.
+
+
+            The sortable fields are:
+
+            - `name`
+
+            - `assigned`
+
+            - `limit`
+
+            - `spent`'
+          example: spent:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. You can set multiple filters.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.
+
+
+            Example: `filters=isBudgetGroup:eq:false,budgetIds:in:"abc,def"`
+
+
+            The filterable fields are:
+
+            - `isBudgetGroup` - `true` or `false`. Operators: `eq`.
+
+            - `budgetIds` - List of string IDs or UUIDs. Operators: `eq`, `in`.
+
+            - `parentBudgetId` - String ID or UUID. Operators: `eq`.
+
+            - `name` - String. Operators: `eq`, `sw`.
+
+            - `retired` - `true` or `false`. Operators: `eq`.'
+          example: budgetIds:eq:{{se_budget_uuid}}
+      responses:
+        '200':
+          description: Get list of budgets response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBudgetsResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Budgets
+      summary: Create a budget
+      description: 'Create a new budget for a company.
+
+
+        See Budgets and Users in the Guides section for more information, sample requests, and responses.'
+      operationId: createBudget
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetCreateDto'
+        required: true
+      responses:
+        '200':
+          description: Create a budget response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/budgets/{budgetId}:
+    get:
+      tags:
+      - Budgets
+      summary: Get budget details
+      description: Get details about an existing budget.
+      operationId: getBudget
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      responses:
+        '200':
+          description: Get budget details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Budgets
+      summary: Delete a budget
+      description: 'Delete an existing budget. A deleted budget cannot be restored. The deleted budget is not available in the list of budgets.
+
+
+        **Note**:
+
+        * While you cannot restore a deleted budget with the API, you can unretire budgets in the BILL web app and mobile app. An unretired budget is active and is available for use.
+
+        * A one-time budget can be unretired at any time. A `recurringInterval` budget can be unretired within one interval. For example, if a `MONTHLY` budget is retired in January, you can unretire it in February. You cannot unretire this budget in March or any later month.'
+      operationId: deleteBudget
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      responses:
+        '200':
+          description: Delete a budget response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Budgets
+      summary: Update a budget
+      description: Update details about an existing budget.
+      operationId: updateBudget
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetUpdateDto'
+        required: true
+      responses:
+        '200':
+          description: Update a budget response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/budgets/{budgetId}/members:
+    get:
+      tags:
+      - Budgets
+      summary: Get list of budget members
+      description: Get a list of user members assigned to an existing budget. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+      operationId: listBudgetMembers
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int64
+          example: 10
+      - name: nextPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set this field as the `nextPage` value for navigation.'
+      - name: prevPage
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Previous page of results. Set this field as the `prevPage` value for navigation.
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. You can set only one sort field.
+
+
+            The format is `sort={field}:{sort_order}`.
+
+
+            The sortable fields are:
+
+            - `name`
+
+            - `spent`'
+          example: spent:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. You can set multiple filters.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.
+
+
+            Example: `filters=retired:eq:true`
+
+
+            The filterable fields are:
+
+            - `retired` - `true` or `false`. Operators: `eq`.'
+          example: retired:eq:false
+      responses:
+        '200':
+          description: Get list of budget members response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBudgetMemberResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/budgets/{budgetId}/members/bulk:
+    put:
+      tags:
+      - Budgets
+      summary: Update multiple budget members
+      description: Update details about multiple user members assigned to an existing budget.
+      operationId: upsertBulkBudgetUsers
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetMemberBulkUpsertRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple budget members response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpendStatusDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/spend/budgets/{budgetId}/members/{userId}:
+    get:
+      tags:
+      - Budgets
+      summary: Get budget member details
+      description: Get details about a user member assigned to an existing budget.
+      operationId: getBudgetMember
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the user
+          example: '{{se_user_uuid}}'
+      responses:
+        '200':
+          description: Get budget member details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetMemberResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Budgets
+      summary: Add or update a budget member
+      description: Add a new user member to an existing budget. You can also update details about an existing user member assigned to the budget.
+      operationId: upsertBudgetMember
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the user
+          example: '{{se_user_uuid}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetMemberUpsertRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Add or update a budget member response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetMemberResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Budgets
+      summary: Delete a budget member
+      description: Delete a user member from an existing budget.
+      operationId: deleteBudgetMember
+      parameters:
+      - name: apiToken
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Access token for Spend & Expense API authentication
+          example: '{{api_token}}'
+      - name: budgetId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the budget
+          example: '{{se_budget_uuid}}'
+      - name: userId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID or UUID of the user
+          example: '{{se_user_uuid}}'
+      responses:
+        '200':
+          description: Delete a budget member response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    BudgetPeriodSpentAmountsDto:
+      type: object
+      properties:
+        cleared:
+          type: number
+          description: Sum of cleared transactions
+        pending:
+          type: number
+          description: Sum of pending transactions
+        total:
+          type: number
+          description: Sum of all transactions (`cleared + pending`)
+      description: Class representing spent amounts for a budget period.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    BudgetPeriodDto:
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Budget period start date
+          format: date
+        endDate:
+          type: string
+          description: Budget period end date
+          format: date
+        limit:
+          type: number
+          description: Budget period spend limit
+        overspendBuffer:
+          type: number
+          description: Spend amount allowed above the budget limit before transactions are declined
+        assigned:
+          type: number
+          description: Total amount assigned to users and vendor cards
+        spent:
+          allOf:
+          - $ref: '#/components/schemas/BudgetPeriodSpentAmountsDto'
+          - description: Budget period amount spent information
+      description: Class representing a budget's current budget period.
+    PeriodIntervalType:
+      type: string
+      description: PeriodIntervalType.
+      enum:
+      - NONE
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+    PaginationResponseDto_BudgetResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/BudgetResponseDto'
+      description: Response from a list API request with paging references.
+    BudgetShareFundsType:
+      type: string
+      description: BudgetShareFundsType.
+      enum:
+      - DO_NOT_SHARE
+      - SHARE_MANUALLY
+      - SHARE_WITH_ALL_OWNERS
+      - SHARE_WITH_ALL_MEMBERS
+      - SHARE_ALL_OWNERS_BUT_MEMBERS_MANUALLY
+    BudgetMemberResponseDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: BILL-generated ID of the user
+          deprecated: true
+        userUuid:
+          type: string
+          description: BILL-generated UUID of the user
+        spent:
+          type: number
+          description: Total amount spent by the user in the current budget period
+        limit:
+          type: number
+          description: Funds assigned to the user in the current budget period
+        recurringLimit:
+          type: number
+          description: Funds assigned to the user in all future budget periods
+        recurring:
+          type: boolean
+          description: Set as `true` if the user receives the `recurringLimit` funds in all future budget periods.
+        budgetRole:
+          allOf:
+          - $ref: '#/components/schemas/BudgetRoleType'
+          - description: Budget user role
+        name:
+          type: string
+          description: User display name
+        retired:
+          type: boolean
+          description: Set as `true` if the budget member is retired
+        shareBudgetFunds:
+          type: boolean
+          description: Set as `true` if all the budget funds are shared with the user
+      description: Budget members response.
+    PaginatedBudgetsResponseDto:
+      type: object
+      description: List of budgets with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_BudgetResponseDto_'
+    BudgetUpdateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Budget name
+        description:
+          type: string
+          description: Budget description
+        expirationDate:
+          type:
+          - string
+          - 'null'
+          description: Budget expiration date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        recurringInterval:
+          allOf:
+          - $ref: '#/components/schemas/PeriodIntervalType'
+          - description: 'Interval after which the budget is reset. By default, BILL uses the timezone of the company''s billing address to reset a budget at 12 AM.
+
+              * `NONE`: Never
+
+              * `DAILY`: Each day at 12 AM
+
+              * `WEEKLY`: Each Monday at 12 AM
+
+              * `MONTHLY`: On the 1st of every month at 12 AM
+
+              * `QUARTERLY`: Once every 3 months, on the 1st of the month at 12 AM. Set the first month with `recurMonth`.
+
+              * `YEARLY`: Once every year, on the 1st of the month at 12 AM. Set the month with `recurMonth`.'
+        recurMonth:
+          maximum: 12
+          minimum: 1
+          type: integer
+          description: The month in which the budget will recur. Set this field only when `recurringInterval` is set as `QUARTERLY` or `YEARLY`. The default value is the current month.
+          format: int64
+        timezone:
+          type: string
+          description: 'Timezone in which the budget funds are reset. The default value is the timezone of the company''s billing address.
+
+
+            Set this field in the `US/{time_zone}` format. For example, `US/Pacific` or `US/Mountain`.'
+        autoAddUsers:
+          type: boolean
+          description: Set as `true` to automatically add all new users to this budget
+        receiptRequired:
+          type: boolean
+          description: Set as `true` if a receipt is required for transactions in the budget
+        maxTxSize:
+          type: number
+          description: Maximum transaction size in the budget. Any single transaction for an amount greater than `maxTxSize` will be declined.
+        carryOver:
+          type: boolean
+          description: Set as `true` for any budget funds assigned to users and vendor cards to carry over from one budget period to the next. The budget period is set with `recurringInterval`.
+        limitlessOverspend:
+          type: boolean
+          description: 'Set as `true` for enabling spend amounts over the budget limit.
+
+
+            **Note**: You cannot set this field as `true` for budgets with `recurringInterval` set as
+
+            `DAILY` or `WEEKLY`.'
+        limit:
+          type: number
+          description: 'Spend limit for the initial budget period.
+
+
+            **Note**: This field is required unless `limitlessOverspend` is set as `true`.'
+        limitlessGoal:
+          type: number
+          description: 'Spend goal for a limitless budget.
+
+
+            **Note**: You can set this field when `limitlessOverspend` is set as `true`.'
+        recurringLimit:
+          type: number
+          description: 'Spend limit for all future budget periods.
+
+
+            **Note**: This field is required when `recurringInterval` is set as any value other than `NONE`.'
+        overspendBuffer:
+          type: number
+          description: 'Spend amount allowed above the budget limit before transactions are declined.
+
+
+            **Note**: You cannot set this field when `limitlessOverspend` is set as `true` or for budgets with `recurringInterval` as `DAILY` or `WEEKLY`.'
+        shareFunds:
+          allOf:
+          - $ref: '#/components/schemas/EditBudgetShareFundsType'
+          - description: Rule for how the budget funds are shared with budget members. The default value is `SHARE_MANUALLY`.
+      description: Update a budget (limit updated)
+      example:
+        limit: 300
+    BudgetMemberBulkUpsertRequestDto:
+      required:
+      - members
+      type: object
+      properties:
+        members:
+          minItems: 1
+          type: array
+          description: List of budget member updates
+          items:
+            $ref: '#/components/schemas/BudgetMemberBulkUpsertDto'
+      description: Update multiple budget members
+      example:
+        members:
+        - userId: '{{se_user_uuid}}'
+          limit: 200
+          recurringLimit: 200
+          role: OWNER
+          shareBudgetFunds: true
+    BudgetMemberUpsertRequestDto:
+      type: object
+      properties:
+        limit:
+          type: number
+          description: 'Funds assigned to the user in the current budget period.
+
+
+            **Note**: This field is required with `shareBudgetFunds` is set as `false`.'
+        recurringLimit:
+          type: number
+          description: 'Funds assigned to the user in all future budget periods.
+
+
+            **Note**: This field is required when `shareBudgetFunds` is set as `false`.'
+        role:
+          allOf:
+          - $ref: '#/components/schemas/BudgetRoleType'
+          - description: Budget user role
+        shareBudgetFunds:
+          type: boolean
+          description: 'Set as `true` to share all the budget funds with the user.
+
+
+            **Note**: You cannot set this field as `true` when either `limit` or `recurringLimit` is set.'
+      description: Add a budget member
+      example:
+        limit: '50'
+        recurringLimit: '100'
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    PaginationResponseDto_BudgetMemberResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+          description: Next page token
+        prevPage:
+          type: string
+          description: Previous page token
+        results:
+          type: array
+          description: Results
+          items:
+            $ref: '#/components/schemas/BudgetMemberResponseDto'
+      description: Response from a list API request with paging references.
+    BudgetMemberBulkUpsertDto:
+      required:
+      - userId
+      type: object
+      properties:
+        userId:
+          type: string
+          description: BILL-generated ID or UUID of the user
+        limit:
+          type: number
+          description: 'Funds assigned to the user in the current budget period.
+
+
+            **Note**: This field is required when `shareBudgetFunds` is set as `false`.'
+        recurringLimit:
+          type: number
+          description: 'Funds assigned to the user in all future budget periods.
+
+
+            **Note**: This field is required when `shareBudgetFunds` is set as `false`.'
+        role:
+          allOf:
+          - $ref: '#/components/schemas/BudgetRoleType'
+          - description: Budget user role
+        shareBudgetFunds:
+          type: boolean
+          description: 'Set as `true` to share all the budget funds with the user.
+
+
+            **Note**: You cannot set this field as `true` when either `limit` or `recurringLimit` is set.'
+      description: Budget member bulk upsert member request dto.
+    EditBudgetShareFundsType:
+      type: string
+      description: The subset of BudgetShareFundsType options that users are allowed to use for updates/creates. (Other options are read-only.)
+      enum:
+      - DO_NOT_SHARE
+      - SHARE_MANUALLY
+    BudgetCreateDto:
+      required:
+      - name
+      - owners
+      - recurringInterval
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: Budget name
+        description:
+          type: string
+          description: Budget description
+        owners:
+          minItems: 1
+          type: array
+          description: List of BILL-generated user IDs or UUIDs of budget owners. You must specify at least one budget owner.
+          items:
+            type: string
+        members:
+          type: array
+          description: List of BILL-generated user IDs or UUIDs of budget members
+          items:
+            type: string
+        observers:
+          type: array
+          description: List of BILL-generated user IDs or UUIDs of budget observers
+          items:
+            type: string
+        expirationDate:
+          type:
+          - string
+          - 'null'
+          description: Budget expiration date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        recurringInterval:
+          allOf:
+          - $ref: '#/components/schemas/PeriodIntervalType'
+          - description: 'Interval after which the budget is reset. By default, BILL uses the timezone of the company''s billing address to reset a budget at 12 AM.
+
+              * `NONE`: Never
+
+              * `DAILY`: Each day at 12 AM
+
+              * `WEEKLY`: Each Monday at 12 AM
+
+              * `MONTHLY`: On the 1st of every month at 12 AM
+
+              * `QUARTERLY`: Once every 3 months, on the 1st of the month at 12 AM. Set the first month with `recurMonth`.
+
+              * `YEARLY`: Once every year, on the 1st of the month at 12 AM. Set the month with `recurMonth`.'
+        recurMonth:
+          maximum: 12
+          minimum: 1
+          type: integer
+          description: The month in which the budget will recur. Set this field only when `recurringInterval` is set as `QUARTERLY` or `YEARLY`. The default value is the current month.
+          format: int64
+        timezone:
+          type: string
+          description: 'Timezone in which the budget funds are reset. The default value is the timezone of the company''s billing address.
+
+
+            Set this field in the `US/{time_zone}` format. For example, `US/Pacific` or `US/Mountain`.'
+        autoAddUsers:
+          type: boolean
+          description: Set as `true` to automatically add all new users to this budget
+        receiptRequired:
+          type: boolean
+          description: Set as `true` if a receipt is required for transactions in the budget
+        maxTxSize:
+          type: number
+          description: Maximum transaction size in the budget. Any single transaction for an amount greater than `maxTxSize` will be declined.
+        carryOver:
+          type: boolean
+          description: Set as `true` for any budget funds assigned to users and vendor cards to carry over from one budget period to the next. The budget period is set with `recurringInterval`.
+        parentBudgetId:
+          type: string
+          description: BILL-generated ID or UUID of the parent budget. Set this field if this budget is a child budget.
+        budgetGroup:
+          type: boolean
+          description: Set as `true` if this budget is a budget group. A budget group can be set as a parent of other budgets.
+        limitlessOverspend:
+          type: boolean
+          description: 'Set as `true` for enabling spend amounts over the budget limit.
+
+
+            **Note**: You cannot set this field as `true` for budgets with `recurringInterval` set as
+
+            `DAILY` or `WEEKLY`.'
+        limit:
+          type: number
+          description: 'Spend limit for the initial budget period.
+
+
+            **Note**: This field is required unless `limitlessOverspend` is set as `true`.'
+        limitlessGoal:
+          type: number
+          description: 'Spend goal for a limitless budget.
+
+
+            **Note**: You can set this field when `limitlessOverspend` is set as `true`.'
+        recurringLimit:
+          type: number
+          description: 'Spend limit for all future budget periods.
+
+
+            **Note**: This field is required when `recurringInterval` is set as any value other than `NONE`.'
+        overspendBuffer:
+          type: number
+          description: 'Spend amount allowed above the budget limit before transactions are declined.
+
+
+            **Note**: You cannot set this field when `limitlessOverspend` is set as `true` or for budgets with `recurringInterval` as `DAILY` or `WEEKLY`.'
+        shareFunds:
+          allOf:
+          - $ref: '#/components/schemas/EditBudgetShareFundsType'
+          - description: Rule for how the budget funds are shared with budget members. The default value is `SHARE_MANUALLY`.
+      description: Create a budget
+      example:
+        name: Happy Music Supplies monthly spending budget
+        owners:
+        - '{{se_user_uuid}}'
+        recurringInterval: MONTHLY
+        limit: 200
+        recurringLimit: 200
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    SpendStatusDto:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the request, e.g. "SUCCESS"
+      description: Simple DTO to respond to requests with a status of "success".
+    BudgetResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the budget
+          deprecated: true
+        uuid:
+          type: string
+          description: BILL-generated UUID of the budget
+        name:
+          type: string
+          description: Budget name
+        description:
+          type: string
+          description: Budget description
+        retired:
+          type: boolean
+          description: Set as `true` if the budget is retired
+        startDate:
+          type: string
+          description: Budget start date
+          format: date
+        expirationDate:
+          type: string
+          description: Budget expiration date
+          format: date
+        recurringInterval:
+          allOf:
+          - $ref: '#/components/schemas/PeriodIntervalType'
+          - description: 'Interval after which the budget is reset. By default, BILL uses the timezone of the company''s billing address to reset a budget at 12 AM.
+
+              * `NONE`: Never
+
+              * `DAILY`: Each day at 12 AM
+
+              * `WEEKLY`: Each Monday at 12 AM
+
+              * `MONTHLY`: On the 1st of every month at 12 AM
+
+              * `QUARTERLY`: Once every 3 months, on the 1st of the month at 12 AM. Set the first month with `recurMonth`.
+
+              * `YEARLY`: Once every year, on the 1st of the month at 12 AM. Set the month with `recurMonth`.'
+        timezone:
+          type: string
+          description: Timezone in which the budget funds are reset
+        autoAddUsers:
+          type: boolean
+          description: Set as `true` to automatically add all new users to this budget
+        receiptRequired:
+          type: boolean
+          description: Set as `true` if a receipt is required for transactions in the budget
+        maxTxSize:
+          type: number
+          description: Maximum transaction size in the budget. Any single transaction for an amount greater than `maxTxSize` will be declined.
+        carryOver:
+          type: boolean
+          description: Set as `true` for any budget funds assigned to users and vendor cards to carry over from one budget period to the next. The budget period is set with `recurringInterval`.
+        default:
+          type: boolean
+          description: Set as `true` if the current budget is set as the default budget for the company
+        parentBudgetId:
+          type: string
+          description: BILL-generated ID of the parent budget
+          deprecated: true
+        parentBudgetUuid:
+          type: string
+          description: BILL-generated UUID of the parent budget
+        budgetGroup:
+          type: boolean
+          description: Set as `true` if this budget is a budget group. A budget group can be set as a parent of other budgets.
+        shareFunds:
+          allOf:
+          - $ref: '#/components/schemas/BudgetShareFundsType'
+          - description: Rule for how the budget funds are shared with budget members. The default value is `SHARE_MANUALLY`.
+        recurringLimit:
+          type: number
+          description: Spend limit for all future budget periods
+        limitlessOverspend:
+          type: boolean
+          description: Set as `true` for enabling spend amounts over the budget limit
+        limitlessGoal:
+          type: number
+          description: Spend goal for a limitless budget
+        currentPeriod:
+          allOf:
+          - $ref: '#/components/schemas/BudgetPeriodDto'
+          - description: Current budget period information
+      description: Budgets response.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    PaginatedBudgetMemberResponseDto:
+      type: object
+      description: List of budget members with paging references.
+      allOf:
+      - $ref: '#/components/schemas/PaginationResponseDto_BudgetMemberResponseDto_'
+    BudgetRoleType:
+      type: string
+      description: Options for setting a user's role within a budget. DELETE removes the user from the budget.
+      enum:
+      - MEMBER
+      - OWNER
+      - OBSERVER
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

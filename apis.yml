@@ -184,14 +184,14 @@ common:
   url: security/divvy-domain-security.yml
 
 apis:
-- aid: divvy:divvy-bill-v3-api
-  name: Divvy Bill V3 API
-  description: The Bill V3 API from Divvy — 214 operation(s) for bill v3.
+- aid: divvy:divvy-attachments-api
+  name: Divvy Attachments API
+  description: The attachments API from Divvy — 4 operation(s) for attachments.
   tags:
-  - Bill V3
+  - attachments
   properties:
   - type: OpenAPI
-    url: openapi/divvy-bill-v3-api-openapi.yml
+    url: openapi/divvy-attachments-api-openapi.yml
   - type: JSONSchema
     url: json-schema/divvy-transaction-response-dto-schema.json
   - type: JSONSchema
@@ -204,14 +204,6 @@ apis:
     url: json-schema/divvy-invoice-response-dto-schema.json
   - type: JSONSchema
     url: json-schema/divvy-invoice-replace-request-dto-schema.json
-- aid: divvy:divvy-connect-events-api
-  name: Divvy Connect Events API
-  description: The Connect Events API from Divvy — 8 operation(s) for connect events.
-  tags:
-  - Connect Events
-  properties:
-  - type: OpenAPI
-    url: openapi/divvy-connect-events-api-openapi.yml
   - type: JSONSchema
     url: json-schema/divvy-send-test-event-request-dto-schema.json
   - type: JSONSchema
@@ -224,7 +216,1094 @@ apis:
     url: json-schema/divvy-event-dto-schema.json
   - type: JSONSchema
     url: json-schema/divvy-subscription-update-request-dto-schema.json
-
+- aid: divvy:divvy-authentication-api
+  name: Divvy Authentication API
+  description: The authentication API from Divvy — 4 operation(s) for authentication.
+  tags:
+  - authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-authentication-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-bill-approvals-api
+  name: Divvy Bill Approvals API
+  description: The bill-approvals API from Divvy — 4 operation(s) for bill-approvals.
+  tags:
+  - bill-approvals
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-bill-approvals-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-bills-api
+  name: Divvy Bills API
+  description: The bills API from Divvy — 6 operation(s) for bills.
+  tags:
+  - bills
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-bills-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-budgets-api
+  name: Divvy Budgets API
+  description: The budgets API from Divvy — 5 operation(s) for budgets.
+  tags:
+  - budgets
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-budgets-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-cards-api
+  name: Divvy Cards API
+  description: The cards API from Divvy — 5 operation(s) for cards.
+  tags:
+  - cards
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-cards-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-classifications-api
+  name: Divvy Classifications API
+  description: The classifications API from Divvy — 49 operation(s) for classifications.
+  tags:
+  - classifications
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-classifications-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-credit-memos-api
+  name: Divvy Credit Memos API
+  description: The credit-memos API from Divvy — 7 operation(s) for credit-memos.
+  tags:
+  - credit-memos
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-credit-memos-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-custom-fields-api
+  name: Divvy Custom Fields API
+  description: The custom-fields API from Divvy — 4 operation(s) for custom-fields.
+  tags:
+  - custom-fields
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-custom-fields-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-customers-api
+  name: Divvy Customers API
+  description: The customers API from Divvy — 12 operation(s) for customers.
+  tags:
+  - customers
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-customers-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-documents-api
+  name: Divvy Documents API
+  description: The documents API from Divvy — 3 operation(s) for documents.
+  tags:
+  - documents
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-documents-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-events-api
+  name: Divvy Events API
+  description: The events API from Divvy — 3 operation(s) for events.
+  tags:
+  - events
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-events-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-exports-api
+  name: Divvy Exports API
+  description: The exports API from Divvy — 2 operation(s) for exports.
+  tags:
+  - exports
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-exports-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-funding-accounts-api
+  name: Divvy Funding Accounts API
+  description: The funding-accounts API from Divvy — 13 operation(s) for funding-accounts.
+  tags:
+  - funding-accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-funding-accounts-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-health-api
+  name: Divvy Health API
+  description: The health API from Divvy — 1 operation(s) for health.
+  tags:
+  - health
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-health-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-invoices-api
+  name: Divvy Invoices API
+  description: The invoices API from Divvy — 7 operation(s) for invoices.
+  tags:
+  - invoices
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-invoices-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-mfa-api
+  name: Divvy Mfa API
+  description: The mfa API from Divvy — 6 operation(s) for mfa.
+  tags:
+  - mfa
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-mfa-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-network-api
+  name: Divvy Network API
+  description: The network API from Divvy — 5 operation(s) for network.
+  tags:
+  - network
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-network-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-organization-users-api
+  name: Divvy Organization Users API
+  description: The organization-users API from Divvy — 4 operation(s) for organization-users.
+  tags:
+  - organization-users
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-organization-users-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-organizations-api
+  name: Divvy Organizations API
+  description: The organizations API from Divvy — 5 operation(s) for organizations.
+  tags:
+  - organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-organizations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-partner-api
+  name: Divvy Partner API
+  description: The partner API from Divvy — 11 operation(s) for partner.
+  tags:
+  - partner
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-partner-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-payment-terms-api
+  name: Divvy Payment Terms API
+  description: The payment-terms API from Divvy — 2 operation(s) for payment-terms.
+  tags:
+  - payment-terms
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-payment-terms-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-payments-api
+  name: Divvy Payments API
+  description: The payments API from Divvy — 10 operation(s) for payments.
+  tags:
+  - payments
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-payments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-receivable-payments-api
+  name: Divvy Receivable Payments API
+  description: The receivable-payments API from Divvy — 2 operation(s) for receivable-payments.
+  tags:
+  - receivable-payments
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-receivable-payments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-recurring-invoices-api
+  name: Divvy Recurring Invoices API
+  description: The recurring-invoices API from Divvy — 4 operation(s) for recurring-invoices.
+  tags:
+  - recurring-invoices
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-recurring-invoices-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-recurringbills-api
+  name: Divvy Recurringbills API
+  description: The recurringbills API from Divvy — 4 operation(s) for recurringbills.
+  tags:
+  - recurringbills
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-recurringbills-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-reimbursements-api
+  name: Divvy Reimbursements API
+  description: The reimbursements API from Divvy — 6 operation(s) for reimbursements.
+  tags:
+  - reimbursements
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-reimbursements-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-reports-api
+  name: Divvy Reports API
+  description: The reports API from Divvy — 1 operation(s) for reports.
+  tags:
+  - reports
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-reports-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-risk-verifications-api
+  name: Divvy Risk Verifications API
+  description: The risk-verifications API from Divvy — 2 operation(s) for risk-verifications.
+  tags:
+  - risk-verifications
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-risk-verifications-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-roles-api
+  name: Divvy Roles API
+  description: The roles API from Divvy — 2 operation(s) for roles.
+  tags:
+  - roles
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-roles-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-subscriptions-api
+  name: Divvy Subscriptions API
+  description: The subscriptions API from Divvy — 4 operation(s) for subscriptions.
+  tags:
+  - subscriptions
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-subscriptions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-transactions-api
+  name: Divvy Transactions API
+  description: The transactions API from Divvy — 8 operation(s) for transactions.
+  tags:
+  - transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-transactions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-users-api
+  name: Divvy Users API
+  description: The users API from Divvy — 3 operation(s) for users.
+  tags:
+  - users
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-users-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-vendor-credits-api
+  name: Divvy Vendor Credits API
+  description: The vendor-credits API from Divvy — 5 operation(s) for vendor-credits.
+  tags:
+  - vendor-credits
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-vendor-credits-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
+- aid: divvy:divvy-vendors-api
+  name: Divvy Vendors API
+  description: The vendors API from Divvy — 8 operation(s) for vendors.
+  tags:
+  - vendors
+  properties:
+  - type: OpenAPI
+    url: openapi/divvy-vendors-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/divvy-transaction-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-payment-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-budget-create-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-invoice-replace-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-send-test-event-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-with-security-key-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-response-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-request-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-event-dto-schema.json
+  - type: JSONSchema
+    url: json-schema/divvy-subscription-update-request-dto-schema.json
 x-enrichment:
   date: '2026-07-19'
   status: backfilled

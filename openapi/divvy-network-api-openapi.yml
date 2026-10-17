@@ -1,0 +1,1225 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Network API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Network
+paths:
+  /v3/network:
+    get:
+      tags:
+      - Network
+      summary: Search for an organization in the BILL Network
+      description: 'Search for a customer, vendor, or verified national vendor organization. You can search in the BILL Network and verified national vendor (`RPPS`) network.
+
+
+        When you search in the BILL Network, there are two `name` requirements for getting search results.
+
+        * Your search term must have a minimum of three characters.
+
+        * Your search term must be a complete word. You will not get search results when your search term is a partial word.
+
+
+        When you search in the verified national vendor (`RPPS`) network, search results are based on both a complete and partial match on `name` and `zipOrPostalCode`. You can further filter your search by the billing statement `accountNumber` with the vendor. For example, your Verizon internet bill account number.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: search
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: name
+        in: query
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: Organization name
+          example: '{{network_vendor_name}}'
+      - name: scope
+        in: query
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/ScopeType'
+          - description: 'Network name. You can search in one or both networks.
+
+              * Select `BILL` for BILL Network
+
+              * Select `RPPS` for verified national vendor network
+
+              * Select `ALL` for both networks'
+            example: BILL
+      - name: zipOrPostalCode
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Organization zip or postal code. When you set this field, BILL searches with `zipOrPostalCode` for all organizations.
+      - name: accountNumber
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Your billing statement account number with the verified national vendor (`RPPS`) organization
+      responses:
+        '200':
+          description: Search for an organization in the BILL Network response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkSearchResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/network/invitation/accept:
+    post:
+      tags:
+      - Network
+      summary: Accept connection request
+      description: 'Accept a connection request sent by a vendor or customer.
+
+
+        The organization receiving the connection request must have auto-connections disabled. If auto-connections are not disabled, BILL automatically connects the organizations in the BILL Network.
+
+
+        When the invitation is accepted, BILL connects the two organizations in the BILL Network.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: acceptInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Accept connection request response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/network/invitation/customer/{customerId}:
+    get:
+      tags:
+      - Network
+      summary: Get customer connection request status
+      description: 'Get the status of an existing connection request sent with `POST /v3/network/invitation/customer/{customerId}`.
+
+
+        When you send a connection request to a customer organization that has auto-connections enabled, BILL automatically connects you with the organization. If the organization has auto-connections disabled, the connection request status changes when the customer accepts the request.
+
+
+        **Note**: If the customer does not respond to the connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: getCustomerInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer record in your organization. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      responses:
+        '200':
+          description: Get customer connection request status response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvitationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Network
+      summary: Send connection request to a customer
+      description: 'Send a connection request to a customer organization in the BILL Network. BILL automatically connects the customer organization with the customer record in your BILL organization.
+
+
+        If the customer organization has auto-connections disabled, BILL sends an invitation email to the customer email address. When the customer accepts the invitation, BILL connects the customer organization with the customer record in your BILL organization.
+
+
+        If the customer does not respond, you can delete the connection request (with `DELETE /v3/network/invitation/customer/{customerId}`) before sending a new connection request.
+
+
+        **Note**: If the customer does not respond to a connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: createCustomerInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer record in your organization. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Send connection request to a customer response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Network
+      summary: Delete customer connection
+      description: 'Delete an existing Network connection with a customer organization. Delete customer connection follows a set of rules.
+
+        * **No scheduled payments**: There should be no scheduled payments. All scheduled payments must be canceled before you can disconnect.
+
+        * **No in-process payments**: There should be no in-progress payments. All in-progress payments must clear before you can disconnect.
+
+
+        You can use this endpoint to cancel a pending connection request sent to a customer that has auto-connections disabled. You can send a new connection request after an existing connection or connection request is canceled.
+
+
+        **Note**: If the customer does not respond to a connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: deleteCustomerInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the customer record in your organization. The value begins with `0cu`.
+          example: '{{customer_id}}'
+      responses:
+        '200':
+          description: Delete customer connection response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/network/invitation/vendor/{vendorId}:
+    get:
+      tags:
+      - Network
+      summary: Get vendor connection request status
+      description: 'Get the status of an existing connection request sent with `POST /v3/network/invitation/vendor/{vendorId}`.
+
+
+        When you send a connection request to a vendor organization that has auto-connections enabled, BILL automatically connects you with the organization. If the organization has auto-connections disabled, the connection request status changes when the vendor accepts the request.
+
+
+        **Note**: If the vendor does not respond to the connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: getVendorInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor record in your organization. The value begins with `009`.
+          example: '{{vendor_id}}'
+      responses:
+        '200':
+          description: Get vendor connection request status response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvitationResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Network
+      summary: Send connection request to a vendor
+      description: 'Send a connection request to a vendor organization in the BILL Network. BILL automatically connects the vendor organization with the vendor record in your BILL organization.
+
+
+        If the vendor organization has auto-connections disabled, BILL sends an invitation email to the vendor email address. When the vendor accepts the invitation, BILL connects the vendor organization with the vendor record in your BILL organization.
+
+
+        If the vendor does not respond, you can delete the connection request (with `DELETE /v3/network/invitation/vendor/{vendorId}`) before sending a new connection request.
+
+
+        **Note**: If the vendor does not respond to the connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: createVendorInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor record in your organization. The value begins with `009`.
+          example: '{{vendor_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Send connection request to a vendor response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    delete:
+      tags:
+      - Network
+      summary: Delete vendor connection
+      description: 'Delete an existing Network connection with a vendor organization. Delete vendor connection follows a set of rules.
+
+        * **No scheduled payments**: There should be no scheduled payments. All scheduled payments must be canceled before you can disconnect.
+
+        * **No in-process payments**: There should be no in-progress payments. All in-progress payments must clear before you can disconnect.
+
+
+        You can use this endpoint to cancel a pending connection request sent to a vendor that has auto-connections disabled. You can send a new connection request after an existing connection or connection request is canceled.
+
+
+        **Note**: If the vendor does not respond to a connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: deleteVendorInvitation
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor record in your organization. The value begins with `009`.
+          example: '{{vendor_id}}'
+      responses:
+        '200':
+          description: Delete vendor connection response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/network/invitation/vendor/{vendorId}/email:
+    post:
+      tags:
+      - Network
+      summary: Send connection request to a vendor not in the BILL Network
+      description: 'Send a connection request to a vendor not in the BILL Network.
+
+
+        BILL sends an invitation email to the provided vendor email address. When the vendor accepts the invitation and sets up a BILL account, BILL connects the vendor organization with the vendor record in your BILL organization.
+
+
+        **Note**:
+
+        * The vendor organization must exist before BILL can send an invitation email.
+
+        * If the vendor does not respond to a connection request for 60 days, the request expires.
+
+
+        See BILL Network in the Guides section for more information, sample requests, and responses.'
+      operationId: inviteVendorNotInBillNetwork
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor record in your organization. The value begins with `009`.
+          example: '{{vendor_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteVendorNotInBillNetworkRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Send connection request to a vendor not in the BILL Network response
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    Network:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Payment Network ID (PNI) of the organization. BILL uses the PNI to send and receive electronic payments.
+        name:
+          type: string
+          description: Organization name
+        type:
+          allOf:
+          - $ref: '#/components/schemas/NetworkAccountType'
+          - description: Account type.
+        addresses:
+          type: array
+          description: Organization address
+          items:
+            $ref: '#/components/schemas/AddressDto'
+        managedBy:
+          allOf:
+          - $ref: '#/components/schemas/NetworkManagedBy'
+          - description: Search result metadata information
+      description: An organization in the BILL network or verified national vendor network.
+    NetworkManagedBy:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Network managed by name
+        email:
+          type: string
+          description: Network managed by email address
+        emailDomain:
+          type: string
+          description: Verified email address domain
+      description: Metadata about who manages the network for the organization.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    GetInvitationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the customer or vendor record in your organization
+        status:
+          allOf:
+          - $ref: '#/components/schemas/NetworkInvitationStatus'
+          - description: Network invitation status.
+        networkId:
+          type: string
+          description: Payment Network ID (PNI). BILL uses the PNI to send and receive electronic payments.
+      description: Invitation status response.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    AcceptInvitationRequestDto:
+      required:
+      - networkId
+      - type
+      type: object
+      properties:
+        networkId:
+          minLength: 1
+          type: string
+          description: Payment Network ID (PNI) of the customer or vendor that sent the invitation. BILL uses the PNI to send and receive electronic payments.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AcceptInviteType'
+          - description: 'Type of organization that sent the invitation.
+
+              * Select `VENDOR` to accept a connection request from a vendor
+
+              * Select `CUSTOMER` to accept a connection request from a customer'
+        id:
+          type:
+          - string
+          - 'null'
+          description: 'BILL-generated ID of the existing vendor or customer record in your organization that you want to connect with. The value begins with `009` (vendor) or `0cu` (customer).
+
+
+            When you set this field, you cannot set `name` in your request.'
+        name:
+          type:
+          - string
+          - 'null'
+          description: 'Name of the new vendor or customer record that you want to add in your organization. BILL creates a new record with this name.
+
+
+            When you set this field, you cannot set `id` in your request.'
+      description: Accept network invitation
+      example: "{\n  \"networkId\": \"{{network_id}}\",\n  \"type\": \"CUSTOMER\",\n  \"id\": {{customer_id}}\n}"
+    AcceptInviteType:
+      type: string
+      description: Enum for different types of organizations in BILL network.
+      enum:
+      - VENDOR
+      - CUSTOMER
+    InviteVendorNotInBillNetworkRequestDto:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          minLength: 1
+          type: string
+          description: Vendor email address
+      description: Invite a vendor not in BILL network
+      example:
+        email: '{{vendor_email}}'
+    AddressDto:
+      type: object
+      properties:
+        line1:
+          type: string
+          description: Address line 1
+        line2:
+          type: string
+          description: Address line 2
+        city:
+          type: string
+          description: City
+        stateOrProvince:
+          type: string
+          description: State or province
+        zipOrPostalCode:
+          type: string
+          description: Zip or postal code
+        country:
+          type: string
+          description: Country
+      description: Address information.
+    NetworkAccountType:
+      type: string
+      description: Enum for different types of accounts in BILL network.
+      enum:
+      - ADVANCED
+      - BUSINESS
+      - RPPS
+      - CONTRACTOR
+      - EMPLOYEE_OR_INDIVIDUAL
+      - UNDEFINED
+    NetworkInvitationStatus:
+      type: string
+      description: Status of the invitation from customer/vendor to an organization.
+      enum:
+      - NOT_CONNECTED
+      - PENDING
+      - CONNECTED
+      - CONNECTED_RPPS
+    NetworkSearchResponseDto:
+      type: object
+      properties:
+        results:
+          type: array
+          description: Results that match the search criteria
+          items:
+            $ref: '#/components/schemas/Network'
+      description: Network search response.
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    ScopeType:
+      type: string
+      description: 'Network name. You can search in one or both networks.
+
+        * Select `BILL` for BILL Network
+
+        * Select `RPPS` for verified national vendor network
+
+        * Select `ALL` for both networks'
+      example: BILL
+      enum:
+      - BILL
+      - RPPS
+      - ALL
+    CreateInvitationRequestDto:
+      required:
+      - networkId
+      - networkType
+      type: object
+      properties:
+        networkId:
+          minLength: 1
+          type: string
+          description: 'Payment Network ID (PNI) of the organization you want to connect with. For a verified national vendor, the value begins with `0rv`. BILL uses the PNI to send and receive electronic payments.
+
+
+            You can retrieve `networkId` from your `GET /v3/network` search result.'
+        networkType:
+          allOf:
+          - $ref: '#/components/schemas/NetworkType'
+          - description: 'Network type.
+
+              * Select `BILL` for BILL Network
+
+              * Select `RPPS` for verified national vendor network'
+        rppsInformation:
+          allOf:
+          - $ref: '#/components/schemas/RppsInformation'
+          - description: Additional information required if `networkType` is `RPPS`
+      description: Create an organization in the BILL network
+      example:
+        networkId: '{{network_id}}'
+        networkType: BILL
+    NetworkType:
+      type: string
+      description: Enum for different types of network.
+      enum:
+      - BILL
+      - RPPS
+    RppsInformation:
+      required:
+      - accountNumber
+      type: object
+      properties:
+        accountNumber:
+          minLength: 1
+          type: string
+          description: 'Your billing statement account number with the verified national vendor organization.
+
+
+            This value must match the vendor `accountNumber` set while creating or updating a vendor.'
+        addressId:
+          type: string
+          description: BILL-generated ID of the billing address for the verified national vendor organization. The value begins with `0ra`. Each address is identified by a unique ID.
+      description: Dto for additional information needed when sending invite to organization in Rpps network.
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

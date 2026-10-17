@@ -1,0 +1,1509 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Vendor Credits API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Vendor Credits
+paths:
+  /v3/vendor-credits:
+    get:
+      tags:
+      - Vendor Credits
+      summary: Get list of vendor credits
+      description: 'Get a list of vendor credit objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listVendorCredits
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{vendor_credit_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of vendor credits response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListVendorCreditResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Vendor Credits
+      summary: Create a vendor credit
+      description: 'Create a vendor credit.
+
+
+        With a vendor credit, you can adjust the amount that you owe a vendor.
+
+
+        See Vendor credits in the Guides section for more information, sample requests, and responses.'
+      operationId: createVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorCreditRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a vendor credit response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/vendor-credits/bulk:
+    put:
+      tags:
+      - Vendor Credits
+      summary: Replace multiple vendor credits
+      description: 'Update the number of line items in multiple vendor credits with one API request. You can also update other details for each vendor credit.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a vendor credit. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the vendor credit.
+
+        * When you omit an existing line item `id`, the line item is removed from the vendor credit.'
+      operationId: bulkReplaceVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/ReplaceVendorCreditWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace multiple vendor credits response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Vendor Credits
+      summary: Create multiple vendor credits
+      description: Create multiple vendor credits with one API request. You can create up to 50 vendor credits with one `POST /v3/vendor-credits/bulk` request.
+      operationId: bulkCreateVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateVendorCreditRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple vendor credits response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Vendor Credits
+      summary: Update multiple vendor credits
+      description: 'Update details about line items in multiple vendor credits with one API request. You can also update other vendor credit details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount`, `quantity`, and `description`. The vendor credit line item `id` does not change with a PATCH operation.'
+      operationId: bulkUpdateVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 50
+              minItems: 1
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateVendorCreditWithIdRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update multiple vendor credits response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/vendor-credits/bulk/archive:
+    post:
+      tags:
+      - Vendor Credits
+      summary: Archive multiple vendor credits
+      description: Archive multiple vendor credits with one API request. In the response, the `archived` field for each object is set as `true`. An archived vendor credit cannot be restored.
+      operationId: bulkArchiveVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: string
+          description: BILL-generated IDs of the vendor credits. Each value begin with `vcr`. Set the IDs as comma-separated values.
+          example: '{{vendor_credit_id}}'
+      responses:
+        '200':
+          description: Archive multiple vendor credits response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditBulkResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/vendor-credits/{vendorCreditId}:
+    get:
+      tags:
+      - Vendor Credits
+      summary: Get vendor credit details
+      description: Get details about an existing vendor credit.
+      operationId: getVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorCreditId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+          example: '{{vendor_credit_id}}'
+      responses:
+        '200':
+          description: Get vendor credit details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditWithUsageResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Vendor Credits
+      summary: Replace a vendor credit
+      description: 'Update the number of line items in a vendor credit. You can also update other vendor credit details.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a vendor credit. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the vendor credit.
+
+        * When you omit an existing line item `id`, the line item is removed from the vendor credit.'
+      operationId: replaceVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorCreditId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+          example: '{{vendor_credit_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceVendorCreditRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace a vendor credit response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Vendor Credits
+      summary: Update a vendor credit
+      description: 'Update details about a vendor credit line item. You can also update other vendor credit line item details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount`, `quantity`, and `description`. The vendor credit line item `id` does not change with a PATCH operation.'
+      operationId: updateVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorCreditId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+          example: '{{vendor_credit_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorCreditRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a vendor credit response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/vendor-credits/{vendorCreditId}/archive:
+    post:
+      tags:
+      - Vendor Credits
+      summary: Archive a vendor credit
+      description: Archive an existing vendor credit. In the response, the `archived` field is set as `true`. An archived vendor credit cannot be restored.
+      operationId: archiveVendorCredit
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: vendorCreditId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+          example: '{{vendor_credit_id}}'
+      responses:
+        '200':
+          description: Archive a vendor credit response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorCreditResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    VendorCreditUsageDto:
+      type: object
+      properties:
+        billId:
+          type: string
+          description: BILL-generated ID of the bill to which the vendor credit is applied
+        paymentId:
+          type: string
+          description: BILL-generated ID of the payment to which the vendor credit is applied
+        amount:
+          type: number
+          description: Vendor credit amount applied
+      description: VendorCredit usage Dto.
+    ReplaceVendorCreditWithIdRequestDto:
+      required:
+      - creditDate
+      - id
+      - referenceNumber
+      - vendorCreditLineItems
+      - vendorId
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        vendorCreditLineItems:
+          minItems: 1
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/ReplaceVendorCreditLineItemDto'
+      description: Replace VendorCredit request Dto.
+    VendorCreditResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        archived:
+          type: boolean
+          description: Set as `true` if the vendor credit is archived
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        amount:
+          type: number
+          description: Vendor credit amount
+        appliedAmount:
+          type: number
+          description: Vendor credit amount applied to invoices
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CreditStatusDto'
+          - description: Vendor credit status.
+        createdTime:
+          type: string
+          description: Vendor credit created time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Vendor credit updated time
+          format: date-time
+        vendorCreditLineItems:
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/VendorCreditLineItemResponseDto'
+      description: VendorCredit response Dto.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    CreateVendorCreditLineItemDto:
+      required:
+      - amount
+      type: object
+      properties:
+        description:
+          type: string
+          description: Vendor credit line item description
+        amount:
+          type: number
+          description: Vendor credit line item amount. For a vendor credit in an international currency (not USD), this value is in the local currency.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/VendorCreditLineItemClassificationsDto'
+          - description: General ledger classifications information for the vendor credit line item
+      description: Vendor Credit Create Request Line Item.
+    VendorCreditWithUsageResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        archived:
+          type: boolean
+          description: Set as `true` if the vendor credit is archived
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        amount:
+          type: number
+          description: Vendor credit amount
+        appliedAmount:
+          type: number
+          description: Vendor credit amount applied to invoices
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CreditStatusDto'
+          - description: Vendor credit status.
+        createdTime:
+          type: string
+          description: Vendor credit created time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Vendor credit updated time
+          format: date-time
+        vendorCreditLineItems:
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/UpdateVendorCreditLineItemDto'
+        usage:
+          type: array
+          description: Vendor credit usage information
+          items:
+            $ref: '#/components/schemas/VendorCreditUsageDto'
+      description: VendorCredit response Dto with usage.
+    UpdateVendorCreditLineItemDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit line item. The value begins with `vci`.
+        description:
+          type: string
+          description: Vendor credit line item description
+        amount:
+          type: number
+          description: Vendor credit line item amount. For a vendor credit in an international currency (not USD), this value is in the local currency.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/VendorCreditLineItemClassificationsDto'
+          - description: General ledger classifications information for the vendor credit line item
+      description: Vendor Credit Create Request Line Item.
+    ListVendorCreditResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_VendorCreditWithUsageResponseDto_'
+    UpdateVendorCreditWithIdRequestDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit. The value begins with `vcr`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          maxLength: 100
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        vendorCreditLineItems:
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/UpdateVendorCreditLineItemDto'
+      description: Update VendorCredit with id request Dto.
+    ReplaceVendorCreditRequestDto:
+      required:
+      - creditDate
+      - referenceNumber
+      - vendorCreditLineItems
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        vendorCreditLineItems:
+          minItems: 1
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/ReplaceVendorCreditLineItemDto'
+      description: Replace a vendor credit
+      example:
+        vendorId: '{{vendor_id}}'
+        referenceNumber: 202602-vendorcredit
+        creditDate: '2026-12-28'
+        description: Happy Vendor Credit (line item added)
+        vendorCreditLineItems:
+        - description: Premium drummer gloves
+          amount: 29.99
+        - id: '{{vendor_credit_line_item_id01}}'
+          description: Classic extreme drum sticks
+          amount: 19.99
+        - id: '{{vendor_credit_line_item_id02}}'
+          description: Metal guitar picks (5-pack)
+          amount: 50
+    CreditStatusDto:
+      type: string
+      description: Credit Status DTO.
+      enum:
+      - FULLY_APPLIED
+      - NOT_APPLIED
+      - PARTIALLY_APPLIED
+      - IN_PROCESS
+      - UNDEFINED
+    VendorCreditLineItemClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+        employeeId:
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+      description: DTO for Bill Line Item classifications.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    CreateVendorCreditRequestDto:
+      required:
+      - creditDate
+      - referenceNumber
+      - vendorCreditLineItems
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        vendorCreditLineItems:
+          minItems: 1
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/CreateVendorCreditLineItemDto'
+      description: Create a vendor credit
+      example:
+        vendorId: '{{vendor_id}}'
+        referenceNumber: 202602-vendorcredit
+        creditDate: '2026-12-28'
+        vendorCreditLineItems:
+        - description: Classic extreme drum sticks
+          amount: 14.99
+        - description: Metal guitar picks (5-pack)
+          amount: 50
+        description: Happy Vendor Credit
+    ReplaceVendorCreditLineItemDto:
+      required:
+      - amount
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit line item. The value begins with `vci`.
+        description:
+          type: string
+          description: Vendor credit line item description
+        amount:
+          type: number
+          description: Vendor credit line item amount. For a vendor credit in an international currency (not USD), this value is in the local currency.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/VendorCreditLineItemClassificationsDto'
+          - description: General ledger classifications information for the vendor credit line item
+      description: Vendor Credit Replace Request Line Item.
+    ListResponseDto_VendorCreditWithUsageResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorCreditWithUsageResponseDto'
+      description: Response from a list API request with paging references.
+    VendorCreditLineItemResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit line item. The value begins with `vci`.
+        description:
+          type: string
+          description: Vendor credit line item description
+        amount:
+          type: number
+          description: Vendor credit line item amount. For a vendor credit in an international currency (not USD), this value is in the local currency.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/VendorCreditLineItemClassificationsDto'
+          - description: General ledger classifications information for the vendor credit line item
+      description: Vendor Credit Create Request Line Item.
+    VendorCreditBulkResponseDto:
+      type: object
+      properties:
+        vendorCredits:
+          type: array
+          description: List of vendor credits
+          items:
+            $ref: '#/components/schemas/VendorCreditResponseDto'
+      description: Response Dto for bulk vendor credit.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    UpdateVendorCreditRequestDto:
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        referenceNumber:
+          maxLength: 100
+          type: string
+          description: User-generated vendor credit number. This value can be in your chosen number scheme.
+        creditDate:
+          type: string
+          description: Vendor credit issued date. This value is in the `yyyy-MM-dd` format.
+          format: date
+        description:
+          type: string
+          description: Vendor credit description
+        applyToChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts used when the vendor credit is applied to a bill payment. The value begins with `0ca`.
+        applyToBankAccountId:
+          type: string
+          description: 'BILL-generated ID of the bank account used when the vendor credit is applied to a bill payment. The value begins with `bac`.
+
+
+            **Note**: You can set only one of `applyToChartOfAccountId` or `applyToBankAccountId`.'
+        vendorCreditLineItems:
+          type: array
+          description: Vendor credit line item information
+          items:
+            $ref: '#/components/schemas/UpdateVendorCreditLineItemDto'
+      description: Update a vendor credit
+      example:
+        description: Happy Vendor Credit (amount updated)
+        vendorCreditLineItems:
+        - id: '{{vendor_credit_line_item_id01}}'
+          description: Classic extreme drum sticks
+          amount: 19.99
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0

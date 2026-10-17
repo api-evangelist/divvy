@@ -1,0 +1,2163 @@
+openapi: 3.2.0
+info:
+  title: BILL v3 Bills API
+  description: BILL is a cloud-based financial operations platform for an organization's accounts payable (AP), accounts receivable (AR), and spend & expense (S&E) automation.
+  version: '1'
+servers:
+- url: https://gateway.stage.bill.com/connect
+  description: sandbox
+tags:
+- name: Bills
+paths:
+  /v3/bills:
+    get:
+      tags:
+      - Bills
+      summary: Get list of bills
+      description: 'Get a list of bill objects. By default, you get 20 results on one page of results. Set `max` in your request to get up to 100 results on one page.
+
+
+        See Search operations with lists in the Guides section for filtering, sorting, and pagination examples.'
+      operationId: listBills
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: max
+        in: query
+        schema:
+          maximum: 100
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of results
+          format: int32
+          example: 10
+      - name: sort
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name and sort order. Both simple and compound sorting is available.
+
+
+            The format is `sort={field_01}:{sort_order},{field_02}:{sort_order}`.
+
+
+            **NOTE**: Sorting occurs in the specified order.'
+          example: createdTime:desc
+      - name: filters
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Field name, operator, and value. Both simple and compound filtering is available.
+
+
+            The format is `filters={field_01}:{op}:{value},{field_02}:{op}:{value}`.'
+          example: id:eq:{{bill_id}}
+      - name: page
+        in: query
+        schema:
+          type:
+          - string
+          - 'null'
+          description: 'Next page of results.
+
+
+            When a list has multiple pages, the `nextPage` and `prevPage` values in the response enable you to navigate between the pages of results. Set `page` as the `nextPage` or `prevPage` value for navigation.'
+      responses:
+        '200':
+          description: Get list of bills response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    post:
+      tags:
+      - Bills
+      summary: Create a bill
+      description: 'Create a new bill.
+
+
+        See Bills in the Guides section for more information, sample requests, and responses.'
+      operationId: createBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create a bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bills/bulk:
+    post:
+      tags:
+      - Bills
+      summary: Create multiple bills
+      description: 'Create multiple bills with one API request. You can create up to 100 bills with one `POST /v3/bills/bulk` request.
+
+
+        Bulk bill creation at BILL follow a set of rules.
+
+        * **Successful response**: In your bulk bill creation request, all your bills must be successfully created for a successful response. If any bill creation is not successful, the entire request fails and none of the bills in the request are created.
+
+        * **You can create bills for multiple vendors**: You can create bills for one vendor or for multiple vendors with one `POST /v3/bills/bulk` request.
+
+
+        See Bills in the Guides section for more information, sample requests, and responses.'
+      operationId: createBulkBills
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BillCreateRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Create multiple bills response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BillWithoutApproversResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bills/record-payment:
+    post:
+      tags:
+      - Bills
+      summary: Record AP payment
+      description: 'Record an offline AP payment made to a vendor.
+
+
+        An offline payment is a payment made outside the BILL system. BILL simply applies the recorded payment amount to one or more bills for the vendor. BILL does not process the payment or transfer funds to the vendor when you record an AP payment with this endpoint.
+
+
+        Use `POST /v3/payments` to create a payment with the BILL system. When you pay with `POST /v3/payments`, BILL processes the payment and transfers funds from your BILL organization funding account to the vendor.'
+      operationId: recordPayment
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordPaymentRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Record AP payment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordPaymentResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bills/{billId}:
+    get:
+      tags:
+      - Bills
+      summary: Get bill details
+      description: Get details about an existing bill.
+      operationId: getBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: billId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          pattern: ^00n[a-zA-Z0-9]{17}$
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+          example: '{{bill_id}}'
+      responses:
+        '200':
+          description: Get bill details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillReadResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    put:
+      tags:
+      - Bills
+      summary: Replace a bill
+      description: 'Update the number of line items in a bill. You can also update other bill details.
+
+
+        You can use the PUT operation to add, remove, or replace the number of line items in a bill. A set of rules apply with the PUT operation.
+
+        * When you add a new line item, a new line item `id` is generated in the bill.
+
+        * When you omit an existing line item `id`, the line item is removed from the bill.'
+      operationId: replaceBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: billId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+          example: '{{bill_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillReplaceRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Replace a bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+    patch:
+      tags:
+      - Bills
+      summary: Update a bill
+      description: 'Update details about a bill line item. You can also update other bill details.
+
+
+        You can use the PATCH operation to modify line item details, such as `amount` and `description`. The bill line item `id` does not change with a PATCH operation.'
+      operationId: updateBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: billId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+          example: '{{bill_id}}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillUpdateRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Update a bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bills/{billId}/archive:
+    post:
+      tags:
+      - Bills
+      summary: Archive a bill
+      description: 'Archive an existing bill. In the response, the `archived` field is set as `true`.
+
+
+        You can restore an archived bill with `POST /v3/bills/{billId}/restore`. There is no change when you archive an archived bill.'
+      operationId: archiveBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: billId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+          example: '{{bill_id}}'
+      responses:
+        '200':
+          description: Archive a bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillWithoutApproversResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+  /v3/bills/{billId}/restore:
+    post:
+      tags:
+      - Bills
+      summary: Restore an archived bill
+      description: 'Restore an archived bill. In the response, the `archived` field is set as `false`.
+
+
+        You can perform any valid BILL operation on restored bills. There is no change when you restore a restored bill.'
+      operationId: restoreBill
+      parameters:
+      - name: sessionId
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: API session ID generated with `/v3/login`
+          example: '{{session_id}}'
+      - name: devKey
+        in: header
+        schema:
+          type:
+          - string
+          - 'null'
+          description: Developer key generated with your BILL developer account
+          example: '{{developer_key}}'
+      - name: billId
+        in: path
+        required: true
+        schema:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+          example: '{{bill_id}}'
+      responses:
+        '200':
+          description: Restore an archived bill response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillWithoutApproversResponseDto'
+        4XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+        5XX:
+          description: List of errors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BdcError'
+components:
+  schemas:
+    BillPaymentStatusDto:
+      type: string
+      description: Payment Status of a bill.
+      enum:
+      - PAID
+      - UNPAID
+      - PARTIALLY_PAID
+      - SCHEDULED
+      - IN_PROCESS
+      - UNDEFINED
+    BillUpdateInvoiceRequestDto:
+      type: object
+      properties:
+        invoiceNumber:
+          maxLength: 100
+          type: string
+          description: User-generated invoice number. This value can be your chosen number scheme or bill due date.
+        invoiceDate:
+          type: string
+          description: Date when the invoice is sent. This value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Invoice linked to a bill.
+    RecordPaymentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        billPayments:
+          type: array
+          description: List of bill payments
+          items:
+            $ref: '#/components/schemas/RecordBillPayResponseDto'
+        description:
+          type: string
+          description: Payment description
+        processDate:
+          type: string
+          description: Payment process date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        amount:
+          type: number
+          description: Payment amount. For a payment in an international currency (not USD), this value is in the local currency.
+        transactionNumber:
+          type: string
+          description: BILL-generated alphanumeric payment identification value
+        confirmationNumber:
+          type: string
+          description: BILL-generated bill payment confirmation value
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatus'
+          - description: Payment status.
+        exchangeRate:
+          type: number
+          description: Exchange rate for the payment in an international currency (not USD)
+        fundingAmount:
+          type: number
+          description: Payment amount in USD
+        onlinePayment:
+          type: boolean
+          description: 'Payment source.
+
+            * `true`: Payment is made with BILL (online)
+
+            * `false`: Payment is made outside BILL and then recorded in BILL (offline)
+
+
+            This field is set as `false` for the Record AP payment operation.'
+        disbursementType:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementType'
+          - description: Disbursement type. This field is set as `OFFLINE` for the Record AP payment operation.
+        remittanceEmail:
+          type: string
+          description: Remittance email address set for the vendor
+        createdTime:
+          type: string
+          description: Payment created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Payment updated date and time
+          format: date-time
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the payment. The value begins with `006`.
+        disbursementStatus:
+          allOf:
+          - $ref: '#/components/schemas/DisbursementStatus'
+          - description: 'Payment disbursement status. This field is set as `DONE` for the Record AP payment operation.
+
+              '
+        singleStatus:
+          allOf:
+          - $ref: '#/components/schemas/PaymentSingleStatus'
+          - description: 'Unified payment status. This field provides BILL payment lifecycle updates based on the `status` and `disbursementStatus` values in the response.
+
+
+              This field is set as `PAID_OFFLINE` for the Record AP payment operation.'
+        toPrintCheck:
+          type: boolean
+          description: 'Set as `true` to set the payment check as printable in your accounting system. Use this field only for check payments.
+
+            '
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/PaymentClassificationsDto'
+          - description: General ledger classifications information for the payment
+        syncReference:
+          type: string
+          description: 'Payment reference ID in your accounting system. Set this field with payment information, such as check number.
+
+            '
+        allowExport:
+          type: boolean
+          description: 'Set as `true` to sync the bill payment with your accounting system
+
+            '
+      description: Record offline payment response dto.
+    Param:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        additional:
+          type: object
+          additionalProperties:
+            type: string
+        name:
+          minLength: 1
+          type: string
+        value:
+          minLength: 1
+          type: string
+    BillWithoutApproversResponseDto:
+      required:
+      - archived
+      - id
+      - vendorId
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        archived:
+          type: boolean
+          description: Set as `true` if the bill is archived
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        fundingAmount:
+          type: number
+          description: Bill total amount. This value is in USD.
+        amount:
+          type: number
+          description: Bill total amount. For a bill in an international currency (not USD), this value is in the local currency.
+        paidAmount:
+          type: number
+          description: Bill paid amount. This value is the sum of all cleared payments and any credit amount applied to the bill.
+        dueAmount:
+          type: number
+          description: Bill due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from the bill `amount`.
+        scheduledAmount:
+          type: number
+          description: Bill scheduled amount. The value is set as the vendor payment amount that is pending clearance.
+        creditAmount:
+          type: number
+          description: Credit amount applied to the bill
+        exchangeRate:
+          type: number
+          description: 'Exchange rate for the bill amount in an international currency (not USD).
+
+
+            The BILL exchange rate changes periodically and a different rate may apply at the time of payment.'
+        description:
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        billLineItems:
+          type: array
+          description: Bill line item information
+          items:
+            $ref: '#/components/schemas/BillResponseLineItem'
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillPaymentStatusDto'
+          - description: Bill payment status.
+        approvalStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillApprovalStatusResponse'
+          - description: Bill approval status.
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the bill. The value begins with `006`.
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+      description: Bills response without approvers.
+    PaymentVendorCreditRequestDto:
+      required:
+      - amount
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`.
+        amount:
+          minimum: 0
+          type: number
+          description: Credit amount
+      description: Payment vendor credit request DTO.
+    BillUpdateLineItemDto:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill line item. The value begins with `bli`.
+        amount:
+          type: number
+          description: 'Bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+
+
+            If you set `amount`, `quantity`, and `price`, BILL uses the `amount` value as the bill line item total amount.'
+        quantity:
+          type: number
+          description: Bill line item unit quantity
+        price:
+          type: number
+          description: Bill line item unit price. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill line item description
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillLineItemClassificationsDto'
+          - description: General ledger classifications information for the bill line item
+      description: Line items that define a bill's overall amount.
+    ListBillResponseDto:
+      type: object
+      description: Response from a list API request with paging references.
+      allOf:
+      - $ref: '#/components/schemas/ListResponseDto_BillReadWithoutApproversResponseDto_'
+      - properties:
+          count:
+            type: integer
+            description: Total number of bills matching the list request, across all pages of results.
+            format: int32
+          totalDueAmount:
+            type: number
+            description: Sum of the balances of all bills matching the list request, across all pages of results. This value is in the organization's base currency.
+    BillResponseLineItem:
+      required:
+      - amount
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill line item. The value begins with `bli`.
+        amount:
+          type: number
+          description: 'Bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+
+
+            If you set `amount`, `quantity`, and `price`, BILL uses the `amount` value as the bill line item total amount.'
+        quantity:
+          type: number
+          description: Bill line item unit quantity
+        price:
+          type: number
+          description: Bill line item unit price. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          type: string
+          description: Bill line item description
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillLineItemClassificationsDto'
+          - description: General ledger classifications information for the bill line item
+      description: Line items that define a bill's overall amount.
+    PaymentStatus:
+      type: string
+      description: The enum Payment status dto.
+      enum:
+      - APPROVING
+      - SCHEDULED
+      - PAID
+      - CANCELLED
+      - VOID
+      - ESCHEATED
+      - UNDEFINED
+    BillPaymentDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the payment. The value begins with `stp`.
+        amount:
+          type: number
+          description: Payment amount applied to the bill
+        processDate:
+          type: string
+          description: Date the payment was processed. The value is in the `yyyy-MM-dd` format.
+          format: date
+      description: A single payment applied to a bill.
+    BillRecordStatus:
+      type: string
+      description: Record status enum for bills.
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - DRAFT
+      - DRAFT_DELETED
+      - UNDEFINED
+    DisbursementType:
+      type: string
+      description: Enum for Disbursement type.
+      enum:
+      - CHECK
+      - ACH
+      - RPPS
+      - PAYPAL
+      - OFFLINE
+      - INTERNATIONAL_E_PAYMENT
+      - AMEX
+      - VIRTUAL_CARD
+      - WALLET
+      - CREDIT_CARD
+      - UNDEFINED
+    BillUpdateRequestDto:
+      required:
+      - paymentTermId
+      type: object
+      properties:
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        billLineItems:
+          type: array
+          description: Bill line items information
+          items:
+            $ref: '#/components/schemas/BillUpdateLineItemDto'
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/BillUpdateInvoiceRequestDto'
+          - description: Invoice information
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill
+          items:
+            $ref: '#/components/schemas/BillVendorCreditRequestItemDto'
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+        billApprovals:
+          type: boolean
+          description: 'Set as `true` for BILL to add approvals information in the response.
+
+
+            When you have approval policies set up for bills and a bill matches a policy, you see an additional `approvers` array of objects in the response. The array shows the list of individual users and/or user groups assigned as bill approvers. In addition, the array provides information about the status of the bill in the current approval flow.
+
+
+            **Note**: When you set `billApprovals` as `true`, you must set the field as `true` if you want to replace the bill with `PUT /v3/bills/{billId}`.'
+        policyRematch:
+          type: boolean
+          description: 'Rule for whether BILL re-matches the updated bill against your approval policies. The default value is `false`.
+
+            * `true`: Rematch the updated bill. BILL removes any previously assigned approvers that are no longer valid, and then assigns any new approvers that match your policy rules.
+
+            * `false`: Do not rematch the updated bill. BILL assigns any new approvers that match your policy rules. Any previously assigned approvers are not removed.'
+      description: Update a bill
+      example:
+        billLineItems:
+        - id: '{{bill_line_item_id01}}'
+          amount: 179
+          description: USB audio interface (amount updated)
+    BillReadResponseDto:
+      required:
+      - archived
+      - id
+      - vendorId
+      - vendorName
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        archived:
+          type: boolean
+          description: Set as `true` if the bill is archived
+        recordStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillRecordStatus'
+          - description: 'Bill record status.
+
+
+              When `recordStatus` is `ACTIVE`, `archived` is set as `false`. For any other `recordStatus` value, `archived` is set as `true`.'
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        vendorName:
+          type: string
+          description: Vendor name
+        fundingAmount:
+          type: number
+          description: Bill total amount. This value is in USD.
+        amount:
+          type: number
+          description: Bill total amount. For a bill in an international currency (not USD), this value is in the local currency.
+        paidAmount:
+          type: number
+          description: Bill paid amount. This value is the sum of all cleared payments and any credit amount applied to the bill.
+        dueAmount:
+          type: number
+          description: Bill due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from the bill `amount`.
+        scheduledAmount:
+          type: number
+          description: Bill scheduled amount. The value is set as the vendor payment amount that is pending clearance.
+        creditAmount:
+          type: number
+          description: Credit amount applied to the bill
+        exchangeRate:
+          type: number
+          description: 'Exchange rate for the bill amount in an international currency (not USD).
+
+
+            The BILL exchange rate changes periodically and a different rate may apply at the time of payment.'
+        description:
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        billLineItems:
+          type: array
+          description: Bill line item information
+          items:
+            $ref: '#/components/schemas/BillResponseLineItem'
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillPaymentStatusDto'
+          - description: Bill payment status.
+        approvalStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillApprovalStatusResponse'
+          - description: Bill approval status.
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the bill. The value begins with `006`.
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        approvers:
+          type: array
+          description: Bill approvers information
+          items:
+            $ref: '#/components/schemas/ApproverDto'
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+        payments:
+          type: array
+          description: Payments applied to the bill
+          items:
+            $ref: '#/components/schemas/BillPaymentDto'
+      description: Bills read response.
+    PaymentClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+      description: Payment classifications dto.
+    Severity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFORMATION
+    BillClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+      description: DTO for Bill classifications.
+    BillResponseDto:
+      required:
+      - archived
+      - id
+      - vendorId
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        archived:
+          type: boolean
+          description: Set as `true` if the bill is archived
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        fundingAmount:
+          type: number
+          description: Bill total amount. This value is in USD.
+        amount:
+          type: number
+          description: Bill total amount. For a bill in an international currency (not USD), this value is in the local currency.
+        paidAmount:
+          type: number
+          description: Bill paid amount. This value is the sum of all cleared payments and any credit amount applied to the bill.
+        dueAmount:
+          type: number
+          description: Bill due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from the bill `amount`.
+        scheduledAmount:
+          type: number
+          description: Bill scheduled amount. The value is set as the vendor payment amount that is pending clearance.
+        creditAmount:
+          type: number
+          description: Credit amount applied to the bill
+        exchangeRate:
+          type: number
+          description: 'Exchange rate for the bill amount in an international currency (not USD).
+
+
+            The BILL exchange rate changes periodically and a different rate may apply at the time of payment.'
+        description:
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        billLineItems:
+          type: array
+          description: Bill line item information
+          items:
+            $ref: '#/components/schemas/BillResponseLineItem'
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillPaymentStatusDto'
+          - description: Bill payment status.
+        approvalStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillApprovalStatusResponse'
+          - description: Bill approval status.
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the bill. The value begins with `006`.
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+        approvers:
+          type: array
+          description: Bill approvers information
+          items:
+            $ref: '#/components/schemas/ApproverDto'
+      description: Bills response.
+    RecordPaymentRequestDto:
+      required:
+      - payments
+      - processDate
+      - toPrintCheck
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        processDate:
+          type: string
+          description: Payment process date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        toPrintCheck:
+          type: boolean
+          description: 'Set as `true` to set the payment check as printable in your accounting system. Use this field only for check payments.
+
+            '
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/PaymentClassificationsDto'
+          - description: General ledger classifications information for the payment
+        description:
+          type: string
+          description: Payment description
+        syncReference:
+          type: string
+          description: 'Payment reference ID in your accounting system. Set this field with payment information, such as check number.
+
+            '
+        payments:
+          minItems: 1
+          type: array
+          description: List of bill payments
+          items:
+            $ref: '#/components/schemas/RecordBillPayRequestDto'
+        allowExport:
+          type: boolean
+          description: 'Set as `true` to sync the bill payment with your accounting system
+
+            '
+      description: Record AP payment
+      example:
+        vendorId: '{{vendor_id}}'
+        processDate: '2026-12-20'
+        toPrintCheck: false
+        payments:
+        - billId: '{{bill_id}}'
+          amount: 70
+    PaymentSingleStatus:
+      type: string
+      enum:
+      - DISBURSEMENT_FAILED_ACTION_NEEDED
+      - DISBURSEMENT_FAILED_VENDOR_BANK_REJECTED
+      - FUNDING_FAILED_ACTION_NEEDED
+      - EXPIRING
+      - FUNDS_ESCHEATED
+      - CANCELED
+      - FUNDING_FAILED_VOIDED
+      - VOIDED
+      - CLEARED
+      - DELIVERED
+      - DISBURSEMENT_ON_HOLD
+      - VOID_PENDING
+      - SENT
+      - DISBURSEMENT_ON_HOLD_PAYER_IN_REVIEW
+      - PROCESSED
+      - FUNDING_STARTED
+      - FUNDING_ON_HOLD
+      - WAITING_ON_APPROVAL
+      - SCHEDULED
+      - READY_TO_FUND
+      - CANCELLATION_IN_PROGRESS
+      - UNDEFINED
+      - PARTIALLY_CLAIMED
+      - PAID_OFFLINE
+    PaymentVendorCreditResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`.
+        amount:
+          type: number
+          description: Credit amount
+      description: Payment vendor credit response DTO.
+    ApproverDto:
+      required:
+      - userId
+      type: object
+      properties:
+        userId:
+          type: string
+          description: 'BILL-generated ID of the individual user or approval group.
+
+            * **Individual user**: The value begins with `006`.
+
+            * **Approval group**: The value begins with `agp`.'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApproverStatusDto'
+          - description: Bill approver status.
+        approverOrder:
+          type: number
+          description: Bill approval order.
+        statusChangedTime:
+          type: string
+          description: Status change date and time
+          format: date-time
+      description: Approver DTO.
+    ListResponseDto_BillReadWithoutApproversResponseDto_:
+      type: object
+      properties:
+        nextPage:
+          type: string
+        prevPage:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillReadWithoutApproversResponseDto'
+      description: Response from a list API request with paging references.
+    Category:
+      type: string
+      enum:
+      - REQUEST
+      - APPLICATION
+      - SERVER
+      - DOWNSTREAM
+    DisbursementStatus:
+      type: string
+      description: The enum type for disbursement status.
+      enum:
+      - SCHEDULE
+      - DONE
+      - FAILED
+      - VOID
+      - HOLD
+      - FXHOLD
+      - ESCHEATED
+      - UNDEFINED
+    BillVendorCreditRequestItemDto:
+      required:
+      - amount
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor credit applied to the bill payment. The value begins with `vcr`.
+        amount:
+          minimum: 0
+          type: number
+          description: Credit amount
+      description: API level DTO for apply vendor credit to bill request item.
+    BillReplaceLineItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill line item. The value begins with `bli`.
+        amount:
+          type: number
+          description: 'Bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+
+
+            If you set `amount`, `quantity`, and `price`, BILL uses the `amount` value as the bill line item total amount.'
+        quantity:
+          type: number
+          description: Bill line item unit quantity
+        price:
+          type: number
+          description: Bill line item unit price. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill line item description
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillLineItemClassificationsDto'
+          - description: General ledger classifications information for the bill line item
+      description: Line items that define a bill's overall amount.
+    Invoice:
+      required:
+      - invoiceDate
+      - invoiceNumber
+      type: object
+      properties:
+        invoiceNumber:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: User-generated invoice number. This value can be your chosen number scheme or bill due date.
+        invoiceDate:
+          type: string
+          description: Date when the invoice is sent. This value is in the `yyyy-MM-dd` format.
+          format: date
+      description: Invoice linked to a bill.
+    BillCreateLineItemDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: 'Bill line item amount. For a bill in an international currency (not USD), this value is in the local currency.
+
+
+            If you set `amount`, `quantity`, and `price`, BILL uses the `amount` value as the bill line item total amount.'
+        quantity:
+          type: number
+          description: Bill line item unit quantity
+        price:
+          type: number
+          description: Bill line item unit price. For a bill in an international currency (not USD), this value is in the local currency.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill line item description
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillLineItemClassificationsDto'
+          - description: General ledger classifications information for the bill line item
+      description: Line items that define a bill's overall amount.
+    BillReadWithoutApproversResponseDto:
+      required:
+      - archived
+      - id
+      - recordStatus
+      - vendorId
+      - vendorName
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        recordStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillRecordStatus'
+          - description: 'Bill record status.
+
+
+              When `recordStatus` is `ACTIVE`, `archived` is set as `false`. For any other `recordStatus` value, `archived` is set as `true`.'
+        archived:
+          type: boolean
+          description: Set as `true` if the bill is archived
+        vendorId:
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        vendorName:
+          type: string
+          description: Vendor name
+        fundingAmount:
+          type: number
+          description: Bill total amount. This value is in USD.
+        amount:
+          type: number
+          description: Bill total amount. For a bill in an international currency (not USD), this value is in the local currency.
+        paidAmount:
+          type: number
+          description: Bill paid amount. This value is the sum of all cleared payments and any credit amount applied to the bill.
+        dueAmount:
+          type: number
+          description: Bill due amount. The value is calculated by subtracting any applied credits (`creditAmount`), scheduled payment (`scheduledAmount`), and cleared payment from the bill `amount`.
+        scheduledAmount:
+          type: number
+          description: Bill scheduled amount. The value is set as the vendor payment amount that is pending clearance.
+        creditAmount:
+          type: number
+          description: Credit amount applied to the bill
+        exchangeRate:
+          type: number
+          description: 'Exchange rate for the bill amount in an international currency (not USD).
+
+
+            The BILL exchange rate changes periodically and a different rate may apply at the time of payment.'
+        description:
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        billLineItems:
+          type: array
+          description: Bill line item information
+          items:
+            $ref: '#/components/schemas/BillResponseLineItem'
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillPaymentStatusDto'
+          - description: Bill payment status.
+        approvalStatus:
+          allOf:
+          - $ref: '#/components/schemas/BillApprovalStatusResponse'
+          - description: Bill approval status.
+        createdBy:
+          type: string
+          description: BILL-generated ID of the user that created the bill. The value begins with `006`.
+        createdTime:
+          type: string
+          description: Created date and time
+          format: date-time
+        updatedTime:
+          type: string
+          description: Updated date and time
+          format: date-time
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+      description: Bills read response without approvers.
+    RecordBillPayRequestDto:
+      required:
+      - amount
+      - billId
+      type: object
+      properties:
+        billId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        amount:
+          type: number
+          description: Payment amount
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill payment
+          items:
+            $ref: '#/components/schemas/PaymentVendorCreditRequestDto'
+      description: Record bill pay request dto.
+    BdcError:
+      required:
+      - category
+      - code
+      - severity
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        code:
+          type: string
+        severity:
+          $ref: '#/components/schemas/Severity'
+        category:
+          $ref: '#/components/schemas/Category'
+        message:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/Param'
+        detail:
+          type: string
+        help:
+          type: string
+    BillCreateRequestDto:
+      required:
+      - billLineItems
+      - dueDate
+      - invoice
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        billLineItems:
+          minItems: 1
+          type: array
+          description: Bill line items information
+          items:
+            $ref: '#/components/schemas/BillCreateLineItemDto'
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill
+          items:
+            $ref: '#/components/schemas/BillVendorCreditRequestItemDto'
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+        billApprovals:
+          type: boolean
+          description: 'Set as `true` for BILL to add approvals information in the response.
+
+
+            When you have approval policies set up for bills and a bill matches a policy, you see an additional `approvers` array of objects in the response. The array shows the list of individual users and/or user groups assigned as bill approvers. In addition, the array provides information about the status of the bill in the current approval flow.
+
+
+            **Note**: When you set `billApprovals` as `true`, you must set the field as `true` if you want to update the bill (`PATCH /v3/bills/{billId}`) or replace the bill (`PUT /v3/bills/{billId}`).'
+        allowDuplicateInvoiceNumber:
+          type: boolean
+          description: Set as `false` to reject the request when the bill's `invoice.invoiceNumber` duplicates an existing invoice number for the vendor. Defaults to `true`, which allows duplicate invoice numbers.
+      description: Create a bill
+      example:
+        vendorId: '{{vendor_id}}'
+        dueDate: '2026-12-31'
+        billLineItems:
+        - amount: 149
+          description: USB audio interface
+        - amount: 79.99
+          description: Drum foot pedal
+        invoice:
+          invoiceNumber: '202601'
+          invoiceDate: '2026-12-31'
+    RecordBillPayResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BILL-generated ID of the bill payment. The value begins with `blp`.
+        billId:
+          type: string
+          description: BILL-generated ID of the bill. The value begins with `00n`.
+        amount:
+          type: number
+          description: Payment amount
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill payment
+          items:
+            $ref: '#/components/schemas/PaymentVendorCreditResponseDto'
+      description: Record bill pay response dto.
+    BillReplaceRequestDto:
+      required:
+      - billLineItems
+      - dueDate
+      - invoice
+      - vendorId
+      type: object
+      properties:
+        vendorId:
+          minLength: 1
+          type: string
+          description: BILL-generated ID of the vendor. The value begins with `009`.
+        description:
+          maxLength: 4000
+          type: string
+          description: Bill description
+        dueDate:
+          type: string
+          description: Bill due date. The value is in the `yyyy-MM-dd` format.
+          format: date
+        paymentTermId:
+          type: string
+        billLineItems:
+          minItems: 1
+          type: array
+          description: Bill line items information
+          items:
+            $ref: '#/components/schemas/BillReplaceLineItemDto'
+        invoice:
+          allOf:
+          - $ref: '#/components/schemas/Invoice'
+          - description: Invoice information
+        payFromChartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts for the bill payment. The value begins with `0ca`.
+        classifications:
+          allOf:
+          - $ref: '#/components/schemas/BillClassificationsDto'
+          - description: General ledger classifications information for the bill
+        vendorCredits:
+          type: array
+          description: Vendor credits applied to the bill
+          items:
+            $ref: '#/components/schemas/BillVendorCreditRequestItemDto'
+        purchaseOrderNumber:
+          type: string
+          description: Purchase order number linked with the bill
+        billApprovals:
+          type: boolean
+          description: 'Set as `true` for BILL to add approvals information in the response.
+
+
+            When you have approval policies set up for bills and a bill matches a policy, you see an additional `approvers` array of objects in the response. The array shows the list of individual users and/or user groups assigned as bill approvers. In addition, the array provides information about the status of the bill in the current approval flow.
+
+
+            **Note**: When you set `billApprovals` as `true`, you must set the field as `true` if you want to update the bill with `PATCH /v3/bills/{billId}`.'
+      description: Replace a bill (line item added)
+      example:
+        vendorId: '{{vendor_id}}'
+        dueDate: '2026-12-31'
+        invoice:
+          invoiceNumber: '202601'
+          invoiceDate: '2026-12-31'
+        billLineItems:
+        - amount: 29.99
+          description: Premium drummer gloves
+        - id: '{{bill_line_item_id01}}'
+          amount: 149
+          description: USB audio interface
+        - id: '{{bill_line_item_id02}}'
+          amount: 79.99
+          description: Drum foot pedal
+    ApproverStatusDto:
+      type: string
+      description: Approver status DTO.
+      enum:
+      - WAITING
+      - VIEWED
+      - REROUTED
+      - DENIED
+      - APPROVED
+      - UPCOMING
+      - STALE
+      - UNDEFINED
+    BillLineItemClassificationsDto:
+      type: object
+      properties:
+        chartOfAccountId:
+          type: string
+          description: BILL-generated ID of the chart of accounts. The value begins with `0ca`.
+        accountingClassId:
+          type: string
+          description: BILL-generated ID of the accounting class. The value begins with `cls`.
+        departmentId:
+          type: string
+          description: BILL-generated ID of the department. The value begins with `0de`.
+        employeeId:
+          type: string
+          description: BILL-generated ID of the employee. The value begins with `emp`.
+        jobId:
+          type: string
+          description: BILL-generated ID of the job. The value begins with `job`.
+        locationId:
+          type: string
+          description: BILL-generated ID of the location. The value begins with `loc`.
+        itemId:
+          type: string
+          description: BILL-generated ID of the item. The value begins with `0ii`.
+        customerId:
+          type: string
+          description: BILL-generated ID of the customer. The value begins with `0cu`.
+      description: DTO for Bill Line Item classifications.
+    BillApprovalStatusResponse:
+      type: string
+      description: Approval status of a bill response.
+      enum:
+      - UNASSIGNED
+      - ASSIGNED
+      - APPROVED
+      - APPROVING
+      - DENIED
+      - UNDEFINED
+x-provenance:
+  method: searched
+  source: https://developer.bill.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developer.bill.com/reference/acceptinvitation.md
+  - https://developer.bill.com/reference/addreimbursementreceipt.md
+  - https://developer.bill.com/reference/addtransactionreceipt.md
+  - https://developer.bill.com/reference/approveordenyreimbursement.md
+  - https://developer.bill.com/reference/archivebankaccount.md
+  - https://developer.bill.com/reference/archivebankaccountuser.md
+  - https://developer.bill.com/reference/archivebill.md
+  - https://developer.bill.com/reference/archiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/archiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/archiveclassificationdepartment.md
+  - https://developer.bill.com/reference/archiveclassificationemployee.md
+  - https://developer.bill.com/reference/archiveclassificationitem.md
+  - https://developer.bill.com/reference/archiveclassificationjob.md
+  - https://developer.bill.com/reference/archiveclassificationlocation.md
+  - https://developer.bill.com/reference/archivecreditmemo.md
+  - https://developer.bill.com/reference/archivecustomer.md
+  - https://developer.bill.com/reference/archivecustomerbankaccount.md
+  - https://developer.bill.com/reference/archivecustomercontact.md
+  - https://developer.bill.com/reference/archiveinvoice.md
+  - https://developer.bill.com/reference/archiveorganizationuser.md
+  - https://developer.bill.com/reference/archivepartneruser.md
+  - https://developer.bill.com/reference/archiverecurringbill.md
+  - https://developer.bill.com/reference/archiverecurringinvoice.md
+  - https://developer.bill.com/reference/archivevendor.md
+  - https://developer.bill.com/reference/archivevendorcredit.md
+  - https://developer.bill.com/reference/authorizetochargecustomer.md
+  - https://developer.bill.com/reference/billapprovedenyactions.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationemployee.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationitem.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationjob.md
+  - https://developer.bill.com/reference/bulkarchiveclassificationlocation.md
+  - https://developer.bill.com/reference/bulkarchivecreditmemo.md
+  - https://developer.bill.com/reference/bulkarchivevendorcredit.md
+  - https://developer.bill.com/reference/bulkcreateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkcreateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkcreateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkcreateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkcreateclassificationitem.md
+  - https://developer.bill.com/reference/bulkcreateclassificationjob.md
+  - https://developer.bill.com/reference/bulkcreateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkcreatecreditmemo.md
+  - https://developer.bill.com/reference/bulkcreatevendorcredit.md
+  - https://developer.bill.com/reference/bulkreplacecreditmemo.md
+  - https://developer.bill.com/reference/bulkreplacevendorcredit.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationemployee.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationitem.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationjob.md
+  - https://developer.bill.com/reference/bulkrestoreclassificationlocation.md
+  - https://developer.bill.com/reference/bulkrestorecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/bulkupdateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/bulkupdateclassificationdepartment.md
+  - https://developer.bill.com/reference/bulkupdateclassificationemployee.md
+  - https://developer.bill.com/reference/bulkupdateclassificationitem.md
+  - https://developer.bill.com/reference/bulkupdateclassificationjob.md
+  - https://developer.bill.com/reference/bulkupdateclassificationlocation.md
+  - https://developer.bill.com/reference/bulkupdatecreditmemo.md
+  - https://developer.bill.com/reference/bulkupdatevendorcredit.md
+  - https://developer.bill.com/reference/cancelpayment.md
+  - https://developer.bill.com/reference/chargecustomer.md
+  - https://developer.bill.com/reference/createbankaccount.md
+  - https://developer.bill.com/reference/createbill.md
+  - https://developer.bill.com/reference/createbillapprovalpolicy.md
+  - https://developer.bill.com/reference/createbilldocument.md
+  - https://developer.bill.com/reference/createbudget.md
+  - https://developer.bill.com/reference/createbudgetcard.md
+  - https://developer.bill.com/reference/createbulkbills.md
+  - https://developer.bill.com/reference/createbulkpayment.md
+  - https://developer.bill.com/reference/createbulkvendor.md
+  - https://developer.bill.com/reference/createclassificationaccountingclass.md
+  - https://developer.bill.com/reference/createclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/createclassificationdepartment.md
+  - https://developer.bill.com/reference/createclassificationemployee.md
+  - https://developer.bill.com/reference/createclassificationitem.md
+  - https://developer.bill.com/reference/createclassificationjob.md
+  - https://developer.bill.com/reference/createclassificationlocation.md
+  - https://developer.bill.com/reference/createcreditmemo.md
+  - https://developer.bill.com/reference/createcustomer.md
+  - https://developer.bill.com/reference/createcustomerattachment.md
+  - https://developer.bill.com/reference/createcustomerbankaccount.md
+  - https://developer.bill.com/reference/createcustomercontact.md
+  - https://developer.bill.com/reference/createcustomerinvitation.md
+  - https://developer.bill.com/reference/createcustomfield.md
+  - https://developer.bill.com/reference/createcustomfieldvalues.md
+  - https://developer.bill.com/reference/createimageuploadurl.md
+  - https://developer.bill.com/reference/createinvoice.md
+  - https://developer.bill.com/reference/createinvoiceattachment.md
+  - https://developer.bill.com/reference/createmasspayment.md
+  - https://developer.bill.com/reference/createorganization.md
+  - https://developer.bill.com/reference/createorganizationuser.md
+  - https://developer.bill.com/reference/createpartneruser.md
+  - https://developer.bill.com/reference/createpayment.md
+  - https://developer.bill.com/reference/createpaymentterm.md
+  - https://developer.bill.com/reference/createphone.md
+  - https://developer.bill.com/reference/createreceiptuploadurl.md
+  - https://developer.bill.com/reference/createrecurringbill.md
+  - https://developer.bill.com/reference/createrecurringinvoice.md
+  - https://developer.bill.com/reference/createreimbursement.md
+  - https://developer.bill.com/reference/createriskverificationphone.md
+  - https://developer.bill.com/reference/createuser.md
+  - https://developer.bill.com/reference/createvendor.md
+  - https://developer.bill.com/reference/createvendorattachment.md
+  - https://developer.bill.com/reference/createvendorbankaccount.md
+  - https://developer.bill.com/reference/createvendorcredit.md
+  - https://developer.bill.com/reference/createvendorinvitation.md
+  - https://developer.bill.com/reference/deleteattachment.md
+  - https://developer.bill.com/reference/deletebudget.md
+  - https://developer.bill.com/reference/deletebudgetmember.md
+  - https://developer.bill.com/reference/deletecard.md
+  - https://developer.bill.com/reference/deletecustomerinvitation.md
+  - https://developer.bill.com/reference/deletecustomfield.md
+  - https://developer.bill.com/reference/deletecustomfieldvalue.md
+  - https://developer.bill.com/reference/deletepolicy.md
+  - https://developer.bill.com/reference/deletereimbursement.md
+  - https://developer.bill.com/reference/deletereimbursementreceipt.md
+  - https://developer.bill.com/reference/deletetransactionreceipt.md
+  - https://developer.bill.com/reference/deleteuser.md
+  - https://developer.bill.com/reference/deletevendorbankaccount.md
+  - https://developer.bill.com/reference/deletevendorinvitation.md
+  - https://developer.bill.com/reference/freezecard.md
+  - https://developer.bill.com/reference/generatechallenge.md
+  - https://developer.bill.com/reference/getattachment.md
+  - https://developer.bill.com/reference/getbankaccount.md
+  - https://developer.bill.com/reference/getbill.md
+  - https://developer.bill.com/reference/getbillingstatementdetail.md
+  - https://developer.bill.com/reference/getbudget.md
+  - https://developer.bill.com/reference/getbudgetmember.md
+  - https://developer.bill.com/reference/getcard.md
+  - https://developer.bill.com/reference/getcardaccount.md
+  - https://developer.bill.com/reference/getcheckimagedata.md
+  - https://developer.bill.com/reference/getclassificationaccountingclass.md
+  - https://developer.bill.com/reference/getclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/getclassificationdepartment.md
+  - https://developer.bill.com/reference/getclassificationemployee.md
+  - https://developer.bill.com/reference/getclassificationitem.md
+  - https://developer.bill.com/reference/getclassificationjob.md
+  - https://developer.bill.com/reference/getclassificationlocation.md
+  - https://developer.bill.com/reference/getconfigurationbyvendorid.md
+  - https://developer.bill.com/reference/getcreditmemo.md
+  - https://developer.bill.com/reference/getcurrentuser.md
+  - https://developer.bill.com/reference/getcustomer.md
+  - https://developer.bill.com/reference/getcustomerbankaccount.md
+  - https://developer.bill.com/reference/getcustomercontact.md
+  - https://developer.bill.com/reference/getcustomerinvitation.md
+  - https://developer.bill.com/reference/getcustomfield.md
+  - https://developer.bill.com/reference/getcustomfieldvalues.md
+  - https://developer.bill.com/reference/getdocument.md
+  - https://developer.bill.com/reference/getdownloadlink.md
+  - https://developer.bill.com/reference/getexchangerate.md
+  - https://developer.bill.com/reference/getexchangerates.md
+  - https://developer.bill.com/reference/getfundingaccountpermission.md
+  - https://developer.bill.com/reference/gethealthcheck.md
+  - https://developer.bill.com/reference/getintlconfig.md
+  - https://developer.bill.com/reference/getinvoice.md
+  - https://developer.bill.com/reference/getmasspayment.md
+  - https://developer.bill.com/reference/getorganization.md
+  - https://developer.bill.com/reference/getorganizationuser.md
+  - https://developer.bill.com/reference/getorganizationuserrole.md
+  - https://developer.bill.com/reference/getpanjwt.md
+  - https://developer.bill.com/reference/getpartneruser.md
+  - https://developer.bill.com/reference/getpartneruserrole.md
+  - https://developer.bill.com/reference/getpayment.md
+  - https://developer.bill.com/reference/getpaymentlink.md
+  - https://developer.bill.com/reference/getpaymentterm.md
+  - https://developer.bill.com/reference/getpriceplan.md
+  - https://developer.bill.com/reference/getreceivablepayment.md
+  - https://developer.bill.com/reference/getrecurringbill.md
+  - https://developer.bill.com/reference/getrecurringinvoice.md
+  - https://developer.bill.com/reference/getreimbursement.md
+  - https://developer.bill.com/reference/getriskverificationphone.md
+  - https://developer.bill.com/reference/getriskverifications.md
+  - https://developer.bill.com/reference/getsessioninfo.md
+  - https://developer.bill.com/reference/gettransaction.md
+  - https://developer.bill.com/reference/getuser.md
+  - https://developer.bill.com/reference/getvendor.md
+  - https://developer.bill.com/reference/getvendoraudittrail.md
+  - https://developer.bill.com/reference/getvendorbankaccount.md
+  - https://developer.bill.com/reference/getvendorcredit.md
+  - https://developer.bill.com/reference/getvendorinvitation.md
+  - https://developer.bill.com/reference/initiateriskverifications.md
+  - https://developer.bill.com/reference/invitevendornotinbillnetwork.md
+  - https://developer.bill.com/reference/listallorganizations.md
+  - https://developer.bill.com/reference/listbankaccounts.md
+  - https://developer.bill.com/reference/listbankaccountusers.md
+  - https://developer.bill.com/reference/listbillapprovalpolicies.md
+  - https://developer.bill.com/reference/listbillingstatements.md
+  - https://developer.bill.com/reference/listbills.md
+  - https://developer.bill.com/reference/listbilluserapprovals.md
+  - https://developer.bill.com/reference/listbudgetmembers.md
+  - https://developer.bill.com/reference/listbudgets.md
+  - https://developer.bill.com/reference/listcardaccountusers.md
+  - https://developer.bill.com/reference/listcardfundingpurposes.md
+  - https://developer.bill.com/reference/listcards.md
+  - https://developer.bill.com/reference/listclassificationaccountingclasses.md
+  - https://developer.bill.com/reference/listclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/listclassificationdepartments.md
+  - https://developer.bill.com/reference/listclassificationemployees.md
+  - https://developer.bill.com/reference/listclassificationitems.md
+  - https://developer.bill.com/reference/listclassificationjobs.md
+  - https://developer.bill.com/reference/listclassificationlocations.md
+  - https://developer.bill.com/reference/listcreditmemos.md
+  - https://developer.bill.com/reference/listcustomerattachments.md
+  - https://developer.bill.com/reference/listcustomerbankaccounts.md
+  - https://developer.bill.com/reference/listcustomercontacts.md
+  - https://developer.bill.com/reference/listcustomers.md
+  - https://developer.bill.com/reference/listcustomfields.md
+  - https://developer.bill.com/reference/listcustomfieldvalues.md
+  - https://developer.bill.com/reference/listdocuments.md
+  - https://developer.bill.com/reference/listexports.md
+  - https://developer.bill.com/reference/listindustries.md
+  - https://developer.bill.com/reference/listinvoiceattachments.md
+  - https://developer.bill.com/reference/listinvoices.md
+  - https://developer.bill.com/reference/listmfaphones.md
+  - https://developer.bill.com/reference/listorganizationuserroles.md
+  - https://developer.bill.com/reference/listorganizationusers.md
+  - https://developer.bill.com/reference/listpartnerorganizations.md
+  - https://developer.bill.com/reference/listpartneruserroles.md
+  - https://developer.bill.com/reference/listpartnerusers.md
+  - https://developer.bill.com/reference/listpayableapcards.md
+  - https://developer.bill.com/reference/listpayablecardaccounts.md
+  - https://developer.bill.com/reference/listpaymentoptions.md
+  - https://developer.bill.com/reference/listpayments.md
+  - https://developer.bill.com/reference/listpaymentterms.md
+  - https://developer.bill.com/reference/listreceivablepayments.md
+  - https://developer.bill.com/reference/listrecurringbills.md
+  - https://developer.bill.com/reference/listrecurringinvoices.md
+  - https://developer.bill.com/reference/listreimbursements.md
+  - https://developer.bill.com/reference/listtransactioncustomfields.md
+  - https://developer.bill.com/reference/listtransactioncustomfieldvalues.md
+  - https://developer.bill.com/reference/listtransactions.md
+  - https://developer.bill.com/reference/listusers.md
+  - https://developer.bill.com/reference/listvendorattachments.md
+  - https://developer.bill.com/reference/listvendorcredits.md
+  - https://developer.bill.com/reference/listvendors.md
+  - https://developer.bill.com/reference/login.md
+  - https://developer.bill.com/reference/loginasuser.md
+  - https://developer.bill.com/reference/logout.md
+  - https://developer.bill.com/reference/nominatebankaccountuser.md
+  - https://developer.bill.com/reference/partnerlogin.md
+  - https://developer.bill.com/reference/recordinvoice.md
+  - https://developer.bill.com/reference/recordpayment.md
+  - https://developer.bill.com/reference/replacebill.md
+  - https://developer.bill.com/reference/replacecreditmemo.md
+  - https://developer.bill.com/reference/replaceinvoice.md
+  - https://developer.bill.com/reference/replacerecurringbill.md
+  - https://developer.bill.com/reference/replacerecurringinvoice.md
+  - https://developer.bill.com/reference/replacevendorcredit.md
+  - https://developer.bill.com/reference/restorebill.md
+  - https://developer.bill.com/reference/restoreclassificationaccountingclass.md
+  - https://developer.bill.com/reference/restoreclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/restoreclassificationdepartment.md
+  - https://developer.bill.com/reference/restoreclassificationemployee.md
+  - https://developer.bill.com/reference/restoreclassificationitem.md
+  - https://developer.bill.com/reference/restoreclassificationjob.md
+  - https://developer.bill.com/reference/restoreclassificationlocation.md
+  - https://developer.bill.com/reference/restorecreditmemo.md
+  - https://developer.bill.com/reference/restorecustomer.md
+  - https://developer.bill.com/reference/restorecustomercontact.md
+  - https://developer.bill.com/reference/restoreinvoice.md
+  - https://developer.bill.com/reference/restoreorganizationuser.md
+  - https://developer.bill.com/reference/restorepartneruser.md
+  - https://developer.bill.com/reference/restorerecurringbill.md
+  - https://developer.bill.com/reference/restorerecurringinvoice.md
+  - https://developer.bill.com/reference/restorevendor.md
+  - https://developer.bill.com/reference/search.md
+  - https://developer.bill.com/reference/sendinvoice.md
+  - https://developer.bill.com/reference/setup.md
+  - https://developer.bill.com/reference/stepupsession.md
+  - https://developer.bill.com/reference/threedschallenge.md
+  - https://developer.bill.com/reference/unfreezecard.md
+  - https://developer.bill.com/reference/updatebankaccount.md
+  - https://developer.bill.com/reference/updatebill.md
+  - https://developer.bill.com/reference/updatebillapprovalpolicy.md
+  - https://developer.bill.com/reference/updatebudget.md
+  - https://developer.bill.com/reference/updatecard.md
+  - https://developer.bill.com/reference/updateclassificationaccountingclass.md
+  - https://developer.bill.com/reference/updateclassificationchartofaccounts.md
+  - https://developer.bill.com/reference/updateclassificationdepartment.md
+  - https://developer.bill.com/reference/updateclassificationemployee.md
+  - https://developer.bill.com/reference/updateclassificationitem.md
+  - https://developer.bill.com/reference/updateclassificationjob.md
+  - https://developer.bill.com/reference/updateclassificationlocation.md
+  - https://developer.bill.com/reference/updatecreditmemo.md
+  - https://developer.bill.com/reference/updatecustomer.md
+  - https://developer.bill.com/reference/updatecustomerbankaccount.md
+  - https://developer.bill.com/reference/updatecustomercontact.md
+  - https://developer.bill.com/reference/updatecustomfield.md
+  - https://developer.bill.com/reference/updateinvoice.md
+  - https://developer.bill.com/reference/updateorganization.md
+  - https://developer.bill.com/reference/updateorganizationuser.md
+  - https://developer.bill.com/reference/updateorgpartnerpriceplan.md
+  - https://developer.bill.com/reference/updatepartneruser.md
+  - https://developer.bill.com/reference/updatepaymentterm.md
+  - https://developer.bill.com/reference/updaterecurringbill.md
+  - https://developer.bill.com/reference/updaterecurringinvoice.md
+  - https://developer.bill.com/reference/updatereimbursement.md
+  - https://developer.bill.com/reference/updatetransaction.md
+  - https://developer.bill.com/reference/updatetransactioncustomfields.md
+  - https://developer.bill.com/reference/updateuser.md
+  - https://developer.bill.com/reference/updatevendor.md
+  - https://developer.bill.com/reference/updatevendorcredit.md
+  - https://developer.bill.com/reference/uploadstatus.md
+  - https://developer.bill.com/reference/upsertbudgetmember.md
+  - https://developer.bill.com/reference/upsertbulkbudgetusers.md
+  - https://developer.bill.com/reference/validate.md
+  - https://developer.bill.com/reference/validatechallenge.md
+  - https://developer.bill.com/reference/verifybankaccount.md
+  - https://developer.bill.com/reference/voidpayment.md
+  merge:
+    pages: 314
+    deduped: 2448
+    conflicts_kept_first: 0
