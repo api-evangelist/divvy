@@ -188,6 +188,8 @@ apis:
   name: Divvy Attachments API
   description: The attachments API from Divvy — 4 operation(s) for attachments.
   tags:
+  - Attachments
+  tags_raw:
   - attachments
   properties:
   - type: OpenAPI
@@ -220,6 +222,8 @@ apis:
   name: Divvy Authentication API
   description: The authentication API from Divvy — 4 operation(s) for authentication.
   tags:
+  - Authentication
+  tags_raw:
   - authentication
   properties:
   - type: OpenAPI
@@ -284,6 +288,8 @@ apis:
   name: Divvy Bills API
   description: The bills API from Divvy — 6 operation(s) for bills.
   tags:
+  - Bills
+  tags_raw:
   - bills
   properties:
   - type: OpenAPI
@@ -316,6 +322,8 @@ apis:
   name: Divvy Budgets API
   description: The budgets API from Divvy — 5 operation(s) for budgets.
   tags:
+  - Budgets
+  tags_raw:
   - budgets
   properties:
   - type: OpenAPI
@@ -348,6 +356,8 @@ apis:
   name: Divvy Cards API
   description: The cards API from Divvy — 5 operation(s) for cards.
   tags:
+  - Cards
+  tags_raw:
   - cards
   properties:
   - type: OpenAPI
@@ -380,6 +390,8 @@ apis:
   name: Divvy Classifications API
   description: The classifications API from Divvy — 49 operation(s) for classifications.
   tags:
+  - Classifications
+  tags_raw:
   - classifications
   properties:
   - type: OpenAPI
@@ -412,6 +424,8 @@ apis:
   name: Divvy Credit Memos API
   description: The credit-memos API from Divvy — 7 operation(s) for credit-memos.
   tags:
+  - Credit Memos
+  tags_raw:
   - credit-memos
   properties:
   - type: OpenAPI
@@ -444,6 +458,8 @@ apis:
   name: Divvy Custom Fields API
   description: The custom-fields API from Divvy — 4 operation(s) for custom-fields.
   tags:
+  - Custom Fields
+  tags_raw:
   - custom-fields
   properties:
   - type: OpenAPI
@@ -476,6 +492,8 @@ apis:
   name: Divvy Customers API
   description: The customers API from Divvy — 12 operation(s) for customers.
   tags:
+  - Customers
+  tags_raw:
   - customers
   properties:
   - type: OpenAPI
@@ -508,6 +526,8 @@ apis:
   name: Divvy Documents API
   description: The documents API from Divvy — 3 operation(s) for documents.
   tags:
+  - Documents
+  tags_raw:
   - documents
   properties:
   - type: OpenAPI
@@ -540,6 +560,8 @@ apis:
   name: Divvy Events API
   description: The events API from Divvy — 3 operation(s) for events.
   tags:
+  - Event
+  tags_raw:
   - events
   properties:
   - type: OpenAPI
@@ -572,6 +594,8 @@ apis:
   name: Divvy Exports API
   description: The exports API from Divvy — 2 operation(s) for exports.
   tags:
+  - Export
+  tags_raw:
   - exports
   properties:
   - type: OpenAPI
@@ -604,6 +628,8 @@ apis:
   name: Divvy Funding Accounts API
   description: The funding-accounts API from Divvy — 13 operation(s) for funding-accounts.
   tags:
+  - Funding Accounts
+  tags_raw:
   - funding-accounts
   properties:
   - type: OpenAPI
@@ -636,6 +662,8 @@ apis:
   name: Divvy Health API
   description: The health API from Divvy — 1 operation(s) for health.
   tags:
+  - Health
+  tags_raw:
   - health
   properties:
   - type: OpenAPI
@@ -668,6 +696,8 @@ apis:
   name: Divvy Invoices API
   description: The invoices API from Divvy — 7 operation(s) for invoices.
   tags:
+  - Invoices
+  tags_raw:
   - invoices
   properties:
   - type: OpenAPI
@@ -700,6 +730,8 @@ apis:
   name: Divvy Mfa API
   description: The mfa API from Divvy — 6 operation(s) for mfa.
   tags:
+  - MFA
+  tags_raw:
   - mfa
   properties:
   - type: OpenAPI
@@ -732,6 +764,8 @@ apis:
   name: Divvy Network API
   description: The network API from Divvy — 5 operation(s) for network.
   tags:
+  - Networks
+  tags_raw:
   - network
   properties:
   - type: OpenAPI
@@ -764,6 +798,8 @@ apis:
   name: Divvy Organization Users API
   description: The organization-users API from Divvy — 4 operation(s) for organization-users.
   tags:
+  - Organization Users
+  tags_raw:
   - organization-users
   properties:
   - type: OpenAPI
@@ -796,6 +832,8 @@ apis:
   name: Divvy Organizations API
   description: The organizations API from Divvy — 5 operation(s) for organizations.
   tags:
+  - Organization
+  tags_raw:
   - organizations
   properties:
   - type: OpenAPI
@@ -828,6 +866,8 @@ apis:
   name: Divvy Partner API
   description: The partner API from Divvy — 11 operation(s) for partner.
   tags:
+  - Partners
+  tags_raw:
   - partner
   properties:
   - type: OpenAPI
@@ -860,6 +900,8 @@ apis:
   name: Divvy Payment Terms API
   description: The payment-terms API from Divvy — 2 operation(s) for payment-terms.
   tags:
+  - Payment Terms
+  tags_raw:
   - payment-terms
   properties:
   - type: OpenAPI
@@ -892,6 +934,8 @@ apis:
   name: Divvy Payments API
   description: The payments API from Divvy — 10 operation(s) for payments.
   tags:
+  - Payments
+  tags_raw:
   - payments
   properties:
   - type: OpenAPI
@@ -956,6 +1000,8 @@ apis:
   name: Divvy Recurring Invoices API
   description: The recurring-invoices API from Divvy — 4 operation(s) for recurring-invoices.
   tags:
+  - Recurringinvoices
+  tags_raw:
   - recurring-invoices
   properties:
   - type: OpenAPI
@@ -1020,6 +1066,8 @@ apis:
   name: Divvy Reimbursements API
   description: The reimbursements API from Divvy — 6 operation(s) for reimbursements.
   tags:
+  - Reimbursement
+  tags_raw:
   - reimbursements
   properties:
   - type: OpenAPI
@@ -1052,6 +1100,8 @@ apis:
   name: Divvy Reports API
   description: The reports API from Divvy — 1 operation(s) for reports.
   tags:
+  - Reports
+  tags_raw:
   - reports
   properties:
   - type: OpenAPI
@@ -1116,6 +1166,8 @@ apis:
   name: Divvy Roles API
   description: The roles API from Divvy — 2 operation(s) for roles.
   tags:
+  - Roles
+  tags_raw:
   - roles
   properties:
   - type: OpenAPI
@@ -1148,6 +1200,8 @@ apis:
   name: Divvy Subscriptions API
   description: The subscriptions API from Divvy — 4 operation(s) for subscriptions.
   tags:
+  - Subscription
+  tags_raw:
   - subscriptions
   properties:
   - type: OpenAPI
@@ -1180,6 +1234,8 @@ apis:
   name: Divvy Transactions API
   description: The transactions API from Divvy — 8 operation(s) for transactions.
   tags:
+  - Transaction
+  tags_raw:
   - transactions
   properties:
   - type: OpenAPI
@@ -1212,6 +1268,8 @@ apis:
   name: Divvy Users API
   description: The users API from Divvy — 3 operation(s) for users.
   tags:
+  - User
+  tags_raw:
   - users
   properties:
   - type: OpenAPI
@@ -1244,6 +1302,8 @@ apis:
   name: Divvy Vendor Credits API
   description: The vendor-credits API from Divvy — 5 operation(s) for vendor-credits.
   tags:
+  - Vendor Credits
+  tags_raw:
   - vendor-credits
   properties:
   - type: OpenAPI
@@ -1276,6 +1336,8 @@ apis:
   name: Divvy Vendors API
   description: The vendors API from Divvy — 8 operation(s) for vendors.
   tags:
+  - Vendors
+  tags_raw:
   - vendors
   properties:
   - type: OpenAPI
